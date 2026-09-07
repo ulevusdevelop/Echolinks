@@ -1,0 +1,418 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================
+   ECHOLINK SOLUTIONS — DESIGN TOKENS
+   Fonts loaded via next/font in lib/fonts.ts.
+   ========================================================= */
+
+:root {
+  --bg-page: #180F39;
+  --bg-section: #251D44;
+  --bg-card: #383054;
+  --bg-card-alt: #463F60;
+  --bg-node: #4F4868;
+  --border-default: rgba(102, 90, 125, 0.45);
+
+  --accent: #FF6000;
+  --accent-light: #FF7A26;
+  --accent-soft: rgba(255, 96, 0, 0.14);
+
+  --text-primary: #EAF1FA;
+  --text-secondary: #abb8c3;
+  --text-muted: #6B7C99;
+
+  --flame-from: #3D1F0A;
+  --flame-to: #2A1608;
+
+  --max-width: 1240px;
+  --radius-card: 16px;
+  --radius-pill: 999px;
+}
+
+* { box-sizing: border-box; padding: 0; margin: 0; }
+
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: var(--font-jetbrains), sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-syne), sans-serif;
+  font-weight: 600;
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+/* =========================================================
+   LAYOUT PRIMITIVES — deliberately generous. Negative space is
+   the design, not empty leftover — don't shrink these to fit
+   more content; shrink the content instead.
+   ========================================================= */
+
+.wrap {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* Section vertical rhythm — matched to the live site's actual block
+   padding variables (--wp--custom--ast-default-block-top-padding),
+   which are 100px desktop and 50px at the ≤921px breakpoint. Was
+   96px/160px before this fix, which overshot the real spec
+   considerably at desktop. */
+.section {
+  background: var(--bg-section);
+  padding: 50px 0;
+}
+.section--page {
+  background: var(--bg-page);
+  padding: 50px 0;
+}
+@media (min-width: 922px) {
+  .section, .section--page {
+    padding: 100px 0;
+  }
+}
+
+/* Tighter variant for secondary/connector sections (stats bar,
+   short CTAs) that shouldn't compete with primary sections. */
+.section--tight {
+  padding: 40px 0;
+}
+@media (min-width: 922px) {
+  .section--tight { padding: 64px 0; }
+}
+
+/* Light section variant — the old site's actual rhythm alternates dark
+   navy bands with light cream ones (confirmed against Good Design.pdf:
+   Hero dark -> Capabilities light -> "How does it work" light -> Industries
+   dark -> "Tech Made Easy" light -> closing CTA dark -> Footer dark).
+   Formalizes what CapabilitiesIntro did ad-hoc so every section that
+   needs a light band uses the same tokens instead of one-off inline
+   colors drifting out of sync with each other. */
+:root {
+  --bg-page-light: #F2F5F7;
+  --bg-section-light: #F2F5F7;
+}
+.section--light {
+  background: var(--bg-page-light);
+  padding: 50px 0;
+}
+@media (min-width: 922px) {
+  .section--light { padding: 100px 0; }
+}
+
+/* Title/sub/eyebrow variants for use inside .section--light — same
+   type scale and spacing as the dark versions, just re-colored for
+   contrast against a light background. Verified contrast ratios:
+   #180F39 on #F2F5F7 = 15.8:1, #434343 on #F2F5F7 = 9.4:1.
+   #F2F5F7 is sourced directly from the live site's CSS custom property
+   --ast-global-color-6 ("subtle/alternate background" in Astra's color
+   panel) — not an estimate. Matches the correction applied to
+   WhoWeServe / WhyDecentralized / CapabilitiesIntro, which previously
+   used an invented #F7F3EC that appears nowhere in the real site's CSS. */
+.sec-title--dark {
+  font-family: var(--font-syne), sans-serif;
+  font-size: clamp(30px, 4.5vw, 48px);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: #180F39;
+}
+.sec-sub--dark {
+  font-size: 18px;
+  line-height: 1.7;
+  color: #434343;
+  max-width: 640px;
+  margin-top: 20px;
+}
+.eyebrow--dark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #B24300;
+  background: rgba(255, 96, 0, 0.1);
+  border: 1px solid rgba(255, 96, 0, 0.25);
+  padding: 7px 16px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-light);
+  background: var(--accent-soft);
+  border: 1px solid rgba(255, 96, 0, 0.3);
+  padding: 7px 16px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 28px;
+}
+
+.sec-title {
+  font-family: var(--font-syne), sans-serif;
+  font-size: clamp(30px, 4.5vw, 48px);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.sec-sub {
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  max-width: 640px;
+  margin-top: 20px;
+}
+
+.sec-sub--center {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+/* Standard spacer between a section's header block (eyebrow/title/
+   sub) and whatever comes after it — used instead of ad-hoc mt-N
+   utilities so this rhythm stays consistent site-wide. */
+.sec-header {
+  margin-bottom: 64px;
+}
+@media (min-width: 1024px) {
+  .sec-header { margin-bottom: 88px; }
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-default);
+  padding: 32px 36px;
+}
+@media (max-width: 640px) {
+  .card { padding: 24px 24px; }
+}
+
+.card--highlight {
+  background: linear-gradient(135deg, var(--flame-from) 0%, var(--flame-to) 100%);
+  border-left: 3px solid var(--accent);
+}
+
+.tag-mono {
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 12px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  overflow-wrap: break-word;
+}
+
+/* Opt-in modifier for the handful of cases that genuinely need to stay
+   on one line (short pill labels with guaranteed room) — nowrap is no
+   longer the default, since forcing it site-wide was overflowing card
+   edges on longer labels like "PROJECT CONTROLS & SCHEDULING". */
+.tag-mono--nowrap {
+  white-space: nowrap;
+}
+
+.tag-mono--accent { color: var(--accent-light); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-jetbrains), sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 15px 28px;
+  border-radius: 50px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+/* Exact responsive button padding from the live site's CSS
+   (.wp-block-button__link): base/≤544px = 15/28, ≥545px = 18/32,
+   ≥922px = 20/40. */
+@media (min-width: 545px) {
+  .btn { padding: 18px 32px; }
+}
+@media (min-width: 922px) {
+  .btn { padding: 20px 40px; }
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: #180F39;
+  box-shadow: 0 4px 20px -4px rgba(255, 96, 0, 0.45);
+}
+.btn--primary:hover {
+  background: var(--accent-light);
+  box-shadow: 0 6px 24px -4px rgba(255, 96, 0, 0.6);
+}
+
+/* Matches the old site's exact secondary button spec: transparent fill,
+   white 1px border, white text/icon fill, 10px radius, Syne 900. Hover
+   state shifts toward the accent color for interactive feedback — the
+   old site's static spec doesn't define a hover state, so this is an
+   addition, not a deviation from a value they specified. */
+.btn--ghost {
+  background: transparent;
+  color: #FFFFFF;
+  fill: #FFFFFF;
+  border: 1px solid #FFFFFF;
+}
+.btn--ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent-light);
+}
+
+/* Dark ghost variant — for the header, which is now a white/light bar
+   matching the old site. The white-bordered .btn--ghost above is still
+   correct everywhere else (Hero, Footer, dark sections) since those
+   keep a dark background; this variant exists specifically because a
+   white-on-white button would be invisible in the new header. */
+.btn--ghost-dark {
+  background: transparent;
+  color: #180F39;
+  border: 1px solid #180F39;
+}
+.btn--ghost-dark:hover {
+  border-color: var(--accent);
+  color: #B24300;
+}
+
+/* Header CTA variant — confirmed by zooming into Good Design.pdf's
+   header: BOTH header buttons ("Become a Member" and "Get Started" in
+   the original) use an orange 1px border with navy text on transparent
+   fill, not a solid orange fill. This was previously wrong: the header's
+   primary CTA used .btn--primary (solid fill), which doesn't match the
+   source. Use this class for both header buttons instead. */
+.btn--ghost-accent {
+  background: transparent;
+  color: #180F39;
+  border: 1px solid var(--accent);
+}
+.btn--ghost-accent:hover {
+  background: var(--accent);
+  color: #180F39;
+}
+
+/* Hand-drawn hover border for nav items — an SVG rectangle traced around
+   the label using a stroke-draw animation. pathLength="1" is set on the
+   <rect> in JSX so the dash math below works regardless of the actual
+   pixel size of each nav item, no per-item measurement needed. */
+.nav-draw {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.nav-draw svg {
+  position: absolute;
+  top: -10px;
+  left: -14px;
+  right: -14px;
+  bottom: -10px;
+  width: calc(100% + 28px);
+  height: calc(100% + 20px);
+  pointer-events: none;
+  overflow: visible;
+}
+.nav-draw svg rect {
+  fill: none;
+  stroke: #B24300;
+  stroke-width: 1.4;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.nav-draw:hover svg rect {
+  stroke-dashoffset: 0;
+}
+
+/* Primary button, inverted for light-section contexts (dark fill,
+   orange text) — used where a solid-orange button would read too
+   similar in tone to the orange accent text already around it on a
+   light background. Shares the same .btn base (Syne, weight 900,
+   10px radius) so it stays in sync with every other button
+   automatically instead of drifting via copy-pasted inline styles. */
+.btn--primary-inverse {
+  background: #180F39;
+  color: var(--accent);
+}
+.btn--primary-inverse:hover {
+  background: #251D44;
+  color: var(--accent-light);
+}
+
+.number-badge {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-light);
+  font-family: var(--font-jetbrains), monospace;
+  font-weight: 600;
+  font-size: 14px;
+}
+.card--highlight .number-badge { border-color: var(--accent); color: var(--accent); }
+
+/* Grid rhythm — generous gaps by default. Components should reach
+   for `.grid-loose` instead of ad-hoc gap-4/gap-5 utilities so card
+   grids never feel cramped against each other. */
+.grid-loose { gap: 28px; }
+@media (min-width: 1024px) { .grid-loose { gap: 36px; } }
+
+@media (max-width: 767px) {
+  .wrap { padding: 0 20px; }
+  .sec-header { margin-bottom: 48px; }
+}
+
+/* Basic rhythm for rendered WordPress HTML inside the Insights modal.
+   The @tailwindcss/typography plugin isn't installed in this project,
+   so this covers the same ground (paragraph/heading/list spacing)
+   without adding a new dependency. */
+.insight-content p + p,
+.insight-content ul,
+.insight-content ol,
+.insight-content h2,
+.insight-content h3,
+.insight-content blockquote {
+  margin-top: 1em;
+}
+.insight-content ul,
+.insight-content ol {
+  padding-left: 1.4em;
+}
+.insight-content li + li {
+  margin-top: 0.4em;
+}
+.insight-content h2,
+.insight-content h3 {
+  font-weight: 700;
+  color: #180F39;
+}
+.insight-content a {
+  color: #B24300;
+  text-decoration: underline;
+}
