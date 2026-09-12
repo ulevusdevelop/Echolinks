@@ -65,7 +65,7 @@ export const OneScan = () => {
               <div className="w-full h-full bg-ink-900 flex flex-col items-center justify-center p-6 text-center">
                 {!scanned ? (
                   <>
-                    <div className="w-24 h-24 rounded-lg bg-white mb-4" style={{ backgroundImage: 'repeating-conic-gradient(#180F39 0% 25%, #fff 0% 50%)', backgroundSize: '10px 10px' }} />
+                    <div className="w-24 h-24 rounded-none bg-white mb-4" style={{ backgroundImage: 'repeating-conic-gradient(#16003B 0% 25%, #fff 0% 50%)', backgroundSize: '10px 10px' }} />
                     <p className="text-ink_text-muted text-xs">Tap &quot;Scan the product&quot; to verify</p>
                   </>
                 ) : (
@@ -73,7 +73,7 @@ export const OneScan = () => {
                     <p className="tag-mono tag-mono--accent mb-4 text-center">✓ VERIFIED JOURNEY</p>
                     <ul className="flex flex-col gap-3">
                       {journeySteps.map((step, i) => (
-                        <li key={i} className="text-xs text-ink_text-secondary flex gap-2">
+                        <li key={step} className="text-xs text-ink_text-secondary flex gap-2">
                           <span className="text-accent-light font-mono">{i + 1}</span>
                           {step}
                         </li>

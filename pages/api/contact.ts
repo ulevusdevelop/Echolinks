@@ -20,10 +20,22 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { name, email, company, message } = req.body || {};
+  const {
+    firstName,
+    lastName,
+    email,
+    organization,
+    title,
+    city,
+    region,
+    country,
+    message,
+  } = req.body || {};
 
-  if (!name || !email || !message) {
-    return res.status(400).json({ error: 'Name, email, and message are required.' });
+  if (!firstName || !lastName || !email || !organization) {
+    return res
+      .status(400)
+      .json({ error: 'First name, last name, email, and organization are required.' });
   }
 
   // Basic email format check — not exhaustive, just catches obvious typos.
@@ -42,7 +54,7 @@ export default async function handler(
   if (!SMTP_HOST || !SMTP_USER || !SMTP_PASSWORD || !CONTACT_TO_EMAIL) {
     console.error(
       'Contact form SMTP env vars are not set — see .env.example. Message was NOT sent:',
-      { name, email, company, message }
+      { firstName, lastName, email, organization, title, city, region, country, message }
     );
     return res.status(500).json({
       error: 'The contact form is not fully configured yet. Please email us directly.',
@@ -61,8 +73,17 @@ export default async function handler(
       from: `"Echolink Website" <${SMTP_USER}>`,
       to: CONTACT_TO_EMAIL,
       replyTo: email,
-      subject: `New contact form submission from ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\nCompany: ${company || '—'}\n\nMessage:\n${message}`,
+      subject: `New contact form submission from ${firstName} ${lastName}`,
+      text: [
+        `Name: ${firstName} ${lastName}`,
+        `Email: ${email}`,
+        `Organization: ${organization}`,
+        `Title: ${title || '—'}`,
+        `Location: ${[city, region, country].filter(Boolean).join(', ') || '—'}`,
+        '',
+        'Message:',
+        message || '—',
+      ].join('\n'),
     });
 
     return res.status(200).json({ success: true });

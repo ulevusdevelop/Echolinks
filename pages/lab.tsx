@@ -17,7 +17,7 @@ export default function LabPage() {
         />
       </Head>
       <RequireMembership>
-        <section className="section--page py-32">
+        <section className="section--page !pt-28 !pb-32">
           <div className="wrap text-center">
             <span className="eyebrow">MEMBER LAB</span>
             <h1 className="sec-title">See the layer work before you commit.</h1>

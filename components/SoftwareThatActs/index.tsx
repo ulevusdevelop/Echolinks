@@ -30,12 +30,22 @@ const agents = [
 
 export const SoftwareThatActs = () => {
   return (
-    <section className="section">
+    // RHYTHM FIX: this sat directly after NotACryptoPlay, another dark
+    // section — the second dark-dark pair on this page (the other being
+    // CoreServices -> WhoWeServe, fixed separately). Flipped to white.
+    // Every piece of content inside already uses the self-contained
+    // dark `.card` treatment (the checklist card, the policy-control
+    // panel, the four agent cards), so nothing internal needs to
+    // change — it now reads as dark cards on a white section, the same
+    // pattern applied to Training and consistent with how the old
+    // site's own pages mix white sections with colored card blocks
+    // rather than full-bleed dark slabs.
+    <section id="software-that-acts" className="section--light">
       <div className="wrap">
         <div className="sec-header max-w-xl">
           <span className="eyebrow">DECENTRALIZED AI AGENTS</span>
-          <h2 className="sec-title">Software that acts, not just answers.</h2>
-          <p className="sec-sub">
+          <h2 className="sec-title" style={{ color: '#16003B' }}>Software that acts, not just answers.</h2>
+          <p className="sec-sub" style={{ color: '#434343' }}>
             An agent is AI you give a job, not a chat box you query. It reads
             your live data, decides, and takes action across your systems,
             inside limits you set. Decentralized means no single vendor owns
@@ -61,7 +71,7 @@ export const SoftwareThatActs = () => {
             ))}
           </div>
 
-          <div className="bg-ink-900 border border-ink-border rounded-lg p-5">
+          <div className="bg-ink-900 border border-ink-border rounded-none p-5">
             <p className="tag-mono tag-mono--accent mb-4">POLICY CONTROL</p>
             <div className="flex flex-col gap-3 mb-4">
               {activityRows.map((row) => (

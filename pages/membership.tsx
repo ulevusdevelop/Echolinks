@@ -38,9 +38,11 @@ export default function MembershipPage() {
           name="description"
           content="Choose a membership plan to unlock the interactive Lab and priority support."
         />
+        <meta property="og:title" content="Membership — Echolink Solutions" />
+        <meta property="og:description" content="Choose a membership plan to unlock the interactive Lab and priority support." />
       </Head>
 
-      <section className="section--page py-32">
+      <section className="section--page !pt-28 !pb-32">
         <div className="wrap text-center">
           <span className="eyebrow">MEMBERSHIP</span>
           <h1 className="sec-title">Unlock the full layer.</h1>

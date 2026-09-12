@@ -24,7 +24,7 @@ export default function AccountPage() {
 
   if (loading) {
     return (
-      <section className="section--page py-32 text-center">
+      <section className="section--page !pt-28 !pb-20 text-center">
         <p className="text-ink_text-secondary">Loading your account…</p>
       </section>
     );
@@ -41,9 +41,10 @@ export default function AccountPage() {
       <Head>
         <title>My Account — Echolink Solutions</title>
         <meta name="robots" content="noindex, nofollow" />
+        <meta name="description" content="Manage your Echolink Solutions membership and account details." />
       </Head>
 
-      <section className="section--page py-32">
+      <section className="section--page !pt-32">
         <div className="wrap max-w-2xl">
           <span className="eyebrow">MY ACCOUNT</span>
           <h1 className="sec-title mb-8">Welcome back, {user.name}.</h1>

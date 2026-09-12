@@ -13,9 +13,11 @@ export default function ServicesPage() {
           name="description"
           content="Decentralized AI, enterprise integration, automation & robotics, and the blockchain trust layer, six ways to put it to work."
         />
+        <meta property="og:title" content="Services — Echolink Solutions" />
+        <meta property="og:description" content="Decentralized AI, enterprise integration, automation & robotics, and the blockchain trust layer, six ways to put it to work." />
       </Head>
-      <div className="pt-24">
-        <CoreServices />
+      <div className="pt-28">
+        <CoreServices headingLevel="h1" />
         <SixWays />
         <EverythingWeConnect />
       </div>

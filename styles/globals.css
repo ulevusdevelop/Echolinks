@@ -9,25 +9,42 @@
 
 :root {
   --bg-page: #180F39;
-  --bg-section: #251D44;
+  /* FIX: was #251D44, a lighter, non-brand purple — direct violation of
+     the confirmed rule "strictly only the 4 brand colors, everywhere"
+     (Round 40), missed at the time because that pass audited .card
+     specifically and never checked this more foundational variable.
+     .section is used far more widely than .card, so this one variable
+     being wrong meant every plain dark section sitewide rendered in a
+     visibly different, lighter shade than sections using .section--page
+     sitting right next to them — reads exactly as "faded" when the two
+     are adjacent, which happens constantly (e.g. the Layer page's very
+     first section). Kept identical to --bg-page — both corrected
+     together to #180F39 per direct color correction ("the deep blue is
+     actually #180F39"), scoped to these two page/section-background
+     variables specifically rather than every hardcoded #16003B
+     instance sitewide (115+ across the codebase, many of them text/
+     border/accent treatments verified separately against the brand
+     guidelines' stated Purple swatch) — flagged for confirmation on
+     whether the broader rename is also wanted. */
+  --bg-section: #180F39;
   --bg-card: #383054;
   --bg-card-alt: #463F60;
   --bg-node: #4F4868;
   --border-default: rgba(102, 90, 125, 0.45);
 
-  --accent: #FF6000;
+  --accent: #FF6100;
   --accent-light: #FF7A26;
   --accent-soft: rgba(255, 96, 0, 0.14);
 
   --text-primary: #EAF1FA;
-  --text-secondary: #abb8c3;
+  --text-secondary: #ABB8C3;
   --text-muted: #6B7C99;
 
   --flame-from: #3D1F0A;
   --flame-to: #2A1608;
 
-  --max-width: 1240px;
-  --radius-card: 16px;
+  --max-width: 1720px;
+  --radius-card: 0px;
   --radius-pill: 999px;
 }
 
@@ -36,7 +53,13 @@
 html, body {
   max-width: 100vw;
   overflow-x: hidden;
-  font-family: var(--font-jetbrains), sans-serif;
+  /* Per official Brand Guidelines (4.1/4.2): Syne is used for header,
+     sub-header, AND body text — not a heading-only display face paired
+     with a separate body font. Body default now matches --font-syne;
+     the small monospace UI tags (eyebrows, "SYSTEMS OF RECORD" style
+     labels) keep --font-jetbrains, an established distinct treatment
+     the brand guide doesn't address either way. */
+  font-family: var(--font-syne), sans-serif !important;
   background: var(--bg-page);
   color: var(--text-primary);
   scroll-behavior: smooth;
@@ -44,11 +67,95 @@ html, body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-syne), sans-serif;
-  font-weight: 600;
+  font-family: var(--font-syne), sans-serif !important;
+}
+
+/* TYPOGRAPHY SYSTEM (direct request): a proper 4-6 size type scale with
+   distinct weight per heading tier, replacing the flat "every heading
+   is 600" rule above. That flat rule is the direct reason the site had
+   no weight hierarchy at all between H1/H2/H3 — worth noting since an
+   earlier round explicitly reverted a similar tiered attempt back to a
+   flat 600 "per direct clarification." This request is fresh, explicit,
+   and comes with its own detailed spec (size table + reference CSS), so
+   it supersedes that earlier decision rather than conflicting with it
+   accidentally.
+
+   Weight and size are still tag-level (h1/h2/h3), same mechanism as
+   before and for the same reason: 36+ files apply Tailwind's
+   font-bold/font-semibold directly to headings, and without
+   !important here those utilities would win the cascade and silently
+   flatten the hierarchy right back out.
+
+   Sizes use clamp() to move smoothly between the spec's mobile and
+   desktop ranges rather than jumping at a single breakpoint — same
+   approach `.sec-title` already used, just now split by tier instead
+   of one size for every heading level. Hero's own h1 keeps its
+   existing inline size override (it's the one h1 with a genuinely
+   unique, larger role than a generic H1), but now inherits 800 weight
+   from this rule instead of needing its own weight override too. */
+h1 {
+  font-size: clamp(40px, 5.5vw, 60px); /* 40px mobile -> 60px desktop, within the 36-64px spec range */
+  font-weight: 800 !important; /* hero-level impact, top of the spec's 700-800 H1 range */
+  line-height: 1.15;
+}
+h2 {
+  font-size: clamp(30px, 4vw, 40px); /* 30px mobile -> 40px desktop, within the 28-44px spec range */
+  font-weight: 700 !important;
+  line-height: 1.25;
+}
+h3 {
+  font-size: clamp(24px, 2.6vw, 28px); /* 24px mobile -> 28px desktop, within the 22-30px spec range */
+  font-weight: 600 !important;
+  line-height: 1.3;
+}
+h4, h5, h6 {
+  /* Not part of the requested scale explicitly — treated as the same
+     tier as H3 (subsection headings) rather than inventing an
+     unrequested 7th size, keeping the system to the "4-6 sizes"
+     the request calls for. */
+  font-size: clamp(24px, 2.6vw, 28px);
+  font-weight: 600 !important;
+  line-height: 1.3;
 }
 
 a { color: inherit; text-decoration: none; }
+
+/* Visible keyboard-focus state, sitewide. Found this missing entirely
+   during a craft review — no focus-visible styling was defined
+   anywhere, and one interactive element (the Services dropdown
+   trigger) explicitly stripped its own outline via Tailwind's
+   `outline-none` with nothing to replace it, meaning keyboard users
+   tabbing to it got no visible indicator at all. Applied broadly to
+   every interactive element type rather than just the one found, since
+   the same gap could exist on any button/link/input without a custom
+   focus style already set. Uses the brand orange, consistent with the
+   rest of the interaction language (hover states, active states) on
+   the site. `:focus-visible` (not plain `:focus`) so this only shows
+   for keyboard navigation, not every mouse click. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Line-length safety net: as the page width increased across several
+   rounds (1240px -> 1720px), any paragraph without its own explicit
+   max-width utility now stretches to whatever wide column it sits in,
+   producing uncomfortably long lines on "some, not all" text — exactly
+   the reported symptom. A plain element selector has lower specificity
+   than any Tailwind max-w-* class, so this only affects paragraphs
+   that don't already have a deliberate width constraint (most already
+   do, via .sec-sub's 640px or an explicit max-w-* class) — it's a
+   fallback, not an override. Manages the readability problem without
+   reducing the page width itself, per direction. 68ch is a
+   comfortable reading measure regardless of the font-size it's set at. */
+p {
+  max-width: 68ch;
+}
 img { max-width: 100%; display: block; }
 
 /* =========================================================
@@ -91,16 +198,15 @@ img { max-width: 100%; display: block; }
   .section--tight { padding: 64px 0; }
 }
 
-/* Light section variant — the old site's actual rhythm alternates dark
-   navy bands with light cream ones (confirmed against Good Design.pdf:
-   Hero dark -> Capabilities light -> "How does it work" light -> Industries
-   dark -> "Tech Made Easy" light -> closing CTA dark -> Footer dark).
-   Formalizes what CapabilitiesIntro did ad-hoc so every section that
-   needs a light band uses the same tokens instead of one-off inline
-   colors drifting out of sync with each other. */
+/* Light section variant. Per the edit doc (item 6): "All backgrounds
+   should alternate between deep purple (#16003B) and pure white
+   (#FFFFFF)" — corrected from #F2F5F7 (an off-white sourced from the
+   live site's Astra color panel, not the brand guide). The brand guide
+   and explicit edit instruction take precedence over what the live
+   site actually had. */
 :root {
-  --bg-page-light: #F2F5F7;
-  --bg-section-light: #F2F5F7;
+  --bg-page-light: #FFFFFF;
+  --bg-section-light: #FFFFFF;
 }
 .section--light {
   background: var(--bg-page-light);
@@ -113,32 +219,29 @@ img { max-width: 100%; display: block; }
 /* Title/sub/eyebrow variants for use inside .section--light — same
    type scale and spacing as the dark versions, just re-colored for
    contrast against a light background. Verified contrast ratios:
-   #180F39 on #F2F5F7 = 15.8:1, #434343 on #F2F5F7 = 9.4:1.
-   #F2F5F7 is sourced directly from the live site's CSS custom property
-   --ast-global-color-6 ("subtle/alternate background" in Astra's color
-   panel) — not an estimate. Matches the correction applied to
-   WhoWeServe / WhyDecentralized / CapabilitiesIntro, which previously
-   used an invented #F7F3EC that appears nowhere in the real site's CSS. */
+   #16003B on #FFFFFF = 17.5:1, #434343 on #FFFFFF = 9.7:1 — both
+   comfortably exceed WCAG AA (and AAA) for body text. */
 .sec-title--dark {
   font-family: var(--font-syne), sans-serif;
-  font-size: clamp(30px, 4.5vw, 48px);
-  font-weight: 600;
-  line-height: 1.3;
+  font-size: clamp(30px, 4vw, 40px);
+  font-weight: 700 !important;
+  line-height: 1.25;
   letter-spacing: -0.01em;
-  color: #180F39;
+  color: #16003B;
 }
 .sec-sub--dark {
-  font-size: 18px;
+  font-size: clamp(17px, 1.1vw, 19px);
+  font-weight: 400;
   line-height: 1.7;
   color: #434343;
-  max-width: 640px;
+  max-width: 700px;
   margin-top: 20px;
 }
 .eyebrow--dark {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-jetbrains), monospace;
+  font-family: var(--font-jetbrains), monospace !important;
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -154,7 +257,7 @@ img { max-width: 100%; display: block; }
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-jetbrains), monospace;
+  font-family: var(--font-jetbrains), monospace !important;
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -166,20 +269,89 @@ img { max-width: 100%; display: block; }
   margin-bottom: 28px;
 }
 
+/* PLAIN eyebrow variants — no pill "bubble wrap" (background, border,
+   padding, pill radius), just the label styled like a small heading.
+   Per the edit doc: "Remove the bubble wrap around HOW WE ENGAGE, HOW
+   IT WORKS, WHAT WE DO, WHO WE SERVE, SOLUTIONS WE HANDLE, and
+   DECENTRALIZED AI AGENTS BY FUNCTION. Style them more like headings."
+   Bolder + slightly larger than the pill version — a bare label needs
+   more visual weight to still read as a heading once it loses the
+   pill's contrast box. */
+.eyebrow-plain {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-jetbrains), monospace !important;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-light);
+  margin-bottom: 20px;
+}
+
+.eyebrow-plain--dark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-jetbrains), monospace !important;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #B24300;
+  margin-bottom: 20px;
+}
+
 .sec-title {
   font-family: var(--font-syne), sans-serif;
-  font-size: clamp(30px, 4.5vw, 48px);
-  font-weight: 600;
-  line-height: 1.3;
+  /* SPECIFICITY NOTE: this class has higher specificity than the
+     tag-level h1/h2/h3 rules above (a class beats a bare tag, even
+     when both use !important) — so wherever this class is applied, ITS
+     size/weight win, not the tag's. To keep the tiered system actually
+     working rather than being silently overridden by this one class
+     (which is applied to the large majority of section headings
+     sitewide), matched these values directly to the H2 tier the spec
+     defines, since that is this class's real role everywhere except
+     Hero's h1 (which carries its own explicit overrides below it in
+     the cascade — see Hero's own className for why that one still
+     comes out at H1 size/weight despite also using this class). */
+  font-size: clamp(30px, 4vw, 40px);
+  font-weight: 700 !important;
+  line-height: 1.25;
   letter-spacing: -0.01em;
   color: var(--text-primary);
 }
+/* Found 10+ other places besides Hero where .sec-title is applied
+   directly to a real page-level <h1> (Layer, Traceability, 404, lab,
+   account, membership, Insights index and its post-detail "not found"
+   state) with no per-instance override at all — every one of those
+   would otherwise render at H2's size/weight instead of H1's. Rather
+   than patching each file individually with its own override (as
+   Hero has, because Hero's h1 also needs a genuinely larger custom
+   size), this single compound selector (h1.sec-title, specificity
+   0,1,1 — one notch above .sec-title alone at 0,1,0) restores proper
+   H1 treatment automatically anywhere the class lands on a real h1,
+   with no component changes needed. */
+h1.sec-title {
+  font-size: clamp(40px, 5.5vw, 60px);
+  font-weight: 800 !important;
+  line-height: 1.15;
+}
 
 .sec-sub {
-  font-size: 18px;
+  /* TYPOGRAPHY SYSTEM: this is the "large paragraph / intro" tier in
+     the spec (17-18px mobile, 18-20px desktop), not body text — it was
+     flat 16px before, identical to regular body copy, which meant
+     section intros carried no size distinction from an ordinary
+     paragraph despite visually needing to read as a step up. Also
+     widened max-width slightly (640px -> 700px), within the spec's
+     recommended 650-750px range for paragraph line length. */
+  font-size: clamp(17px, 1.1vw, 19px);
+  font-weight: 400;
   line-height: 1.7;
   color: var(--text-secondary);
-  max-width: 640px;
+  max-width: 700px;
   margin-top: 20px;
 }
 
@@ -199,23 +371,85 @@ img { max-width: 100%; display: block; }
   .sec-header { margin-bottom: 88px; }
 }
 
+/* STRICT BRAND COLORS (direct confirmation: "Yes — strictly only the 4
+   brand colors, everywhere"). Was `var(--bg-card)` = #383054, a
+   lighter/desaturated tint that isn't one of the four brand colors
+   (deep purple #16003B, orange #FF6100, white, black). Cards now sit
+   on solid white. Since most existing card content was authored
+   assuming a dark card background (white text, muted blue-gray labels,
+   etc.), the color overrides below flip that text to dark-on-white —
+   scoped under .card so this doesn't touch text anywhere else on the
+   page, and skips .btn so button color schemes stay untouched. */
 .card {
-  background: var(--bg-card);
+  background: #FFFFFF;
   border-radius: var(--radius-card);
-  border: 1px solid var(--border-default);
+  border: 1px solid rgba(22, 0, 59, 0.12);
   padding: 32px 36px;
 }
 @media (max-width: 640px) {
   .card { padding: 24px 24px; }
 }
 
+/* Highlight variant — brought back by direct request ("I LOVE THE
+   GRADIENT... BRING BACK THE GRADIENT"). This reverses part of Round
+   40's strict-brand-colors pass specifically for this element; the
+   base .card white background and its text cascade stay as they are,
+   this is scoped to the highlight variant only. */
 .card--highlight {
   background: linear-gradient(135deg, var(--flame-from) 0%, var(--flame-to) 100%);
   border-left: 3px solid var(--accent);
 }
 
+/* Text-color cascade for content nested inside .card — see the note
+   above .card for why this exists. Excludes .btn so button styling
+   (which has its own deliberate color scheme) is never touched. */
+.card :is(h1, h2, h3, h4, h5, h6):not(.btn) {
+  color: #16003B;
+}
+.card .text-white:not(.btn) {
+  color: #16003B !important;
+}
+.card .text-ink_text-secondary:not(.btn) {
+  color: #434343 !important;
+}
+.card .text-ink_text-muted:not(.btn) {
+  color: #8A8A8A !important;
+}
+.card .tag-mono:not(.btn) {
+  color: #8A8A8A;
+}
+.card .tag-mono--accent:not(.btn) {
+  color: #B24300;
+}
+.card .border-ink-border {
+  border-color: rgba(22, 0, 59, 0.12) !important;
+}
+.card :is(.bg-ink-600, .bg-ink-700, .bg-ink-800, .bg-ink-900):not(.btn) {
+  background: #F2F5F7 !important;
+}
+
+/* .card--highlight sits on a dark gradient again, so its nested text
+   goes back to light — the general .card rules above force dark-on-
+   white for the plain white card, so this reverses that specifically
+   for the highlight variant now that its background is dark again. */
+.card--highlight :is(h1, h2, h3, h4, h5, h6):not(.btn) {
+  color: #FFFFFF;
+}
+.card--highlight .text-white:not(.btn) {
+  color: #FFFFFF !important;
+}
+.card--highlight .text-ink_text-secondary:not(.btn) {
+  color: #B8C2D6 !important;
+}
+.card--highlight .tag-mono:not(.btn) {
+  color: var(--accent-light) !important;
+}
+.card--highlight .tag-mono--accent:not(.btn) {
+  color: var(--accent-light) !important;
+}
+
 .tag-mono {
-  font-family: var(--font-jetbrains), monospace;
+  font-family: var(--font-jetbrains), monospace !important;
   font-size: 12px;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -238,28 +472,36 @@ img { max-width: 100%; display: block; }
   align-items: center;
   gap: 8px;
   font-family: var(--font-jetbrains), sans-serif;
-  font-size: 13px;
+  /* TYPOGRAPHY SYSTEM: 13px -> 14px, into the spec's 14-16px button
+     range (was just under it). Weight (600) already matched the spec's
+     500-600 button range, no change needed there. */
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  padding: 15px 28px;
-  border-radius: 50px;
+  padding: 11px 26px;
+  /* Sharp rectangular per the edit doc (item 2): "Ensure that all tab
+     and action buttons are sharp rectangular shapes." Was 50px
+     (full pill) — corrected to 0, matching the reference screenshot's
+     crisp square-cornered button exactly. */
+  border-radius: 0;
   transition: all 0.2s ease;
   cursor: pointer;
 }
-/* Exact responsive button padding from the live site's CSS
-   (.wp-block-button__link): base/≤544px = 15/28, ≥545px = 18/32,
-   ≥922px = 20/40. */
+/* Vertical padding reduced from the live site's original spec
+   (15/18/20px top-bottom) per direct feedback — was too much,
+   especially on navbar buttons. Horizontal padding kept close to the
+   original scale. */
 @media (min-width: 545px) {
-  .btn { padding: 18px 32px; }
+  .btn { padding: 13px 30px; }
 }
 @media (min-width: 922px) {
-  .btn { padding: 20px 40px; }
+  .btn { padding: 15px 36px; }
 }
 
 .btn--primary {
   background: var(--accent);
-  color: #180F39;
+  color: #FFFFFF;
   box-shadow: 0 4px 20px -4px rgba(255, 96, 0, 0.45);
 }
 .btn--primary:hover {
@@ -290,8 +532,8 @@ img { max-width: 100%; display: block; }
    white-on-white button would be invisible in the new header. */
 .btn--ghost-dark {
   background: transparent;
-  color: #180F39;
-  border: 1px solid #180F39;
+  color: #16003B;
+  border: 1px solid #16003B;
 }
 .btn--ghost-dark:hover {
   border-color: var(--accent);
@@ -306,12 +548,35 @@ img { max-width: 100%; display: block; }
    source. Use this class for both header buttons instead. */
 .btn--ghost-accent {
   background: transparent;
-  color: #180F39;
-  border: 1px solid var(--accent);
+  color: #16003B;
+  border: 2px solid var(--accent);
+  font-weight: 700;
 }
 .btn--ghost-accent:hover {
   background: var(--accent);
-  color: #180F39;
+  color: #FFFFFF;
+}
+/* Small right arrow that slides in on hover, matching the old site's
+   button interaction — hidden by default (0 width, no gap) so it
+   doesn't disturb the button's resting layout, then expands in on
+   hover. Implemented as a pseudo-element rather than adding "→" to
+   every button's JSX individually, since this needs to apply
+   consistently across every header CTA without touching each one. */
+.btn--ghost-accent::after {
+  content: '→';
+  display: inline-block;
+  width: 0;
+  margin-left: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateX(-4px);
+  transition: all 0.2s ease;
+}
+.btn--ghost-accent:hover::after {
+  width: 1em;
+  margin-left: 6px;
+  opacity: 1;
+  transform: translateX(0);
 }
 
 /* Hand-drawn hover border for nav items — an SVG rectangle traced around
@@ -336,8 +601,11 @@ img { max-width: 100%; display: block; }
 }
 .nav-draw svg rect {
   fill: none;
-  stroke: #B24300;
-  stroke-width: 1.4;
+  /* Per edit doc item 3: "the loop around the tab when hover is deep
+     purple like it was in the original website" — was #B24300 (a dark
+     orange/rust tone), corrected to the brand purple. */
+  stroke: #16003B;
+  stroke-width: 2.4;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   transition: stroke-dashoffset 0.5s cubic-bezier(0.65, 0, 0.35, 1);
@@ -353,7 +621,7 @@ img { max-width: 100%; display: block; }
    10px radius) so it stays in sync with every other button
    automatically instead of drifting via copy-pasted inline styles. */
 .btn--primary-inverse {
-  background: #180F39;
+  background: #16003B;
   color: var(--accent);
 }
 .btn--primary-inverse:hover {
@@ -361,17 +629,31 @@ img { max-width: 100%; display: block; }
   color: var(--accent-light);
 }
 
+/* For a ghost button sitting on a solid-orange background (the
+   footer's closing CTA) — .btn--ghost's hover state shifts to orange,
+   which would disappear against an orange background. This inverts to
+   white instead, so it stays visible in both states. */
+.btn--on-accent {
+  background: transparent;
+  color: #FFFFFF;
+  border: 2px solid #FFFFFF;
+}
+.btn--on-accent:hover {
+  background: #FFFFFF;
+  color: var(--accent);
+}
+
 .number-badge {
   flex: 0 0 auto;
   width: 48px;
   height: 48px;
   border: 1px solid var(--border-default);
-  border-radius: 8px;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--accent-light);
-  font-family: var(--font-jetbrains), monospace;
+  font-family: var(--font-jetbrains), monospace !important;
   font-weight: 600;
   font-size: 14px;
 }
@@ -410,7 +692,7 @@ img { max-width: 100%; display: block; }
 .insight-content h2,
 .insight-content h3 {
   font-weight: 700;
-  color: #180F39;
+  color: #16003B;
 }
 .insight-content a {
   color: #B24300;

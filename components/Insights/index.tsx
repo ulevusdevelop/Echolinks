@@ -46,7 +46,7 @@ export const Insights = ({ posts }: InsightsProps) => {
 
   return (
     // BACKGROUND + LAYOUT FIX: this whole section was built as a light
-    // section (bg-[#F2F5F7]) with posts as a horizontal list (rows with
+    // section (bg-[#FFFFFF]) with posts as a horizontal list (rows with
     // dividers, tag/title/excerpt/"Read" in 3 columns per row). Checked
     // against a direct crop of Sample.pdf and both are wrong — the
     // reference has this on the site's standard DARK section background,
@@ -107,7 +107,7 @@ export const Insights = ({ posts }: InsightsProps) => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-[#180F39]/60 backdrop-blur-sm" aria-hidden="true" />
+            <div className="fixed inset-0 bg-[#16003B]/60 backdrop-blur-sm" aria-hidden="true" />
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto p-4 md:p-8">
@@ -125,7 +125,7 @@ export const Insights = ({ posts }: InsightsProps) => {
                   <button
                     type="button"
                     onClick={() => setOpenIndex(null)}
-                    className="absolute top-6 right-6 text-[#180F39] hover:text-[#B24300] transition-colors"
+                    className="absolute top-6 right-6 text-[#16003B] hover:text-[#B24300] transition-colors"
                   >
                     <span className="sr-only">Close</span>
                     <XMarkIcon className="w-6 h-6" />
@@ -136,7 +136,7 @@ export const Insights = ({ posts }: InsightsProps) => {
                       <span className="tag-mono !text-[#B24300] mb-4 inline-block">
                         {openPost.tag}
                       </span>
-                      <Dialog.Title className="text-[#180F39] font-bold text-2xl md:text-3xl leading-tight mb-6 pr-8">
+                      <Dialog.Title className="text-[#16003B] font-bold text-2xl md:text-3xl leading-tight mb-6 pr-8">
                         {openPost.title}
                       </Dialog.Title>
                       <div

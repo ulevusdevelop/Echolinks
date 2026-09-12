@@ -1,6 +1,7 @@
 // pages/login.tsx
 import React, { useState } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/AuthContext';
 
@@ -33,36 +34,97 @@ export default function LoginPage() {
       <Head>
         <title>Log in — Echolink Solutions</title>
         <meta name="robots" content="noindex, nofollow" />
+        <meta name="description" content="Log in to your Echolink Solutions member account, or become a member." />
       </Head>
-      <section className="section--page py-32">
+
+      {/* MIRRORED from the old site's own /client-login page: a
+          "Welcome!" band with two choice buttons (Current Member
+          Login / Become A Member) and decorative curved arrow lines,
+          sitting above the actual login form rather than replacing it
+          — the old site's version was a pure choice screen with no
+          form of its own, but this site already has a working login
+          form that shouldn't be thrown away, so the two are combined:
+          welcome framing on top, working form below. */}
+      <section className="relative overflow-hidden pt-28 pb-20 text-center" style={{ background: '#16003B' }}>
+        <svg
+          viewBox="0 0 400 120"
+          className="absolute top-16 right-0 w-[400px] h-[120px] pointer-events-none hidden md:block"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M400 15 C 320 25, 270 75, 310 105 C 335 122, 300 130, 260 118"
+            stroke="#FF6100"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        </svg>
+        <svg
+          viewBox="0 0 260 140"
+          className="absolute bottom-0 left-0 w-[260px] h-[140px] pointer-events-none hidden md:block"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M15 130 C 55 60, 130 55, 165 100 C 180 120, 200 60, 245 20"
+            stroke="#FF6100"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+          <path d="M20 108 l-10 24 l24 -8 Z" fill="#FF6100" />
+          <path d="M200 30 l24 -8 l-6 24 Z" fill="#FF6100" />
+        </svg>
+
+        <div className="wrap relative">
+          <h1 className="text-white font-bold text-4xl md:text-5xl mb-5">Welcome!</h1>
+          <p className="text-lg mb-10">
+            <span style={{ color: '#FF6100' }} className="font-bold">Login</span>
+            <span className="text-white"> Or </span>
+            <span style={{ color: '#FF6100' }} className="font-bold">Sign Up</span>
+            <span className="text-white"> Here</span>
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <a href="#login-form" className="btn btn--ghost !border-accent">
+              Current Member Login
+            </a>
+            <Link href="/membership" className="btn btn--ghost !border-accent">
+              Become A Member
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section id="login-form" className="section--page !pt-20 !pb-32">
         <div className="wrap max-w-md">
           <span className="eyebrow">MEMBER LOGIN</span>
-          <h1 className="sec-title mb-8">Welcome back.</h1>
+          <h2 className="sec-title mb-8">Welcome back.</h2>
 
           <form onSubmit={handleSubmit} className="card flex flex-col gap-4">
             <div>
-              <label className="tag-mono block mb-2">EMAIL OR USERNAME</label>
+              <label htmlFor="username" className="tag-mono block mb-2">EMAIL OR USERNAME</label>
               <input
+                id="username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                className="w-full bg-ink-900 border border-ink-border rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-accent"
+                className="w-full bg-ink-900 border border-ink-border rounded-none px-4 py-3 text-white text-sm focus:outline-none focus:border-accent"
               />
             </div>
             <div>
-              <label className="tag-mono block mb-2">PASSWORD</label>
+              <label htmlFor="password" className="tag-mono block mb-2">PASSWORD</label>
               <input
+                id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full bg-ink-900 border border-ink-border rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-accent"
+                className="w-full bg-ink-900 border border-ink-border rounded-none px-4 py-3 text-white text-sm focus:outline-none focus:border-accent"
               />
             </div>
 
             {error && (
-              <p className="text-sm text-red-400 bg-red-950/40 border border-red-900 rounded-lg px-4 py-3">
+              <p className="text-sm text-red-400 bg-red-950/40 border border-red-900 rounded-none px-4 py-3">
                 {error}
               </p>
             )}

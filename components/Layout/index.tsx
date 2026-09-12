@@ -1,86 +1,116 @@
 import React, { useState, ReactNode, useEffect, Fragment } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { Dialog, Popover, Transition } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Footer } from '../Footer';
 import { useAuth } from '@/context/AuthContext';
+import { SITE_URL } from '@/lib/site';
 
 // Simple (non-mega-menu) top-level items
 const navigation = [
   { name: 'The Layer', href: '/layer' },
   { name: 'How it works', href: '/how-it-works' },
+  { name: 'Project Control', href: '/project-controls' },
   { name: 'Traceability', href: '/traceability' },
   { name: 'Insights', href: '/insights' },
 ];
 
 // Services mega-menu — 5 columns, per the sitemap direction doc.
 // "About Services" replaces the old "More" label.
+// UX FIX: each column's TITLE is now the clickable link to that
+// category's own page (clicking "Core Services" -> /services, etc.).
+// The items listed under each title are a hover PREVIEW only, not
+// individually clickable links, per direction: "the sub categories
+// should not be clickable, they are just there to give a clue of what
+// that category page looks like." `items` is now a plain string list
+// instead of {name, href} pairs, since no per-item destination is
+// needed anymore.
 const servicesColumns = [
   {
     title: 'CORE SERVICES',
-    links: [
-      { name: 'Decentralized AI', href: '/services' },
-      { name: 'Enterprise integration', href: '/services' },
-      { name: 'Automation & robotics', href: '/services' },
-      { name: 'Blockchain trust layer', href: '/services' },
-      { name: 'Project scheduling & controls', href: '/project-controls' },
-      { name: 'Verifiable traceability', href: '/traceability' },
-      { name: 'Training & enablement', href: '/training' },
+    href: '/services',
+    items: [
+      'Decentralized AI',
+      'Enterprise integration',
+      'Automation & robotics',
+      'Blockchain trust layer',
+      'Project scheduling & controls',
+      'Verifiable traceability',
+      'Training & enablement',
     ],
   },
   {
     title: 'AI AGENTS',
-    links: [
-      { name: 'Finance', href: '/#agent-grid' },
-      { name: 'Sales', href: '/#agent-grid' },
-      { name: 'Customer service', href: '/#agent-grid' },
-      { name: 'IT', href: '/#agent-grid' },
-      { name: 'Legal', href: '/#agent-grid' },
-      { name: 'Marketing', href: '/#agent-grid' },
-      { name: 'Healthcare', href: '/#agent-grid' },
-      { name: 'Hospitals & clinics', href: '/#agent-grid' },
-      { name: 'Supply chain', href: '/#agent-grid' },
-      { name: 'HR', href: '/#agent-grid' },
+    href: '/layer#agent-grid',
+    items: [
+      'Finance',
+      'Sales',
+      'Customer service',
+      'IT',
+      'Legal',
+      'Marketing',
+      'Healthcare',
+      'Hospitals & clinics',
+      'Supply chain',
+      'HR',
     ],
   },
   {
     title: 'PROJECT CONTROLS',
-    links: [
-      { name: 'Schedule development', href: '/project-controls' },
-      { name: 'Primavera P6 & CPM', href: '/project-controls' },
-      { name: 'Baselines & change control', href: '/project-controls' },
-      { name: 'Earned value management', href: '/project-controls' },
-      { name: 'Cost & variance analysis', href: '/project-controls' },
-      { name: 'Power BI reporting', href: '/project-controls' },
-      { name: 'Verifiable project records', href: '/project-controls' },
+    href: '/project-controls',
+    items: [
+      'Schedule development',
+      'Primavera P6 & CPM',
+      'Baselines & change control',
+      'Earned value management',
+      'Cost & variance analysis',
+      'Power BI reporting',
+      'Verifiable project records',
     ],
   },
   {
     title: 'TRACEABILITY',
-    links: [
-      { name: 'Airlines & aviation', href: '/traceability' },
-      { name: 'Air taxis & eVTOL', href: '/traceability' },
-      { name: 'Supply chain', href: '/traceability' },
-      { name: 'Pharma', href: '/traceability' },
-      { name: 'Food', href: '/traceability' },
-      { name: 'Hospitals & clinics', href: '/traceability' },
-      { name: 'Luxury goods', href: '/traceability' },
+    href: '/traceability',
+    items: [
+      'Airlines & aviation',
+      'Air taxis & eVTOL',
+      'Supply chain',
+      'Pharma',
+      'Food',
+      'Hospitals & clinics',
+      'Luxury goods',
     ],
   },
   {
     title: 'ABOUT SERVICES',
-    links: [
-      { name: 'How we work', href: '/how-it-works' },
-      { name: 'Why decentralized AI', href: '/#why-decentralized' },
-      { name: 'Who we serve', href: '/#who-we-serve' },
-      { name: 'Solutions we handle', href: '/services#everything-we-connect' },
-      { name: 'Business models', href: '/services#six-ways' },
-      { name: 'How it works', href: '/how-it-works' },
-      { name: 'See it work', href: '/how-it-works' },
+    href: '/layer',
+    items: [
+      'How we work',
+      'Why decentralized AI',
+      'Who we serve',
+      'Solutions we handle',
+      'Business models',
+      'How it works',
+      'See it work',
     ],
   },
 ];
+
+// Solid filled triangle, replacing Heroicons' ChevronDownIcon for
+// dropdown indicators. Per the edit doc (item 2): "Make sure the
+// dropdown triangles next to the tabs are thick and filled in just
+// like the original website" — Heroicons' chevron (even the /solid
+// variant) is a curved arrow shape, not a true filled triangle, so a
+// custom SVG matches the reference more precisely than swapping icon
+// sets would.
+const FilledTriangle = ({ className = '' }: { className?: string }) => (
+  <svg viewBox="0 0 12 8" className={className} aria-hidden="true">
+    <path d="M0 0 L12 0 L6 8 Z" fill="currentColor" />
+  </svg>
+);
 
 // Wraps a nav label in an SVG rectangle that "draws itself" on hover —
 // pathLength={1} lets the CSS stroke-dasharray/dashoffset math in
@@ -90,37 +120,36 @@ const NavDraw = ({ children }: { children: React.ReactNode }) => (
   <span className="nav-draw">
     {children}
     <svg aria-hidden="true">
-      <rect x="0" y="0" width="100%" height="100%" rx="6" pathLength={1} />
+      <rect x="0" y="0" width="100%" height="100%" rx="0" pathLength={1} />
     </svg>
   </span>
 );
 
-// Shared link styling for the white header — dark navy default, shifts
-// to the accessible orange on hover (#B24300, verified 4.5:1+ against
-// white — plain #FF6000 fails contrast here, same issue fixed earlier
-// across the light sections).
-const navLinkClass =
-  'text-sm text-[#180F39] hover:text-[#B24300] transition-colors';
+// Shared link styling for the white header. Text color stays constant
+// on hover per direction ("the color should remain same") — the
+// nav-draw rectangle is now the only hover feedback, not a color
+// change too.
+// TYPOGRAPHY SYSTEM: added font-medium (500) — spec calls for
+// navigation at 500-600 weight, this had no weight utility at all
+// before, meaning it rendered at the browser/Tailwind default (400),
+// same weight as body text, with nothing distinguishing nav links from
+// ordinary paragraph copy.
+const navLinkClass = 'text-sm font-medium text-[#16003B] transition-colors';
 
 const ServicesMegaMenu = () => {
-  // Which category's sub-items are showing in the flyout. Defaults to
-  // the first category so the panel isn't empty the instant it opens.
-  const [activeIndex, setActiveIndex] = useState(0);
+  // Which category's sub-items are currently previewed. Defaults to
+  // the first category so the panel isn't empty the instant it opens,
+  // before the user has hovered anything.
+  const [hovered, setHovered] = useState(0);
 
   return (
     <Popover className="relative">
       {({ open }) => (
         <>
-          {/* Chevron now sits OUTSIDE NavDraw as a normal flex sibling,
-              spaced by the button's own gap-1 — it was previously
-              nested inside NavDraw's content, which put it under the
-              same inline-flex/absolute-SVG wrapper as the label and
-              caused it to render on top of the text instead of after
-              it. */}
           <Popover.Button className={`flex items-center gap-1 outline-none ${navLinkClass}`}>
             <NavDraw>Services</NavDraw>
-            <ChevronDownIcon
-              className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`}
+            <FilledTriangle
+              className={`w-2.5 h-2 transition-transform ${open ? 'rotate-180' : ''}`}
             />
           </Popover.Button>
           <Transition
@@ -132,52 +161,50 @@ const ServicesMegaMenu = () => {
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 -translate-y-1"
           >
-            <Popover.Panel className="absolute left-1/2 -translate-x-1/2 mt-4 z-50">
-              {/* Two-level flyout: left column lists all 5 category
-                  names stacked vertically; hovering one shows its
-                  sub-items on the right. Replaces the old "5 columns
-                  shown at once" layout per request. */}
-              <div
-                className="flex bg-white rounded-card shadow-2xl border overflow-hidden w-[620px] max-w-[90vw]"
-                style={{ borderColor: 'rgba(24,15,57,0.1)' }}
-              >
-                <div
-                  className="w-56 flex-shrink-0 border-r py-3"
-                  style={{ borderColor: 'rgba(24,15,57,0.1)' }}
-                >
-                  {servicesColumns.map((col, i) => (
-                    <button
-                      key={col.title}
-                      type="button"
-                      onMouseEnter={() => setActiveIndex(i)}
-                      className="w-full text-left font-mono text-xs tracking-tag uppercase px-5 py-3 transition-colors"
-                      style={{
-                        color: activeIndex === i ? '#B24300' : '#434343',
-                        background: activeIndex === i ? 'rgba(255,96,0,0.06)' : 'transparent',
-                      }}
-                    >
-                      {col.title}
-                    </button>
-                  ))}
-                </div>
+            {/* Reverted to the old behavior per direction: categories
+                listed vertically (clickable, not a 3-column grid of
+                everything at once), and hovering one reveals its
+                sub-items in a preview panel alongside it. Sub-items
+                stay non-clickable, same as before. */}
+            <Popover.Panel className="fixed left-0 right-0 mt-4 z-50">
+              <div style={{ background: '#16003B' }} className="border-t border-white/10 shadow-2xl">
+                <div className="wrap py-28 md:py-32">
+                  <div className="grid lg:grid-cols-[240px_260px_1fr] gap-12">
+                    <div>
+                      <h3 className="text-white font-bold text-3xl leading-[1.15]">
+                        Services &amp; Solutions
+                      </h3>
+                    </div>
 
-                <div className="flex-1 p-6">
-                  <p className="font-mono text-xs tracking-tag uppercase mb-4" style={{ color: '#B24300' }}>
-                    {servicesColumns[activeIndex].title}
-                  </p>
-                  <ul className="flex flex-col gap-2.5">
-                    {servicesColumns[activeIndex].links.map((link) => (
-                      <li key={link.name}>
-                        <Link
-                          href={link.href}
-                          className="text-sm transition-colors"
-                          style={{ color: '#434343' }}
-                        >
-                          {link.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
+                    <ul className="flex flex-col gap-1" onMouseLeave={() => setHovered(0)}>
+                      {servicesColumns.map((col, i) => (
+                        <li key={col.title} onMouseEnter={() => setHovered(i)}>
+                          <Link
+                            href={col.href}
+                            className="block font-mono text-xs tracking-tag uppercase py-3 border-l-2 pl-4 transition-colors font-bold"
+                            style={{
+                              color: 'var(--accent)',
+                              borderColor: hovered === i ? 'var(--accent)' : 'transparent',
+                            }}
+                          >
+                            {col.title}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* Preview only — not clickable. Shows just the
+                        hovered category's items, matching the old
+                        site's flyout behavior instead of showing every
+                        category's items at once. */}
+                    <ul className="flex flex-col gap-3">
+                      {servicesColumns[hovered].items.map((item) => (
+                        <li key={item} className="text-sm text-white/60">
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               </div>
             </Popover.Panel>
@@ -193,6 +220,7 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, loading } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -202,6 +230,15 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
 
   return (
     <>
+      {/* Canonical URL, set once here for every page instead of
+          repeated per-page — found missing entirely during a craft
+          sweep. Strips any query string, since query params (utm
+          tracking, etc.) shouldn't create a distinct canonical
+          destination from the clean page URL. */}
+      <Head>
+        <link rel="canonical" href={`${SITE_URL}${router.asPath.split('?')[0]}`} />
+      </Head>
+
       {/* White header, matching the old site. Always solid (not
           transparent-until-scroll) — that was the exact source of the
           logo/button invisibility bug fixed earlier, and a white bar is
@@ -213,23 +250,28 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
           scrolled ? 'shadow-md' : 'shadow-sm'
         }`}
       >
-        <nav className="wrap flex items-center justify-between py-6 md:py-7" aria-label="Global">
-          <Link href="/" className="flex items-center gap-2.5">
-            <span className="w-9 h-9 relative flex-shrink-0">
+        {/* Reuses the exact .wrap class from every content section below
+            it, rather than an approximated custom padding — guarantees
+            the logo and last button align pixel-for-pixel with where
+            content actually starts/ends on every other section, per
+            direct feedback that the previous custom padding didn't
+            truly match. */}
+        <nav className="wrap flex items-center justify-between py-3 md:py-4" aria-label="Global">
+          <Link href="/" className="flex items-center flex-shrink-0">
+            {/* Logo swap: was a separate mark icon + "ECHOLINK / SOLUTIONS"
+                text stacked beside it. Per the edit doc, the homepage
+                logo should be the single horizontal navy logo image,
+                not a mark-plus-text reconstruction. Sized up twice more
+                per direct feedback (Round 31, then again this round). */}
+            <span className="relative h-11 w-[231px]">
               <Image
-                src="/logo-mark-transparent.png"
+                src="/logo-horizontal-navy.png"
                 alt="Echolink Solutions"
                 fill
-                className="object-contain"
+                sizes="420px"
+                className="object-contain object-left"
+                priority
               />
-            </span>
-            <span className="leading-tight">
-              <span className="block text-sm font-bold tracking-wide" style={{ color: '#180F39' }}>
-                ECHOLINK
-              </span>
-              <span className="block text-[10px] font-mono tracking-tag" style={{ color: '#665A7D' }}>
-                SOLUTIONS
-              </span>
             </span>
           </Link>
 
@@ -246,15 +288,15 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
           </div>
 
           <div className="hidden lg:flex items-center gap-3">
-            <Link href="/how-it-works" className="btn btn--ghost-accent">
+            <Link href="/how-it-works" className="btn btn--ghost-accent !py-3">
               See it work
             </Link>
             {!loading && user ? (
-              <Link href="/account" className="btn btn--ghost-accent">
+              <Link href="/account" className="btn btn--ghost-accent !py-3">
                 My account
               </Link>
             ) : (
-              <Link href="/contact" className="btn btn--ghost-accent">
+              <Link href="/contact" className="btn btn--ghost-accent !py-3">
                 Contact us
               </Link>
             )}
@@ -263,7 +305,7 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
           <button
             type="button"
             className="lg:hidden -m-2.5 p-2.5"
-            style={{ color: '#180F39' }}
+            style={{ color: '#16003B' }}
             onClick={() => setMobileMenuOpen(true)}
           >
             <span className="sr-only">Open main menu</span>
@@ -275,13 +317,19 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
           <div className="fixed inset-0 z-50 bg-white" />
           <Dialog.Panel className="fixed inset-0 z-50 overflow-y-auto bg-white px-8 py-8">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-bold" style={{ color: '#180F39' }}>
-                ECHOLINK SOLUTIONS
+              <span className="relative h-11 w-[231px]">
+                <Image
+                  src="/logo-horizontal-navy.png"
+                  alt="Echolink Solutions"
+                  fill
+                  sizes="231px"
+                  className="object-contain object-left"
+                />
               </span>
               <button
                 type="button"
                 className="-m-2.5 p-2.5"
-                style={{ color: '#180F39' }}
+                style={{ color: '#16003B' }}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <span className="sr-only">Close menu</span>
@@ -292,7 +340,7 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
               <Link
                 href="/layer"
                 className="text-lg"
-                style={{ color: '#180F39' }}
+                style={{ color: '#16003B' }}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 The Layer
@@ -303,11 +351,11 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
                   type="button"
                   onClick={() => setMobileServicesOpen((v) => !v)}
                   className="flex items-center justify-between w-full text-lg"
-                  style={{ color: '#180F39' }}
+                  style={{ color: '#16003B' }}
                 >
                   Services
-                  <ChevronDownIcon
-                    className={`w-4 h-4 transition-transform ${
+                  <FilledTriangle
+                    className={`w-3 h-2.5 transition-transform ${
                       mobileServicesOpen ? 'rotate-180' : ''
                     }`}
                   />
@@ -316,20 +364,19 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
                   <div className="mt-4 pl-4 flex flex-col gap-5">
                     {servicesColumns.map((col) => (
                       <div key={col.title}>
-                        <p className="font-mono text-xs tracking-tag uppercase mb-2" style={{ color: '#B24300' }}>
+                        <Link
+                          href={col.href}
+                          className="font-mono text-xs tracking-tag uppercase mb-2 inline-block"
+                          style={{ color: '#B24300' }}
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
                           {col.title}
-                        </p>
+                        </Link>
+                        {/* Preview only — not clickable, same as desktop. */}
                         <ul className="flex flex-col gap-2">
-                          {col.links.map((link) => (
-                            <li key={link.name}>
-                              <Link
-                                href={link.href}
-                                className="text-sm"
-                                style={{ color: '#434343' }}
-                                onClick={() => setMobileMenuOpen(false)}
-                              >
-                                {link.name}
-                              </Link>
+                          {col.items.map((item) => (
+                            <li key={item} className="text-sm" style={{ color: '#8A8A8A' }}>
+                              {item}
                             </li>
                           ))}
                         </ul>
@@ -344,7 +391,7 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
                   key={item.name}
                   href={item.href}
                   className="text-lg"
-                  style={{ color: '#180F39' }}
+                  style={{ color: '#16003B' }}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.name}

@@ -11,9 +11,11 @@ export default function TrainingPage() {
           name="description"
           content="Hands-on training built around your actual systems. A track record of 2,000 careers, now pointed at decentralized AI, automation, and traceability."
         />
+        <meta property="og:title" content="Training — Echolink Solutions" />
+        <meta property="og:description" content="Hands-on training built around your actual systems. A track record of 2,000 careers, now pointed at decentralized AI, automation, and traceability." />
       </Head>
-      <div className="pt-24">
-        <Training />
+      <div className="pt-28">
+        <Training headingLevel="h1" />
       </div>
     </>
   );

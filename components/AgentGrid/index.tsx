@@ -13,8 +13,7 @@ const agents = [
   { title: 'Supply chain', description: 'Replenishment, exception handling, and provenance from supplier to shelf.' },
   { title: 'HR', description: 'Onboarding, requests, and policy answers, with privacy and access built in.' },
   { title: 'Compliance & risk', description: 'Monitors controls, flags violations, and keeps a verifiable record.' },
-  { title: 'Project management', description: 'Tracks tasks, deadlines, and dependencies, surfacing risks before they slip.' },
-  { title: 'Project controls', description: 'Watches schedule, cost, and progress data, flagging slippage before it lands.' },
+  { title: 'Project management & controls', description: 'Tracks tasks, deadlines, and dependencies, and watches schedule, cost, and progress data, flagging slippage before it lands.' },
 ];
 const pillars = [
   { title: 'Decentralized', description: 'No single vendor or model owns your intelligence.' },
@@ -28,11 +27,11 @@ export const AgentGrid = () => {
     <section id="agent-grid" className="section relative overflow-hidden">
       <span
         aria-hidden="true"
-        className="absolute -top-3 left-16 w-6 h-6 bg-accent rounded-sm hidden lg:block"
+        className="absolute -top-3 left-16 w-6 h-6 bg-accent rounded-none hidden lg:block"
       />
       <div className="wrap">
         <div className="sec-header max-w-2xl mx-auto text-center">
-          <span className="eyebrow">DECENTRALIZED AI AGENTS BY FUNCTION</span>
+          <span className="eyebrow-plain">DECENTRALIZED AI AGENTS BY FUNCTION</span>
           <h2 className="sec-title">An agent for every part of the business.</h2>
           <p className="sec-sub sec-sub--center">
             Purpose-built AI agents for the work your teams do every day, each one
@@ -41,9 +40,20 @@ export const AgentGrid = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        {/* STYLE FIX (Layer Page item 8): mirrored the "Capabilities"
+            list treatment from the automation/IoT pages (images 22/23)
+            — plain text rows with a thin divider line, no card box.
+            Kept all 13 roles (the reference's own list is short because
+            it's page-specific; this section needs all of them) and kept
+            the 3-column grid since 13 rows in one column would run very
+            long — the divider-line treatment is what actually mirrors
+            the reference, not the column count. Skipped adding a photo
+            like the reference has, since a single generic photo doesn't
+            fit 13 distinct agent roles the way it fits one page's single
+            topic. */}
+        <div className="grid md:grid-cols-3 gap-x-10 gap-y-8">
           {agents.map((agent) => (
-            <div key={agent.title} className="card">
+            <div key={agent.title} className="pt-5 border-t border-ink-border">
               <h4 className="text-white font-bold mb-2">{agent.title}</h4>
               <p className="text-ink_text-secondary text-sm leading-relaxed">
                 {agent.description}

@@ -15,7 +15,7 @@ export const RequireMembership = ({ children, membership }: RequireMembershipPro
 
   if (loading) {
     return (
-      <div className="section--page py-24 text-center">
+      <div className="section--page !py-24 text-center">
         <p className="text-ink_text-secondary">Checking your access…</p>
       </div>
     );
@@ -23,7 +23,7 @@ export const RequireMembership = ({ children, membership }: RequireMembershipPro
 
   if (!user) {
     return (
-      <div className="section--page py-24 text-center">
+      <div className="section--page !py-24 text-center">
         <span className="eyebrow">MEMBERS ONLY</span>
         <h2 className="sec-title">Sign in to view this content.</h2>
         <p className="sec-sub sec-sub--center mt-4">
@@ -42,7 +42,7 @@ export const RequireMembership = ({ children, membership }: RequireMembershipPro
 
   if (!hasAccess) {
     return (
-      <div className="section--page py-24 text-center">
+      <div className="section--page !py-24 text-center">
         <span className="eyebrow">UPGRADE REQUIRED</span>
         <h2 className="sec-title">This content needs a different plan.</h2>
         <p className="sec-sub sec-sub--center mt-4">

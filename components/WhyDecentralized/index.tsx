@@ -32,13 +32,13 @@ const points = [
 // language rather than repeating a formula.
 export const WhyDecentralized = () => {
   return (
-    <section id="why-decentralized" className="relative bg-[#F2F5F7] py-20 lg:py-28">
+    <section id="why-decentralized" className="relative bg-[#FFFFFF] py-[50px] lg:py-[100px]">
       <div className="wrap">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <span className="tag-mono !text-[#B24300] mb-4 inline-block">
             WHY DECENTRALIZED AI
           </span>
-          <h2 className="text-[#180F39] font-bold text-3xl md:text-4xl leading-tight mb-5">
+          <h2 className="text-[#16003B] font-bold text-3xl md:text-4xl leading-tight mb-5">
             Your systems already do the work. They can&apos;t yet prove it, or
             protect you.
           </h2>
@@ -48,24 +48,24 @@ export const WhyDecentralized = () => {
           </p>
         </div>
 
-        <div className="max-w-3xl mx-auto border-t border-[#180F39]/15">
+        <div className="max-w-3xl mx-auto border-t border-[#16003B]/15">
           {points.map((point) => (
             <div
               key={point.number}
-              className="grid md:grid-cols-[80px_1fr] gap-4 md:gap-10 py-8 border-b border-[#180F39]/15"
+              className="grid md:grid-cols-[80px_1fr] gap-4 md:gap-10 py-8 border-b border-[#16003B]/15"
             >
               <span className="text-[#B24300] font-mono font-bold text-2xl">
                 {point.number}
               </span>
               <div>
-                <h4 className="text-[#180F39] font-bold text-lg mb-2">
+                <h4 className="text-[#16003B] font-bold text-lg mb-2">
                   {point.title}
                 </h4>
                 <p className="text-[#434343] text-sm leading-relaxed mb-3">
                   {point.description}
                 </p>
                 <p className="text-sm leading-relaxed text-[#434343]">
-                  <span className="text-[#180F39] font-bold">How it protects you:</span>{' '}
+                  <span className="text-[#16003B] font-bold">How it protects you:</span>{' '}
                   {point.protects}
                 </p>
               </div>
@@ -73,7 +73,7 @@ export const WhyDecentralized = () => {
           ))}
         </div>
 
-        <div className="max-w-2xl mx-auto text-center mt-14 border border-[#180F39]/20 rounded-card p-8">
+        <div className="max-w-2xl mx-auto text-center mt-14 border border-[#16003B]/20 rounded-card p-8">
           <span className="tag-mono !text-[#B24300]">THE HONEST PART</span>
           <p className="text-[#434343] text-sm leading-relaxed mt-4 mb-6">
             You do not need to rip out a thing. Your systems keep running the work

@@ -2,12 +2,24 @@ import React from 'react';
 
 export const NotACryptoPlay = () => {
   return (
-    <section className="section relative overflow-hidden">
+    <section id="not-a-crypto-play" className="section relative overflow-hidden">
+      {/* Gradient restored by direct request ("I LOVE THE GRADIENT...
+          BRING BACK THE GRADIENT") — reverses the flatten from Round
+          40's strict-brand-colors pass, specifically for this
+          section. COLOR FIX this round: #2A1608 isn't a brand color —
+          it's an invented muddy brown, not the dark vignette-into-purple
+          effect it was probably going for. The brand guide's actual
+          4-color palette includes true black (#000000) alongside the
+          purple, orange, and white already used everywhere else, so a
+          black-to-purple vignette keeps this section's original
+          dark, moody character while using only real brand colors —
+          unlike WhoWeServe's gradient, which is a purple-to-orange
+          statement blend, this one was never meant to reach orange at
+          all. */}
       <div
-        className="absolute inset-0 opacity-60"
+        className="absolute inset-0"
         style={{
-          background:
-            'linear-gradient(135deg, #2A1608 0%, #180F39 60%)',
+          background: 'linear-gradient(135deg, #000000 0%, #16003B 60%)',
         }}
       />
       <div className="wrap relative grid md:grid-cols-2 gap-12 items-center">
@@ -31,10 +43,10 @@ export const NotACryptoPlay = () => {
           ].map((item) => (
             <div
               key={item.text}
-              className={`flex items-center gap-3 rounded-lg px-5 py-4 border ${
+              className={`flex items-center gap-3 rounded-none px-5 py-4 border ${
                 item.positive
-                  ? 'bg-accent-soft border-accent'
-                  : 'bg-ink-900/60 border-ink-border'
+                  ? 'card--highlight'
+                  : 'bg-ink-800 border-ink-border'
               }`}
             >
               <span className={item.positive ? 'text-accent-light font-bold' : 'text-ink_text-muted'}>

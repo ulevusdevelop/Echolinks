@@ -12,9 +12,24 @@ const rows = [
 // numbered editorial list (WhyDecentralized). Calmest content on the
 // Layer page, so it gets the calmest, most technical-reads-as-precise
 // presentation.
+//
+// LAYOUT EXPERIMENT (direct feedback: "sections feel like stacked
+// blocks, not designed" — specifically about the Layer page): the
+// closing "One layer" pill used to sit neatly inside this section's own
+// padding, ending cleanly before NotACryptoPlay's dark section began
+// equally cleanly below it — two self-contained rectangles with no
+// compositional relationship. Turned that pill into a genuinely bigger
+// card and let it physically straddle the boundary between the two
+// sections (absolutely positioned, translated half its height below
+// this section's bottom edge), so there's real depth/layering at this
+// one transition instead of a flat stack. `overflow-hidden` removed
+// from this section specifically — it would otherwise clip the card
+// at exactly the point it's supposed to cross. `z-10` on the section
+// is what lets the overlapping card paint above NotACryptoPlay's
+// background (a later sibling) instead of being covered by it.
 export const WholeStack = () => {
   return (
-    <section className="relative bg-[#F2F5F7] py-20 lg:py-28 overflow-hidden">
+    <section id="whole-stack" className="relative z-10 bg-[#FFFFFF] py-[50px] lg:py-[100px]">
       <svg
         viewBox="0 0 200 200"
         fill="none"
@@ -23,19 +38,19 @@ export const WholeStack = () => {
       >
         <path
           d="M10 30 C 90 10, 150 60, 120 140"
-          stroke="#FF6000"
+          stroke="#FF6100"
           strokeWidth="3"
           strokeLinecap="round"
         />
-        <path d="M108 132 l14 10 l-18 8 Z" fill="#FF6000" />
+        <path d="M108 132 l14 10 l-18 8 Z" fill="#FF6100" />
       </svg>
 
       <div className="wrap relative">
         <div className="max-w-xl mb-14">
-          <span className="tag-mono !text-[#FF6000] mb-4 inline-block">
+          <span className="tag-mono !text-[#FF6100] mb-4 inline-block">
             THE CATEGORY WE OWN
           </span>
-          <h2 className="text-[#180F39] font-bold text-3xl md:text-4xl leading-tight mb-5">
+          <h2 className="text-[#16003B] font-bold text-3xl md:text-4xl leading-tight mb-5">
             The whole stack, assembled into one layer.
           </h2>
           <p className="text-[#4A4560] text-base leading-relaxed">
@@ -54,9 +69,9 @@ export const WholeStack = () => {
           {rows.map((row) => (
             <div
               key={row.label}
-              className="border border-[#180F39]/20 rounded-lg px-5 py-4 max-w-xs"
+              className="border border-[#16003B]/20 rounded-none px-5 py-4 max-w-xs"
             >
-              <span className="block text-[#180F39] font-bold text-sm mb-1">
+              <span className="block text-[#16003B] font-bold text-sm mb-1">
                 {row.label}
               </span>
               <span className="block text-[#4A4560] text-xs leading-relaxed">
@@ -66,21 +81,30 @@ export const WholeStack = () => {
           ))}
         </div>
 
-        <div
-          className="inline-flex items-center gap-3 rounded-lg px-5 py-4"
-          style={{ background: '#180F39' }}
-        >
-          <span className="text-[#FF6000] font-bold text-sm">One layer</span>
-          <span className="tag-mono !text-[#FF9E5E]">
-            ALL FIVE, ASSEMBLED INTO ONE VERIFIABLE WHOLE
-          </span>
-        </div>
-
-        <p className="text-[#4A4560] text-sm leading-relaxed mt-8 max-w-xl">
+        <p className="text-[#4A4560] text-sm leading-relaxed mt-8 mb-10 max-w-xl">
           We are the connective trust layer that hides the complexity and
           delivers the outcome, trust, automation, and compliance, in the
           language enterprise buyers already speak.
         </p>
+
+        {/* Bridge card — see the component-level comment above for why
+            this is positioned this way. Sized up from the original
+            small pill so it reads as a deliberate object straddling
+            the boundary, not a slightly-repositioned version of what
+            was there before. Negative bottom margin (desktop only —
+            the overlap effect doesn't help on narrow mobile layouts,
+            where it would just look like a layout bug) pulls it down
+            so its bottom half visually crosses past this section's own
+            padding into whatever renders next. */}
+        <div
+          className="relative z-20 inline-flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 rounded-none px-7 py-6 shadow-xl lg:mb-[-70px]"
+          style={{ background: '#16003B' }}
+        >
+          <span className="text-[#FF6100] font-bold text-lg">One layer</span>
+          <span className="tag-mono !text-[#FF9E5E]">
+            ALL FIVE, ASSEMBLED INTO ONE VERIFIABLE WHOLE
+          </span>
+        </div>
       </div>
     </section>
   );

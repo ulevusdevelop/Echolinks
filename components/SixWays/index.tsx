@@ -9,18 +9,24 @@ const models = [
   { label: 'MODEL 06', title: 'Compliance as code', description: 'Regulatory workflows enforced by smart contracts.', delivered: 'Delivered as: rules enforced per compliance domain' },
 ];
 
+// CONSISTENCY FIX (cross-page audit pass): this was flipped to a light
+// section in an earlier round specifically to avoid three dark
+// sections in a row with TwoIdeas and Traceability as neighbors. That
+// reasoning no longer holds — Traceability moved to its own dedicated
+// page in Round 21, and TwoIdeas itself flipped to white in Round 23
+// (Layer Page item 9, an explicit edit-doc instruction). The result was
+// a NEW problem this round's audit caught: WhyDecentralized -> TwoIdeas
+// -> SixWays now ran three white sections in a row at the end of
+// /layer. Flipped back to dark to close the page on a proper beat,
+// using the standard dark .card / .card--highlight treatment already
+// established elsewhere instead of the light-section card styling.
 export const SixWays = () => {
   return (
-    // Converted to a light band — was the middle of three dark sections
-    // in a row (TwoIdeas -> SixWays -> Traceability), which read as
-    // monotonous compared to Good Design's alternating rhythm. Plain
-    // content grid with no dark-dependent visuals, so a clean candidate
-    // to flip using the same light-section pattern as CapabilitiesIntro.
-    <section id="six-ways" className="section--light">
+    <section id="six-ways" className="section">
       <div className="wrap">
         <div className="sec-header max-w-xl">
-          <h2 className="sec-title--dark">Six ways to put the layer to work.</h2>
-          <p className="sec-sub--dark">
+          <h2 className="sec-title">Six ways to put the layer to work.</h2>
+          <p className="sec-sub">
             Each one solves a specific problem and scales as you grow. Start with a
             single workflow, expand across systems when you are ready. You pay for the
             outcome, never the blockchain.
@@ -31,22 +37,11 @@ export const SixWays = () => {
           {models.map((model) => (
             <div
               key={model.label}
-              className="rounded-card p-8 border"
-              style={
-                model.highlight
-                  ? {
-                      background: 'rgba(255,96,0,0.08)',
-                      borderColor: 'var(--accent)',
-                    }
-                  : {
-                      background: '#FFFFFF',
-                      borderColor: 'rgba(24,15,57,0.12)',
-                    }
-              }
+              className={`card ${model.highlight ? 'card--highlight' : ''}`}
             >
               <span className="tag-mono tag-mono--accent">{model.label}</span>
-              <h4 className="text-[#180F39] font-bold text-lg mt-3 mb-3">{model.title}</h4>
-              <p className="text-[#434343] text-sm leading-relaxed mb-5">
+              <h4 className="text-white font-bold text-lg mt-3 mb-3">{model.title}</h4>
+              <p className="text-ink_text-secondary text-sm leading-relaxed mb-5">
                 {model.description}
               </p>
               <p className="tag-mono tag-mono--accent !normal-case !text-[11px] leading-snug">

@@ -13,35 +13,38 @@ module.exports = {
         mono: ['var(--font-jetbrains)', 'ui-monospace', 'monospace'],
       },
       colors: {
-        // Authoritative brand palette from the site's Elementor Global
-        // Colors panel: #FF6000, #180F39, #434343, #665A7D, #abb8c3.
-        // Elevation scale below is derived from #180F39 (page background)
-        // by proportional lightening, keeping the whole system rooted in
-        // one real, confirmed value instead of independently sampled or
-        // estimated tones.
+        // CORRECTED (per Echolink Solutions official Brand Guidelines,
+        // section 3.1): Purple #16003B, Orange #FF6100, White #FFFFFF,
+        // Black #000000. These are the authoritative values — the
+        // previous palette below was sampled from the live site's
+        // Elementor Global Colors panel (#16003B, #FF6100), which is
+        // close but off-brand; the brand guide takes precedence.
+        // Elevation scale re-derived from #16003B using the same
+        // proportional lightening deltas as the previous scale, just
+        // rooted in the corrected base color instead of the old one.
         ink: {
-          DEFAULT: '#180F39',   // page background
-          900: '#251D44',       // section background
-          800: '#383054',       // card background
-          700: '#463F60',       // card background (alt)
-          600: '#4F4868',       // node/box fill
+          DEFAULT: '#16003B',   // page background — brand guide purple
+          900: '#230E46',       // section background
+          800: '#362156',       // card background
+          700: '#443062',       // card background (alt)
+          600: '#4D396A',       // node/box fill
           border: 'rgba(102, 90, 125, 0.45)', // derived from #665A7D
         },
         accent: {
-          DEFAULT: '#FF6000',
-          light: '#FF7A26',
-          soft: 'rgba(255,96,0,0.14)',
+          DEFAULT: '#FF6100',   // brand guide orange
+          light: '#FF7B26',
+          soft: 'rgba(255,97,0,0.14)',
         },
         ink_text: {
           primary: '#EAF1FA',
-          secondary: '#abb8c3',  // verified 8.90:1 on #180F39
+          secondary: '#abb8c3',  // verified 8.90:1 on #16003B
           muted: '#8b93a0',      // dimmed derivative of #abb8c3
         },
         // Light-section text — #434343 verified 8.94:1+ on cream/white,
         // #665A7D verified 6.32:1 on white (works as secondary on light
         // backgrounds only — it fails contrast on dark, see globals.css).
         light_text: {
-          primary: '#180F39',
+          primary: '#16003B',
           body: '#434343',
           secondary: '#665A7D',
         },
@@ -51,7 +54,7 @@ module.exports = {
         },
       },
       borderRadius: {
-        card: '16px',
+        card: '0px',
         pill: '999px',
       },
       maxWidth: {
@@ -62,5 +65,5 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/typography')],
 }

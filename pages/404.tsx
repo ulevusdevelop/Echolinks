@@ -8,8 +8,9 @@ export default function NotFound() {
       <Head>
         <title>Page not found — Echolink Solutions</title>
         <meta name="robots" content="noindex" />
+        <meta name="description" content="The page you're looking for doesn't exist or has moved." />
       </Head>
-      <section className="section--page py-40 text-center">
+      <section className="section--page !py-40 text-center">
         <div className="wrap">
           <span className="tag-mono tag-mono--accent">404</span>
           <h1 className="sec-title mt-4">This page didn&apos;t make it into the layer.</h1>

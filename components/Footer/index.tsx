@@ -2,6 +2,11 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
+// REBALANCED this round: EXPLORE had grown to 9 items across several
+// rounds of adding new pages, while the other columns stayed at 4-5 —
+// a visibly lopsided footer. Split into 4 more evenly-weighted columns
+// (5/5/4/4) instead of 3 uneven ones, closer to the old site's own
+// footer structure (which runs 4 link columns + Contact, not 2).
 const columns = [
   {
     title: 'EXPLORE',
@@ -9,19 +14,36 @@ const columns = [
       { name: 'The Layer', href: '/layer' },
       { name: 'Services', href: '/services' },
       { name: 'How we work', href: '/how-it-works' },
+      { name: 'Live demo', href: '/lab' },
+      { name: 'Business models', href: '/services#six-ways' },
+    ],
+  },
+  {
+    title: 'MANAGED SERVICES',
+    links: [
+      { name: 'EDI/API Managed Services', href: '/services/edi-api-managed-services' },
+      { name: 'ERP Managed Services', href: '/services/erp-managed-services' },
+      { name: 'FACET Configurations', href: '/services/facet-configurations' },
       { name: 'Project controls & EVM', href: '/project-controls' },
       { name: 'Training', href: '/training' },
-      { name: 'Business models', href: '/services' },
     ],
   },
   {
     title: 'SEE IT',
     links: [
       { name: 'How it works', href: '/how-it-works' },
-      { name: 'Live demo', href: '/lab' },
       { name: 'Traceability', href: '/traceability' },
       { name: 'Clients', href: '/clients' },
       { name: 'Insights', href: '/insights' },
+    ],
+  },
+  {
+    title: 'INDUSTRIES & RESOURCES',
+    links: [
+      { name: 'Healthcare', href: '/industries/healthcare' },
+      { name: 'Transportation & Logistics', href: '/industries/transportation' },
+      { name: 'White Papers', href: '/white-papers' },
+      { name: 'Case Studies', href: '/clients' },
     ],
   },
 ];
@@ -42,15 +64,19 @@ export const Footer = () => {
             centered column: heading, then paragraph below it, then both
             buttons side by side on their own row underneath, everything
             horizontally centered within the card. Rebuilt to match. */}
-        <div className="card mb-24 relative overflow-hidden text-center bg-gradient-to-br from-ink-800 to-ink-900 py-14 px-8">
-          <span className="absolute -top-3 -left-3 w-6 h-6 bg-accent rounded-sm" aria-hidden="true" />
-          <span className="absolute top-8 left-10 w-3 h-3 rounded-sm hidden md:block bg-accent/60" aria-hidden="true" />
-          <span className="absolute -bottom-3 right-24 w-5 h-5 bg-ink-600 border border-ink-border rounded-sm hidden md:block" aria-hidden="true" />
-
-          <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 max-w-xl mx-auto">
+        {/* SIMPLIFIED AGAIN per direct feedback — even the quiet
+            gradient card wasn't landing as clean/professional enough.
+            Removed the card treatment entirely: no background box, no
+            gradient, no border, no scattered accents. Just centered
+            content directly on the footer's own background, separated
+            from the link grid below by generous whitespace and a
+            single thin rule. This is close to as minimal as a closing
+            CTA can be while still reading as its own section. */}
+        <div className="text-center pt-28 md:pt-36 pb-20 md:pb-24 border-b border-ink-border">
+          <h3 className="text-2xl md:text-3xl font-bold text-white mb-5 max-w-xl mx-auto leading-tight">
             Let&apos;s wire your first verifiable workflow.
           </h3>
-          <p className="text-ink_text-secondary text-sm leading-relaxed max-w-lg mx-auto mb-8">
+          <p className="text-ink_text-secondary text-sm md:text-base leading-relaxed max-w-lg mx-auto mb-10">
             Bring one system, one decision you need to trust, and one process you
             want a machine to run. We will scope the integration and the proof in a
             single working session.
@@ -69,13 +95,22 @@ export const Footer = () => {
             pattern used across the homepage sections, so the footer
             doesn't suddenly revert to a different, more generic layout
             logic than everything above it. */}
-        <div className="grid lg:grid-cols-[320px_1fr] gap-16">
+        {/* PADDING FIX (direct feedback): the border-b above closed the
+            CTA off cleanly, but the columns grid immediately below it
+            had no top spacing of its own at all — the rule sat right on
+            top of "SERVICES"/"SOLUTIONS"/etc. with nothing separating
+            them. Added real top margin here rather than more bottom
+            padding above the border, so the border reads as a rule with
+            space on both sides, not a line glued to the content below
+            it. */}
+        <div className="grid lg:grid-cols-[320px_1fr] gap-16 mt-16 md:mt-20">
           <div>
-            <span className="w-9 h-9 relative flex-shrink-0 block">
+            <span className="w-16 h-16 relative flex-shrink-0 block">
               <Image
                 src="/logo-mark-transparent.png"
                 alt="Echolink Solutions"
                 fill
+                sizes="64px"
                 className="object-contain"
               />
             </span>
@@ -87,7 +122,7 @@ export const Footer = () => {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-3 gap-10">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-10">
             {columns.map((col) => (
               <div key={col.title}>
                 <p className="tag-mono mb-5">{col.title}</p>
