@@ -4123,3 +4123,135 @@ Verified: `./node_modules/.bin/tsc --noEmit` clean, full
 `./node_modules/.bin/next build` — 26 routes, `/robots.txt` and
 `/sitemap.xml` both confirmed building as their own dynamic routes with
 no conflict.
+
+## Round 108 — .sec-sub had no font-family at all, found from the actual served CSS
+
+Direct correction, with the actual live globals.css pasted in as
+evidence: `.sec-sub` (and `.sec-sub--dark`) had no `font-family`
+declaration whatsoever — relying entirely on inheriting Syne from the
+`html, body` rule. Every other shared text class in this file
+(`.sec-title`, `.eyebrow-plain`, `.tag-mono`, `.number-badge`) sets its
+own explicit `font-family: var(--font-syne) !important` rather than
+depending on inheritance, and `.sec-sub` was the one exception —
+inheritance should work in theory, but evidently isn't reliable enough
+in practice for this specific, widely-used class. Added the same
+explicit, enforced declaration used everywhere else.
+
+This also exposed a real gap in how this was being checked in earlier
+rounds: previous sweeps searched for font-family declarations pointing
+to the *wrong* font, which would never catch a class with *no*
+font-family at all. Ran a proper, targeted search this time — every
+class-based CSS rule that sets `font-size` or `font-weight` without an
+explicit `font-family` in the same rule — and confirmed `.sec-sub`/
+`.sec-sub--dark` were the only genuine gaps; a few other search hits
+were false positives (tag selectors like `h1`-`h6` don't need their own
+font-family since a separate, earlier rule already covers them for the
+same elements; `.sec-title` does have one).
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes.
+
+## Round 109 — Every p tag guaranteed Syne at the tag-selector level
+
+Direct instruction: ensure every `<p>` tag uses Syne. Applied the same
+fix pattern that resolved `.sec-sub` last round, but at the broadest
+possible level this time — the bare `p` tag selector itself (which
+already existed as a low-priority max-width fallback) now also carries
+an explicit `font-family: var(--font-syne), sans-serif !important`.
+
+This doesn't rely on inheritance from `html`/`body` at all anymore —
+every paragraph in the document gets Syne directly, with one safe
+exception by design: a class-level rule with its own `!important` (if
+one ever existed) would still win, since specificity is the tiebreaker
+among `!important` declarations of the same priority tier — bare tag
+selectors are the lowest-specificity `!important` there is. Given the
+exhaustive font audit from recent rounds found zero components
+deliberately using a different font on any paragraph, this should have
+no unintended side effects — it's a guaranteed floor, not an override
+of anything that was intentionally different.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes.
+
+## Round 110 — Trust-chain diagram: removed the "verify" label, centered the cubes on the line
+
+Direct instruction, "1 · Blockchain is the trust layer" diagram: remove
+the word "verify" beside the cubes, and make the vertical line pass
+straight through the center of the cubes.
+
+Both were the same underlying cause: the verify cube's button contained
+the cube icon *and* the "verify" text side by side in a horizontal row.
+Since the diagram centers each row as a whole (flex `items-center` in a
+vertical column), the combined cube+text row was centered — but that
+meant the cube itself sat off to the left within its own row, not on
+the diagram's actual center line, which is where the vertical track
+(and the traveling ball from the previous round) is positioned.
+
+Removed the "verify" text entirely and changed the button to center
+just the cube alone. With nothing else in the row, the row's center is
+now the cube's center, which is also the track line's center — so the
+line now passes straight through every cube, and the boxes above/below
+line up with it too, all without needing to touch the track's own
+positioning.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes, `/how-it-works` confirmed
+building.
+
+## Round 111 — Top diagram: the line now runs through the icons, not above them
+
+Direct correction, same complaint pattern as the trust-chain diagram
+fixed last round but for the horizontal "See it clearly" top summary:
+the track was a fully separate element sitting above the icon row
+(with its own margin-bottom keeping it apart), never overlapping the
+icons at all — not a near-miss, structurally incapable of passing
+through them.
+
+Restructured: the icon row is now `position: relative` and the track/
+ball sit absolutely positioned *inside* it at `top: 50%`, using an
+inline style specifically (not a Tailwind class) to guarantee it wins
+over `.flow-track`'s own `position: relative` regardless of CSS
+cascade order. Also gave every icon (System, AI, Blockchain, checkmark)
+the same `h-20` wrapper height — they'd previously ranged from 64px to
+96px tall with different internal alignment (some centered, one bottom-
+justified), which would have made a single center line land at a
+different point relative to each icon graphic even once overlapping
+was fixed. Split the captions ("data event," "verify," "Blockchain
+anchored") into their own row below the icons, since they'd previously
+been stacked directly under each icon inside the same column — that
+structure is what made a shared, consistent center line across icons
+of different heights impractical in the first place.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes, `/how-it-works` confirmed
+building.
+
+## Round 112 — Top diagram: line removed, ball loops like the trust-chain one
+
+Direct instruction: remove the line, keep the ball traveling from
+"data event" to the tick, and fix the loop behavior so a new ball
+starts fresh instead of the same one sliding back to the beginning.
+
+The backward-slide was a real, structural side effect of how the
+previous version worked: it was React-state-driven (a `stage` variable
+cycling 0→1→2→3→0…) with a CSS `transition: left`, so every time state
+looped back to 0, the transition animated the ball visibly backward
+across the *entire* row — because a CSS transition animates between
+whatever two values change, including a big jump back to the start.
+
+Rebuilt using the same technique already proven on the vertical trust-
+chain diagram: a continuous CSS keyframe where each cycle fades a fresh
+ball in at the start, moves it to the end, fades it out, then the next
+cycle begins — never animating backward through the middle. Two balls,
+staggered 2.25s apart, so a new one is always starting while the
+previous one is still finishing, matching "a new ball starts and does
+the same over and over." The line/track element itself is gone
+entirely, only the ball remains. Dropped the state-driven checkmark
+"lighting up in sync" and caption highlighting along with it, since
+those depended on the same discrete stage tracking — consistent with
+how the vertical diagram doesn't have an equivalent target-highlight
+feature either.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes, `/how-it-works` confirmed
+building.

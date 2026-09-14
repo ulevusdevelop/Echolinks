@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 // SECTION-WIDE FIX (this pass): checked structure, not just copy, against
@@ -97,12 +97,14 @@ const TrustChainDiagram = ({
                 key={node.id}
                 type="button"
                 onClick={() => setActiveId(node.id)}
-                className="flex items-center gap-2.5 py-2.5"
+                className="flex items-center justify-center py-2.5"
               >
-                {/* Solid cube with a darker lower-facet overlay to fake
-                    3D depth — checked against an extreme-zoom crop of
-                    Sample.pdf, which shows a solid filled two-tone cube,
-                    not a translucent outlined diamond. */}
+                {/* "verify" text label removed (direct instruction) —
+                    was sitting beside the cube, which pushed the cube
+                    itself off-center from the vertical track line
+                    running through the middle of the diagram. Cube is
+                    now the only content in this row and centers
+                    correctly on that line. */}
                 <span className={`relative w-7 h-7 flex-shrink-0 transition-transform ${isActive ? 'scale-110' : ''}`} aria-hidden="true">
                   <span className="absolute inset-0 bg-accent rounded-none rotate-45" />
                   <span
@@ -110,7 +112,6 @@ const TrustChainDiagram = ({
                     style={{ clipPath: 'polygon(0% 50%, 50% 100%, 100% 50%)' }}
                   />
                 </span>
-                <span className="tag-mono tag-mono--accent">verify</span>
               </button>
             );
           }
@@ -272,110 +273,100 @@ const SharedNetworkDiagram = ({
 // exactly when the packet arrives there, in sync — driven by real React
 // state rather than independent CSS timelines, which can't guarantee
 // that kind of synchronization reliably.
-const STAGE_POSITIONS = [8, 36, 64, 92]; // approx. % position of System/AI/Blockchain/checkmark within the row
-const STAGE_DURATION = 1900; // ms per stop
-
 const TopDiagram = () => {
-  const [stage, setStage] = useState(0);
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setStage((s) => (s + 1) % STAGE_POSITIONS.length);
-    }, STAGE_DURATION);
-    return () => clearInterval(id);
-  }, []);
-
   return (
     <div className="rounded-card p-8 md:p-9 mb-8" style={{ background: '#16003B' }}>
-      <div className="flow-track mx-4 md:mx-8 mb-2" aria-hidden="true">
-        <span className="flow-packet" style={{ left: `${STAGE_POSITIONS[stage]}%` }} />
+      {/* REBUILT again this round (direct correction): "remove the
+          line" — the track element is gone entirely, only the ball
+          remains. And "the ball does not reach its end and go back to
+          the beginning but a new ball starts" — switched from React-
+          state-driven position (a CSS transition on `left`, which
+          visibly slid backward every time the state looped back to
+          stage 0) to the same continuous fade-in/fade-out keyframe
+          already used for the vertical trust-chain diagram: each cycle
+          starts a fresh, invisible ball at the System icon that fades
+          in, travels to the checkmark, fades out, and only then does
+          the next cycle begin — no backward slide, no visible track. */}
+      <div className="relative flex flex-wrap items-center justify-center gap-10 md:gap-16">
+        <span className="flow-packet-horizontal" aria-hidden="true" />
+        <span className="flow-packet-horizontal flow-packet-horizontal--delay" aria-hidden="true" />
+
+        {/* System */}
+        <div className="w-16 h-20 flex items-center justify-center relative icon-float">
+          <div className="absolute inset-0 m-auto w-16 h-16 rounded-none rotate-45" style={{ background: 'linear-gradient(135deg, #1c4378, #143360)' }} />
+          <div
+            className="absolute inset-0 m-auto w-16 h-16 rounded-none rotate-45"
+            style={{ background: 'linear-gradient(135deg, #0E2647, #081d38)', clipPath: 'polygon(0% 50%, 50% 100%, 100% 50%)' }}
+          />
+          <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">
+            System
+          </div>
+        </div>
+
+        <span className="text-ink_text-muted hidden md:block">—</span>
+
+        {/* AI */}
+        <div className="w-20 h-20 relative flex items-center justify-center">
+          <div className="absolute w-10 h-10 rounded-none rotate-45" style={{ background: 'linear-gradient(135deg, #1c4378, #143360)' }} aria-hidden="true" />
+          <div className="absolute w-16 h-16 rounded-full" style={{ background: 'radial-gradient(circle at 40% 35%, #FF8A3D 0%, #F26A1B 55%, #a23d08 100%)', boxShadow: '0 0 24px 6px rgba(255,138,61,0.45)' }} />
+          <span className="absolute w-20 h-6 border rounded-full icon-spin" style={{ borderColor: 'rgba(255,138,61,0.5)' }} aria-hidden="true" />
+          <span className="relative z-10 text-white font-bold text-sm">AI</span>
+        </div>
+
+        <span className="text-ink_text-muted hidden md:block">—</span>
+
+        {/* Blockchain */}
+        <div className="w-16 h-20 flex items-center justify-center">
+          <div className="relative" style={{ width: 64, height: 40 }}>
+            <div className="absolute left-0 bottom-0 w-7 h-7 rounded-none rotate-45 icon-drift-a" style={{ background: 'linear-gradient(135deg, #d4540f, #a23d08)' }} />
+            <div className="absolute left-4 bottom-0 w-7 h-7 rounded-none rotate-45 icon-drift-b" style={{ background: 'linear-gradient(135deg, #F26A1B, #c24d0c)' }} />
+            <div className="absolute left-2 top-0 w-7 h-7 rounded-none rotate-45 icon-drift-c" style={{ background: 'linear-gradient(135deg, #FF8A3D, #F26A1B)' }} />
+          </div>
+        </div>
+
+        {/* Checkmark */}
+        <div className="w-20 h-20 flex items-center justify-center">
+          <span
+            className="w-8 h-8 rounded-full border flex items-center justify-center"
+            style={{ borderColor: 'rgba(61,190,122,0.5)', color: '#3DBE7A', background: 'transparent' }}
+          >
+            ✓
+          </span>
+        </div>
       </div>
-      <div className="flex flex-wrap items-center justify-center gap-10 md:gap-16 py-8">
-        {/* System — colors corrected to the exact gradients from the
-            live site's own SVG source (blueprint): a cool blue-navy
-            iso-cube (topF/leftF families). Now gently floats up and
-            down continuously (icon-float), independent of the packet's
-            own journey. */}
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-3 relative icon-float">
-            <div className="absolute inset-0 rounded-none rotate-45" style={{ background: 'linear-gradient(135deg, #1c4378, #143360)' }} />
-            <div
-              className="absolute inset-0 rounded-none rotate-45"
-              style={{ background: 'linear-gradient(135deg, #0E2647, #081d38)', clipPath: 'polygon(0% 50%, 50% 100%, 100% 50%)' }}
-            />
-            <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">
-              System
-            </div>
-          </div>
-          <p className="tag-mono">data event</p>
-        </div>
 
-        <span className="text-ink_text-muted hidden md:block">—</span>
-
-        {/* AI — sphere gradient corrected to the exact coreGlow stops
-            from the blueprint (#FF8A3D -> #F26A1B -> #a23d08 radial).
-            The orbit ring now actually rotates continuously
-            (icon-spin), like a ring around a planet, rather than
-            sitting static. */}
-        <div className="text-center">
-          <div className="w-20 h-24 mx-auto mb-3 relative flex flex-col items-center justify-end">
-            <div className="absolute bottom-1 w-10 h-10 rounded-none rotate-45" style={{ background: 'linear-gradient(135deg, #1c4378, #143360)' }} aria-hidden="true" />
-            <div className="absolute bottom-4 w-16 h-16 rounded-full" style={{ background: 'radial-gradient(circle at 40% 35%, #FF8A3D 0%, #F26A1B 55%, #a23d08 100%)', boxShadow: '0 0 24px 6px rgba(255,138,61,0.45)' }} />
-            <span className="absolute bottom-9 w-20 h-6 border rounded-full icon-spin" style={{ borderColor: 'rgba(255,138,61,0.5)' }} aria-hidden="true" />
-            <span className="relative z-10 mb-6 text-white font-bold text-sm">AI</span>
-          </div>
-          <p className="tag-mono tag-mono--accent">verify</p>
-        </div>
-
-        <span className="text-ink_text-muted hidden md:block">—</span>
-
-        {/* Blockchain — bright orange gradient family, matching the
-            blueprint's SVG source. Each of the 3 cubes now drifts
-            irregularly and independently (icon-drift-a/b/c — different
-            amplitude and timing per cube), instead of sitting static. */}
-        <div className="text-center">
-          <div className="flex items-center justify-center mb-3" style={{ width: 64, height: 40 }}>
-            <div className="relative w-full h-full">
-              <div className="absolute left-0 bottom-0 w-7 h-7 rounded-none rotate-45 icon-drift-a" style={{ background: 'linear-gradient(135deg, #d4540f, #a23d08)' }} />
-              <div className="absolute left-4 bottom-0 w-7 h-7 rounded-none rotate-45 icon-drift-b" style={{ background: 'linear-gradient(135deg, #F26A1B, #c24d0c)' }} />
-              <div className="absolute left-2 top-0 w-7 h-7 rounded-none rotate-45 icon-drift-c" style={{ background: 'linear-gradient(135deg, #FF8A3D, #F26A1B)' }} />
-            </div>
-          </div>
+      {/* Caption row — same 4 labels, now a separate row below the
+          icons rather than stacked individually under each one, since
+          the icons above no longer carry their own text-center wrapper
+          per icon. */}
+      <div className="flex flex-wrap items-center justify-center gap-10 md:gap-16 mt-3 mb-5 text-center">
+        <p className="tag-mono w-16">data event</p>
+        <span className="text-ink_text-muted hidden md:block opacity-0">—</span>
+        <p className="tag-mono tag-mono--accent w-20">verify</p>
+        <span className="text-ink_text-muted hidden md:block opacity-0">—</span>
+        <div className="w-16">
           <p className="tag-mono">Blockchain</p>
           <p className="tag-mono tag-mono--accent">anchored</p>
         </div>
-
-        {/* Checkmark — lights up (solid green fill, brighter check)
-            specifically when the packet's stage reaches it (stage 3),
-            fading back to a dim outline otherwise. */}
-        <span
-          className="w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-500"
-          style={
-            stage === 3
-              ? { borderColor: '#3DBE7A', color: '#FFFFFF', background: '#3DBE7A', boxShadow: '0 0 14px 3px rgba(61,190,122,0.55)' }
-              : { borderColor: 'rgba(61,190,122,0.35)', color: 'rgba(61,190,122,0.5)', background: 'transparent' }
-          }
-        >
-          ✓
-        </span>
+        <p className="w-20"></p>
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
-        <span className={`tag-mono rounded-none px-4 py-2 border transition-colors ${stage === 0 ? 'border-accent text-accent-light' : 'border-ink-border'}`}>
+        <span className="tag-mono rounded-none px-4 py-2 border border-ink-border">
           1 A system creates a data event
         </span>
         <span className="text-ink_text-muted">—</span>
-        <span className={`tag-mono rounded-none px-4 py-2 border transition-colors ${stage === 1 ? 'border-accent text-accent-light' : 'border-ink-border'}`}>
+        <span className="tag-mono rounded-none px-4 py-2 border border-ink-border">
           2 Decentralized AI verifies it
         </span>
         <span className="text-ink_text-muted">—</span>
-        <span className={`tag-mono rounded-none px-4 py-2 border transition-colors ${stage === 2 ? 'border-accent text-accent-light' : 'border-ink-border'}`}>
+        <span className="tag-mono rounded-none px-4 py-2 border border-ink-border">
           3 It is anchored to the blockchain
         </span>
       </div>
 
       <div className="flex justify-center mt-5">
-        <span className={`tag-mono border rounded-none px-5 py-2 transition-colors ${stage === 3 ? 'border-accent tag-mono--accent' : 'border-ink-border'}`}>
+        <span className="tag-mono border border-ink-border rounded-none px-5 py-2">
           ✓ Now provable, forever
         </span>
       </div>

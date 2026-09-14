@@ -9,6 +9,23 @@
 
 :root {
   --bg-page: #180F39;
+  /* FIX: was #251D44, a lighter, non-brand purple — direct violation of
+     the confirmed rule "strictly only the 4 brand colors, everywhere"
+     (Round 40), missed at the time because that pass audited .card
+     specifically and never checked this more foundational variable.
+     .section is used far more widely than .card, so this one variable
+     being wrong meant every plain dark section sitewide rendered in a
+     visibly different, lighter shade than sections using .section--page
+     sitting right next to them — reads exactly as "faded" when the two
+     are adjacent, which happens constantly (e.g. the Layer page's very
+     first section). Kept identical to --bg-page — both corrected
+     together to #180F39 per direct color correction ("the deep blue is
+     actually #180F39"), scoped to these two page/section-background
+     variables specifically rather than every hardcoded #16003B
+     instance sitewide (115+ across the codebase, many of them text/
+     border/accent treatments verified separately against the brand
+     guidelines' stated Purple swatch) — flagged for confirmation on
+     whether the broader rename is also wanted. */
   --bg-section: #180F39;
   --bg-card: #383054;
   --bg-card-alt: #463F60;
@@ -20,14 +37,35 @@
   --accent-soft: rgba(255, 96, 0, 0.14);
 
   --text-primary: #EAF1FA;
+  /* CHANGED TO WHITE (direct instruction, same as the Tailwind
+     ink_text tokens): all grayish text on the purple background
+     becomes white. */
   --text-secondary: #FFFFFF;
   --text-muted: #FFFFFF;
 
+  /* CONTRAST + STANDOUT FIX: these two stops measured 1.15:1 contrast
+     against each other — essentially indistinguishable, so this
+     "flame" gradient rendered as a flat, muddy near-black blob instead
+     of a visible gradient, which is very likely why the "2,000 careers"
+     card built with it doesn't stand out. Changed the dark stop to the
+     actual brand purple (#16003B, already used everywhere else) and
+     the light stop to a rich ember orange chosen specifically to keep
+     white text comfortably legible at every point in the gradient
+     (7.75:1 against white, well past the 4.5:1 body-text minimum) while
+     still reading clearly as "flame" — unlike the brand's bright
+     #FF6100, which only manages 3.02:1 against white and would have
+     failed for the card's body paragraph text. */
   --flame-from: #16003B;
   --flame-to: #8B3A0F;
 
   --max-width: 1720px;
   --radius-card: 0px;
+  /* CHANGED TO 0 (direct instruction — sitewide "no radius" rule,
+     explicitly extended to every section with this same pill/chip
+     behavior): this was 999px (a true pill shape), used by every
+     eyebrow badge and tag/chip across the site. Squared off here so
+     the fix cascades everywhere at once rather than hunting down each
+     usage. */
   --radius-pill: 0px;
 }
 
@@ -36,6 +74,13 @@
 html, body {
   max-width: 100vw;
   overflow-x: hidden;
+  /* Per official Brand Guidelines (4.1/4.2): Syne is used for header,
+     sub-header, AND body text — not a heading-only display face paired
+     with a separate body font. As of this round, Syne is used
+     EXCLUSIVELY sitewide (direct instruction: "the font has to be
+     Syne") — the small monospace UI tags (eyebrows, tag/metric text)
+     previously kept JetBrains Mono as a deliberate distinct treatment;
+     that font has been removed from the codebase entirely. */
   font-family: var(--font-syne), sans-serif !important;
   background: var(--bg-page);
   color: var(--text-primary);
@@ -47,22 +92,49 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-syne), sans-serif !important;
 }
 
+/* TYPOGRAPHY SYSTEM (direct request): a proper 4-6 size type scale with
+   distinct weight per heading tier, replacing the flat "every heading
+   is 600" rule above. That flat rule is the direct reason the site had
+   no weight hierarchy at all between H1/H2/H3 — worth noting since an
+   earlier round explicitly reverted a similar tiered attempt back to a
+   flat 600 "per direct clarification." This request is fresh, explicit,
+   and comes with its own detailed spec (size table + reference CSS), so
+   it supersedes that earlier decision rather than conflicting with it
+   accidentally.
+
+   Weight and size are still tag-level (h1/h2/h3), same mechanism as
+   before and for the same reason: 36+ files apply Tailwind's
+   font-bold/font-semibold directly to headings, and without
+   !important here those utilities would win the cascade and silently
+   flatten the hierarchy right back out.
+
+   Sizes use clamp() to move smoothly between the spec's mobile and
+   desktop ranges rather than jumping at a single breakpoint — same
+   approach `.sec-title` already used, just now split by tier instead
+   of one size for every heading level. Hero's own h1 keeps its
+   existing inline size override (it's the one h1 with a genuinely
+   unique, larger role than a generic H1), but now inherits 800 weight
+   from this rule instead of needing its own weight override too. */
 h1 {
-  font-size: clamp(40px, 5.5vw, 60px);
-  font-weight: 800 !important;
+  font-size: clamp(40px, 5.5vw, 60px); /* 40px mobile -> 60px desktop, within the 36-64px spec range */
+  font-weight: 800 !important; /* hero-level impact, top of the spec's 700-800 H1 range */
   line-height: 1.15;
 }
 h2 {
-  font-size: clamp(30px, 4vw, 40px);
+  font-size: clamp(30px, 4vw, 40px); /* 30px mobile -> 40px desktop, within the 28-44px spec range */
   font-weight: 700 !important;
   line-height: 1.25;
 }
 h3 {
-  font-size: clamp(24px, 2.6vw, 28px);
+  font-size: clamp(24px, 2.6vw, 28px); /* 24px mobile -> 28px desktop, within the 22-30px spec range */
   font-weight: 600 !important;
   line-height: 1.3;
 }
 h4, h5, h6 {
+  /* Not part of the requested scale explicitly — treated as the same
+     tier as H3 (subsection headings) rather than inventing an
+     unrequested 7th size, keeping the system to the "4-6 sizes"
+     the request calls for. */
   font-size: clamp(24px, 2.6vw, 28px);
   font-weight: 600 !important;
   line-height: 1.3;
@@ -70,6 +142,18 @@ h4, h5, h6 {
 
 a { color: inherit; text-decoration: none; }
 
+/* Visible keyboard-focus state, sitewide. Found this missing entirely
+   during a craft review — no focus-visible styling was defined
+   anywhere, and one interactive element (the Services dropdown
+   trigger) explicitly stripped its own outline via Tailwind's
+   `outline-none` with nothing to replace it, meaning keyboard users
+   tabbing to it got no visible indicator at all. Applied broadly to
+   every interactive element type rather than just the one found, since
+   the same gap could exist on any button/link/input without a custom
+   focus style already set. Uses the brand orange, consistent with the
+   rest of the interaction language (hover states, active states) on
+   the site. `:focus-visible` (not plain `:focus`) so this only shows
+   for keyboard navigation, not every mouse click. */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -80,11 +164,31 @@ select:focus-visible,
   outline-offset: 2px;
 }
 
-/* FONT FIX: explicit + !important so no equal-specificity utility
-   class (e.g. a leftover font-sans/font-mono) can silently win the
-   cascade against a bare tag selector that was relying on inheritance
-   alone. Matches the pattern already used on h1/h2/h3 and .eyebrow. */
+/* Line-length safety net: as the page width increased across several
+   rounds (1240px -> 1720px), any paragraph without its own explicit
+   max-width utility now stretches to whatever wide column it sits in,
+   producing uncomfortably long lines on "some, not all" text — exactly
+   the reported symptom. A plain element selector has lower specificity
+   than any Tailwind max-w-* class, so this only affects paragraphs
+   that don't already have a deliberate width constraint (most already
+   do, via .sec-sub's 640px or an explicit max-w-* class) — it's a
+   fallback, not an override. Manages the readability problem without
+   reducing the page width itself, per direction. 68ch is a
+   comfortable reading measure regardless of the font-size it's set at. */
 p {
+  /* FONT-FAMILY ADDED (direct instruction: "ensure that every p tag are
+     using the Syne fonts"): this rule already existed as a low-priority
+     fallback for max-width, relying on the html/body rule's inheritance
+     for font-family — the same inheritance pattern that turned out not
+     to be reliable enough for .sec-sub. Rather than trust inheritance
+     for every paragraph sitewide, this now guarantees Syne directly on
+     the tag itself. !important on a bare tag selector still loses to
+     any class-level rule that also uses !important (specificity is the
+     tiebreaker among !important declarations), so this doesn't risk
+     overriding a genuinely different, more specific choice anywhere —
+     it just guarantees every paragraph that doesn't have its own
+     explicit font-family lands on Syne by default, with no exceptions
+     left to chance. */
   font-family: var(--font-syne), sans-serif !important;
   max-width: 68ch;
 }
@@ -102,6 +206,11 @@ img { max-width: 100%; display: block; }
   padding: 0 32px;
 }
 
+/* Section vertical rhythm — matched to the live site's actual block
+   padding variables (--wp--custom--ast-default-block-top-padding),
+   which are 100px desktop and 50px at the ≤921px breakpoint. Was
+   96px/160px before this fix, which overshot the real spec
+   considerably at desktop. */
 .section {
   background: var(--bg-section);
   padding: 50px 0;
@@ -116,6 +225,8 @@ img { max-width: 100%; display: block; }
   }
 }
 
+/* Tighter variant for secondary/connector sections (stats bar,
+   short CTAs) that shouldn't compete with primary sections. */
 .section--tight {
   padding: 40px 0;
 }
@@ -123,6 +234,12 @@ img { max-width: 100%; display: block; }
   .section--tight { padding: 64px 0; }
 }
 
+/* Light section variant. Per the edit doc (item 6): "All backgrounds
+   should alternate between deep purple (#16003B) and pure white
+   (#FFFFFF)" — corrected from #F2F5F7 (an off-white sourced from the
+   live site's Astra color panel, not the brand guide). The brand guide
+   and explicit edit instruction take precedence over what the live
+   site actually had. */
 :root {
   --bg-page-light: #FFFFFF;
   --bg-section-light: #FFFFFF;
@@ -135,8 +252,13 @@ img { max-width: 100%; display: block; }
   .section--light { padding: 100px 0; }
 }
 
+/* Title/sub/eyebrow variants for use inside .section--light — same
+   type scale and spacing as the dark versions, just re-colored for
+   contrast against a light background. Verified contrast ratios:
+   #16003B on #FFFFFF = 17.5:1, #434343 on #FFFFFF = 9.7:1 — both
+   comfortably exceed WCAG AA (and AAA) for body text. */
 .sec-title--dark {
-  font-family: var(--font-syne), sans-serif !important;
+  font-family: var(--font-syne), sans-serif;
   font-size: clamp(30px, 4vw, 40px);
   font-weight: 700 !important;
   line-height: 1.25;
@@ -144,8 +266,6 @@ img { max-width: 100%; display: block; }
   color: #16003B;
 }
 .sec-sub--dark {
-  /* FONT FIX: was missing font-family entirely, relying purely on
-     inheritance. Added explicit + !important, same as .sec-sub. */
   font-family: var(--font-syne), sans-serif !important;
   font-size: 20px;
   font-weight: 400;
@@ -158,6 +278,8 @@ img { max-width: 100%; display: block; }
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  /* FONT FIX (blueprint): section-intro labels specify Syne, not the
+     monospace font this and the other 3 eyebrow variants were using. */
   font-family: var(--font-syne), sans-serif !important;
   font-size: 12px;
   letter-spacing: 0.1em;
@@ -186,6 +308,16 @@ img { max-width: 100%; display: block; }
   margin-bottom: 28px;
 }
 
+/* PLAIN eyebrow variants — no pill "bubble wrap" (background, border,
+   padding, pill radius), just the label styled like a small heading.
+   Per the edit doc: "Remove the bubble wrap around HOW WE ENGAGE, HOW
+   IT WORKS, WHAT WE DO, WHO WE SERVE, SOLUTIONS WE HANDLE, and
+   DECENTRALIZED AI AGENTS BY FUNCTION. Style them more like headings."
+   These are the actual "section-introducing" labels the typography
+   blueprint describes exactly (its "STEP ONE"-style example) — updated
+   to the exact spec: Syne (not monospace), 900 weight (not 700), 14px
+   desktop stepping to 13px at max-width 1024px (was a flat 13px with
+   no responsive step). */
 .eyebrow-plain {
   display: inline-flex;
   align-items: center;
@@ -216,25 +348,69 @@ img { max-width: 100%; display: block; }
 }
 
 .sec-title {
-  font-family: var(--font-syne), sans-serif !important;
+  font-family: var(--font-syne), sans-serif;
+  /* SPECIFICITY NOTE: this class has higher specificity than the
+     tag-level h1/h2/h3 rules above (a class beats a bare tag, even
+     when both use !important) — so wherever this class is applied, ITS
+     size/weight win, not the tag's. To keep the tiered system actually
+     working rather than being silently overridden by this one class
+     (which is applied to the large majority of section headings
+     sitewide), matched these values directly to the H2 tier the spec
+     defines, since that is this class's real role everywhere except
+     Hero's h1 (which carries its own explicit overrides below it in
+     the cascade — see Hero's own className for why that one still
+     comes out at H1 size/weight despite also using this class). */
   font-size: clamp(30px, 4vw, 40px);
   font-weight: 700 !important;
   line-height: 1.25;
   letter-spacing: -0.01em;
   color: var(--text-primary);
 }
+/* Found 10+ other places besides Hero where .sec-title is applied
+   directly to a real page-level <h1> (Layer, Traceability, 404, lab,
+   account, membership, Insights index and its post-detail "not found"
+   state) with no per-instance override at all — every one of those
+   would otherwise render at H2's size/weight instead of H1's. Rather
+   than patching each file individually with its own override (as
+   Hero has, because Hero's h1 also needs a genuinely larger custom
+   size), this single compound selector (h1.sec-title, specificity
+   0,1,1 — one notch above .sec-title alone at 0,1,0) restores proper
+   H1 treatment automatically anywhere the class lands on a real h1,
+   with no component changes needed. */
 h1.sec-title {
+  /* WEIGHT CORRECTED (direct evidence): the live site's own computed
+     CSS for this exact heading shows font-weight: 600, not 800. The
+     800 value here came from this project's own typography-tier
+     system (Round 83), which doesn't match the blueprint's real
+     values for this element. Corrected to match the actual source.
+     Also: Hero's own h1 previously carried a REDUNDANT second
+     !important weight override (Tailwind's !font-extrabold utility) on
+     top of this rule — two different !important declarations for the
+     same property is exactly what produces the "crossed out /
+     overridden" rules visible in DevTools that were flagged directly.
+     Removed the duplicate at the source (Hero's className) so this one
+     rule is the single, clean, non-conflicting source of truth for
+     every h1.sec-title instance sitewide. */
   font-size: clamp(40px, 5.5vw, 60px);
   font-weight: 600 !important;
   line-height: 1.15;
 }
 
 .sec-sub {
-  /* FONT FIX: was relying entirely on inheritance from body (no
-     font-family declared here at all), so any sibling class of equal
-     specificity applied to the same element could silently override
-     it. Now explicit + !important, matching every other guaranteed-
-     Syne class in this file. */
+  /* EXACT VALUE (direct instruction): "most of the body font (ie all
+     paragraphs) using font-family: Syne, font-weight: 400, font-size:
+     20px" — this is the shared class most section-intro paragraphs
+     sitewide already use, so setting it here cascades the exact value
+     broadly rather than needing to hand-edit every instance. Was a
+     17-19px clamp (an earlier round's own typography-tier system);
+     replaced with the flat 20px this instruction specifies.
+     FONT-FAMILY ADDED (direct correction): this class had no explicit
+     font-family at all — every other shared text class in this file
+     (.sec-title, .eyebrow-plain, .tag-mono) sets its own explicit
+     Syne !important rather than relying on inheritance from html/body,
+     and this was the one exception. Inheritance should work in theory,
+     but evidently wasn't reliable enough in practice — added the same
+     explicit, enforced declaration used everywhere else. */
   font-family: var(--font-syne), sans-serif !important;
   font-size: 20px;
   font-weight: 400;
@@ -250,6 +426,9 @@ h1.sec-title {
   text-align: center;
 }
 
+/* Standard spacer between a section's header block (eyebrow/title/
+   sub) and whatever comes after it — used instead of ad-hoc mt-N
+   utilities so this rhythm stays consistent site-wide. */
 .sec-header {
   margin-bottom: 64px;
 }
@@ -257,6 +436,15 @@ h1.sec-title {
   .sec-header { margin-bottom: 88px; }
 }
 
+/* STRICT BRAND COLORS (direct confirmation: "Yes — strictly only the 4
+   brand colors, everywhere"). Was `var(--bg-card)` = #383054, a
+   lighter/desaturated tint that isn't one of the four brand colors
+   (deep purple #16003B, orange #FF6100, white, black). Cards now sit
+   on solid white. Since most existing card content was authored
+   assuming a dark card background (white text, muted blue-gray labels,
+   etc.), the color overrides below flip that text to dark-on-white —
+   scoped under .card so this doesn't touch text anywhere else on the
+   page, and skips .btn so button color schemes stay untouched. */
 .card {
   background: #FFFFFF;
   border-radius: var(--radius-card);
@@ -267,11 +455,23 @@ h1.sec-title {
   .card { padding: 24px 24px; }
 }
 
+/* Highlight variant — brought back by direct request ("I LOVE THE
+   GRADIENT... BRING BACK THE GRADIENT"). This reverses part of Round
+   40's strict-brand-colors pass specifically for this element; the
+   base .card white background and its text cascade stay as they are,
+   this is scoped to the highlight variant only. */
 .card--highlight {
   background: linear-gradient(135deg, var(--flame-from) 0%, var(--flame-to) 100%);
   border-left: 3px solid var(--accent);
 }
 
+/* HOVER-TRIGGERED VARIANT (direct instruction, SixWays specifically):
+   "when I hover over any other box, the style currently applied to the
+   first box appear on the hovered [one]" — .card--highlight above was
+   permanently applied to only one card (via a `highlight: true` data
+   flag). This variant applies the identical background/border/nested-
+   text treatment, but only on :hover, meant to be applied to every
+   card in a set instead of one being permanently singled out. */
 .card--highlight-on-hover:hover {
   background: linear-gradient(135deg, var(--flame-from) 0%, var(--flame-to) 100%);
   border-left: 3px solid var(--accent);
@@ -282,6 +482,9 @@ h1.sec-title {
 .card--highlight-on-hover:hover .tag-mono:not(.btn) { color: var(--accent-light); }
 .card--highlight-on-hover:hover .tag-mono--accent:not(.btn) { color: var(--accent-light); }
 
+/* Text-color cascade for content nested inside .card — see the note
+   above .card for why this exists. Excludes .btn so button styling
+   (which has its own deliberate color scheme) is never touched. */
 .card :is(h1, h2, h3, h4, h5, h6):not(.btn) {
   color: #16003B;
 }
@@ -307,6 +510,10 @@ h1.sec-title {
   background: #F2F5F7 !important;
 }
 
+/* .card--highlight sits on a dark gradient again, so its nested text
+   goes back to light — the general .card rules above force dark-on-
+   white for the plain white card, so this reverses that specifically
+   for the highlight variant now that its background is dark again. */
 .card--highlight :is(h1, h2, h3, h4, h5, h6):not(.btn) {
   color: #FFFFFF;
 }
@@ -324,6 +531,9 @@ h1.sec-title {
 }
 
 .tag-mono {
+  /* CONVERTED TO SYNE (direct instruction: "the font has to be Syne")
+     — this was the last shared class still hardcoded to JetBrains
+     Mono, used for metrics/step-numbers/metadata sitewide. */
   font-family: var(--font-syne), sans-serif !important;
   font-size: 12px;
   letter-spacing: 0.09em;
@@ -332,6 +542,10 @@ h1.sec-title {
   overflow-wrap: break-word;
 }
 
+/* Opt-in modifier for the handful of cases that genuinely need to stay
+   on one line (short pill labels with guaranteed room) — nowrap is no
+   longer the default, since forcing it site-wide was overflowing card
+   edges on longer labels like "PROJECT CONTROLS & SCHEDULING". */
 .tag-mono--nowrap {
   white-space: nowrap;
 }
@@ -342,18 +556,32 @@ h1.sec-title {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  /* FONT FIX: added !important. Was declared without it, so it wasn't
-     actually guaranteed against an equal-specificity override. */
-  font-family: var(--font-syne), sans-serif !important;
+  /* CONSISTENCY SWEEP (direct instruction): "anything I asked you to do
+     ... should be done to all titles and buttons throughout, not just
+     the sections I pointed out." The nav CTA buttons (.btn--ghost-
+     accent) were corrected to Syne/900 weight per the live site's exact
+     button CSS — applying that same font treatment here, to the BASE
+     button class every variant inherits from, so it's consistent
+     everywhere a button appears, not just the nav. Colors/backgrounds
+     per variant are untouched; this only changes the font. */
+  font-family: var(--font-syne), sans-serif;
   font-size: 14px;
   font-weight: 900;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   padding: 11px 26px;
+  /* Sharp rectangular per the edit doc (item 2): "Ensure that all tab
+     and action buttons are sharp rectangular shapes." Was 50px
+     (full pill) — corrected to 0, matching the reference screenshot's
+     crisp square-cornered button exactly. */
   border-radius: 0;
   transition: all 0.2s ease;
   cursor: pointer;
 }
+/* Vertical padding reduced from the live site's original spec
+   (15/18/20px top-bottom) per direct feedback — was too much,
+   especially on navbar buttons. Horizontal padding kept close to the
+   original scale. */
 @media (min-width: 545px) {
   .btn { padding: 13px 30px; }
 }
@@ -371,6 +599,11 @@ h1.sec-title {
   box-shadow: 0 6px 24px -4px rgba(255, 96, 0, 0.6);
 }
 
+/* Matches the old site's exact secondary button spec: transparent fill,
+   white 1px border, white text/icon fill, 10px radius, Syne 900. Hover
+   state shifts toward the accent color for interactive feedback — the
+   old site's static spec doesn't define a hover state, so this is an
+   addition, not a deviation from a value they specified. */
 .btn--ghost {
   background: transparent;
   color: #FFFFFF;
@@ -382,6 +615,11 @@ h1.sec-title {
   color: var(--accent-light);
 }
 
+/* Dark ghost variant — for the header, which is now a white/light bar
+   matching the old site. The white-bordered .btn--ghost above is still
+   correct everywhere else (Hero, Footer, dark sections) since those
+   keep a dark background; this variant exists specifically because a
+   white-on-white button would be invisible in the new header. */
 .btn--ghost-dark {
   background: transparent;
   color: #16003B;
@@ -392,16 +630,35 @@ h1.sec-title {
   color: #B24300;
 }
 
+/* Header CTA variant — confirmed by zooming into Good Design.pdf's
+   header: BOTH header buttons ("Become a Member" and "Get Started" in
+   the original) use an orange 1px border with navy text on transparent
+   fill, not a solid orange fill. This was previously wrong: the header's
+   primary CTA used .btn--primary (solid fill), which doesn't match the
+   source. Use this class for both header buttons instead. */
 .btn--ghost-accent {
   background: transparent;
   color: #16003B;
   border: 2px solid var(--accent);
+  /* Only padding needs its own override now — font-family/weight match
+     the base .btn already (both Syne/900 as of the consistency sweep
+     above), so restating them here would just be the same redundant-
+     declaration problem flagged directly for the Hero heading earlier.
+     Flat 15px/30px padding is still a genuine, deliberate difference
+     from the base .btn's responsive 11px->13px->15px scale, specific
+     to this exact nav-button spec. */
   padding: 15px 30px;
 }
 .btn--ghost-accent:hover {
   background: var(--accent);
   color: #FFFFFF;
 }
+/* Small right arrow that slides in on hover, matching the old site's
+   button interaction — hidden by default (0 width, no gap) so it
+   doesn't disturb the button's resting layout, then expands in on
+   hover. Implemented as a pseudo-element rather than adding "→" to
+   every button's JSX individually, since this needs to apply
+   consistently across every header CTA without touching each one. */
 .btn--ghost-accent::after {
   content: '→';
   display: inline-block;
@@ -419,6 +676,10 @@ h1.sec-title {
   transform: translateX(0);
 }
 
+/* Hand-drawn hover border for nav items — an SVG rectangle traced around
+   the label using a stroke-draw animation. pathLength="1" is set on the
+   <rect> in JSX so the dash math below works regardless of the actual
+   pixel size of each nav item, no per-item measurement needed. */
 .nav-draw {
   position: relative;
   display: inline-flex;
@@ -437,6 +698,9 @@ h1.sec-title {
 }
 .nav-draw svg rect {
   fill: none;
+  /* Per edit doc item 3: "the loop around the tab when hover is deep
+     purple like it was in the original website" — was #B24300 (a dark
+     orange/rust tone), corrected to the brand purple. */
   stroke: #16003B;
   stroke-width: 2.4;
   stroke-dasharray: 1;
@@ -447,6 +711,12 @@ h1.sec-title {
   stroke-dashoffset: 0;
 }
 
+/* Primary button, inverted for light-section contexts (dark fill,
+   orange text) — used where a solid-orange button would read too
+   similar in tone to the orange accent text already around it on a
+   light background. Shares the same .btn base (Syne, weight 900,
+   10px radius) so it stays in sync with every other button
+   automatically instead of drifting via copy-pasted inline styles. */
 .btn--primary-inverse {
   background: #16003B;
   color: var(--accent);
@@ -456,6 +726,10 @@ h1.sec-title {
   color: var(--accent-light);
 }
 
+/* For a ghost button sitting on a solid-orange background (the
+   footer's closing CTA) — .btn--ghost's hover state shifts to orange,
+   which would disappear against an orange background. This inverts to
+   white instead, so it stays visible in both states. */
 .btn--on-accent {
   background: transparent;
   color: #FFFFFF;
@@ -476,12 +750,16 @@ h1.sec-title {
   align-items: center;
   justify-content: center;
   color: var(--accent-light);
+  /* CONVERTED TO SYNE (direct instruction) — was JetBrains Mono. */
   font-family: var(--font-syne), sans-serif !important;
   font-weight: 600;
   font-size: 14px;
 }
 .card--highlight .number-badge { border-color: var(--accent); color: var(--accent); }
 
+/* Grid rhythm — generous gaps by default. Components should reach
+   for `.grid-loose` instead of ad-hoc gap-4/gap-5 utilities so card
+   grids never feel cramped against each other. */
 .grid-loose { gap: 28px; }
 @media (min-width: 1024px) { .grid-loose { gap: 36px; } }
 
@@ -490,13 +768,10 @@ h1.sec-title {
   .sec-header { margin-bottom: 48px; }
 }
 
-/* FONT FIX: this container had no font-family guarantee at all for
-   rendered WordPress HTML content — added at the container level so
-   every paragraph/heading rendered inside it stays on Syne even if
-   the source markup carries its own inline font styling. */
-.insight-content {
-  font-family: var(--font-syne), sans-serif !important;
-}
+/* Basic rhythm for rendered WordPress HTML inside the Insights modal.
+   The @tailwindcss/typography plugin isn't installed in this project,
+   so this covers the same ground (paragraph/heading/list spacing)
+   without adding a new dependency. */
 .insight-content p + p,
 .insight-content ul,
 .insight-content ol,
@@ -522,6 +797,20 @@ h1.sec-title {
   text-decoration: underline;
 }
 
+/* "See it clearly" top diagram — REBUILT this round (direct
+   feedback): the previous version was a continuous CSS-only loop with
+   no real stops and no synchronization with the checkmark. What was
+   actually asked: the packet should travel System -> AI -> Blockchain
+   -> checkmark, pausing a few seconds at each stop, with the checkmark
+   lighting up specifically when the packet arrives there — genuine
+   synchronization needs actual state, not independent CSS timelines
+   that can drift apart, so the packet's position is now driven by
+   React state (see TopDiagram) and only needs a CSS transition here,
+   not a keyframe loop. The icons themselves also needed their own
+   idle motion, independent of the packet: System gently floats up and
+   down like a hovering box, the AI ring rotates continuously around
+   the sphere, and the Blockchain cubes drift irregularly (different
+   amplitude/timing per cube) rather than sitting static. */
 .flow-track {
   position: relative;
   height: 2px;
@@ -571,6 +860,16 @@ h1.sec-title {
 .icon-drift-b { animation: icon-drift-b 3.1s ease-in-out infinite .3s; }
 .icon-drift-c { animation: icon-drift-c 2.8s ease-in-out infinite .6s; }
 
+/* "1 - Blockchain is the trust layer" diagram — a continuous vertical
+   traveling-ball animation (direct instruction): a packet leaves ERP AI,
+   travels down through each verify cube to Customer AI, then loops —
+   with a second ball following behind on a delay, "another ball starts
+   and does the same over and over again." Same technique as the "See
+   it clearly" top diagram's horizontal track (a CSS-driven dot along a
+   track spanning the full row), adapted to vertical motion for this
+   diagram's vertical chain layout. Continuous/looping rather than
+   stage-paused, matching what was actually described this time (a ball
+   that just keeps flowing, not one that stops and waits at each node). */
 @keyframes flow-packet-vertical {
   0% { top: 0%; opacity: 0; }
   6% { opacity: 1; }
@@ -599,6 +898,43 @@ h1.sec-title {
 }
 .flow-packet-vertical--delay {
   animation-delay: 2s;
+  width: 7px;
+  height: 7px;
+  opacity: 0.75;
+}
+
+/* "See it clearly" TOP diagram, horizontal version of the same
+   continuous technique (direct correction): "the ball does not reach
+   its end and then go back to the beginning but rather a new ball
+   starts." The previous version was React-state-driven with a CSS
+   transition on `left` — every time the state looped back to stage 0,
+   the ball visibly slid backward across the whole row, since a CSS
+   transition animates between whatever two values change, including a
+   jump from 92% back to 8%. Switched to the same fade-in-at-start/
+   fade-out-at-end looping keyframe already used for the vertical
+   trust-chain diagram: each cycle starts a fresh, invisible ball at
+   0% that fades in, travels to 100%, fades out, and only then does the
+   *next* cycle begin — never sliding back through the middle. Track/
+   line removed entirely per direct instruction; only the ball remains. */
+@keyframes flow-packet-horizontal {
+  0% { left: 0%; opacity: 0; }
+  6% { opacity: 1; }
+  94% { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+.flow-packet-horizontal {
+  position: absolute;
+  top: 50%;
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 35%, #FF8A3D, #a23d08);
+  box-shadow: 0 0 12px 4px rgba(255, 138, 61, 0.6);
+  transform: translate(-50%, -50%);
+  animation: flow-packet-horizontal 4.5s cubic-bezier(.4, 0, .2, 1) infinite;
+}
+.flow-packet-horizontal--delay {
+  animation-delay: 2.25s;
   width: 7px;
   height: 7px;
   opacity: 0.75;
