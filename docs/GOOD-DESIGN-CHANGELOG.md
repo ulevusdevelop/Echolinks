@@ -4095,3 +4095,31 @@ each stop, matching what was actually described here.
 
 Verified: `./node_modules/.bin/tsc --noEmit` clean, full
 `./node_modules/.bin/next build` — 26 routes.
+
+## Round 107 — Confirmed the Render build-blocking conflict isn't in this codebase
+
+Direct report of a real Render build failure: "Conflicting public and
+page file was found... /robots.txt" — Next.js refusing to build
+because both `public/robots.txt` (a static file) and
+`pages/robots.txt.tsx` (a dynamic route) existed simultaneously in the
+deployed repo, both trying to serve the same URL.
+
+Traced the cause: an earlier round's own code comment on
+`pages/robots.txt.tsx` confirms it was converted from a static
+`public/robots.txt` file, but nothing indicates the old static file
+was ever actually deleted from the repo at that time. Zip-extraction-
+over-existing-folder only adds/overwrites files, never deletes ones
+missing from the new archive — so that orphaned file has very likely
+persisted silently through every zip delivered since, and would explain
+why a Render build could fail even with otherwise-correct code.
+
+Confirmed this delivery's own `public/` directory has neither a stray
+`robots.txt` nor `sitemap.xml` (the other dynamic route with the same
+static-to-dynamic conversion risk) — this is a repo-state issue on the
+deployment side, not something to fix in the codebase itself, since the
+codebase already only contains the correct dynamic routes.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes, `/robots.txt` and
+`/sitemap.xml` both confirmed building as their own dynamic routes with
+no conflict.
