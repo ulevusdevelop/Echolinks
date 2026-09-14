@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 // SECTION-WIDE FIX (this pass): checked structure, not just copy, against
@@ -76,7 +76,7 @@ const TrustChainDiagram = ({
   const active = nodes.find((n) => n.id === activeId);
 
   return (
-    <div className="rounded-card p-8 md:p-9 flex flex-col" style={{ background: '#16003B' }}>
+    <div className="rounded-card p-10 md:p-12 flex flex-col" style={{ background: '#16003B' }}>
       <h4 className="text-white font-bold mb-3">{title}</h4>
       <p className="text-ink_text-secondary text-sm leading-relaxed mb-8">{description}</p>
 
@@ -180,7 +180,7 @@ const SharedNetworkDiagram = ({
       : activeNode?.detail;
 
   return (
-    <div className="rounded-card p-8 md:p-9 flex flex-col" style={{ background: '#16003B' }}>
+    <div className="rounded-card p-10 md:p-12 flex flex-col" style={{ background: '#16003B' }}>
       <h4 className="text-white font-bold mb-3">{title}</h4>
       <p className="text-ink_text-secondary text-sm leading-relaxed mb-8">{description}</p>
 
@@ -273,26 +273,82 @@ const SharedNetworkDiagram = ({
 // exactly when the packet arrives there, in sync — driven by real React
 // state rather than independent CSS timelines, which can't guarantee
 // that kind of synchronization reliably.
+const TOP_STAGE_POSITIONS = [8, 36, 64, 92]; // System, AI, Blockchain, Checkmark
+const TOP_TRAVEL_MS = 500;
+const TOP_HOLD_MS = 1000;
+const TOP_FADE_MS = 200;
+
 const TopDiagram = () => {
+  // REBUILT again this round, for two reasons at once: (1) direct
+  // report that the pure-CSS staged keyframe from last round wasn't
+  // actually making all the stops in practice ("stops at System then
+  // moves straight to the tick") — rather than keep guessing at CSS
+  // keyframe percentages I can't directly render and inspect, switched
+  // to JS-driven state where every stop is an explicit, debuggable step;
+  // (2) glow-on-arrival needs to be genuinely synced to the ball's
+  // actual position, which independent CSS timelines can't guarantee —
+  // real state makes that synchronization reliable instead of hopeful.
+  //
+  // The original slide-back bug (an earlier round) only happened
+  // because the reset from the last stop back to the first was allowed
+  // to animate while visible. Avoided here on purpose: the position
+  // jumps back to System while opacity is still 0, and stays invisible
+  // for the full TOP_TRAVEL_MS it takes that jump to complete, only
+  // fading in once the ball is already sitting at System with nothing
+  // left to visibly slide.
+  const [stageIndex, setStageIndex] = useState(0);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+    const after = (ms: number, fn: () => void) => {
+      timeouts.push(setTimeout(() => { if (!cancelled) fn(); }, ms));
+    };
+
+    const runCycle = () => {
+      setStageIndex(0); // jump back to System — invisible, so no visible slide
+      setVisible(false);
+      let t = TOP_TRAVEL_MS; // wait for that jump to finish before showing anything
+      after(t, () => setVisible(true));
+      t += TOP_FADE_MS;
+      after(t, () => setStageIndex(1)); // travel to AI
+      t += TOP_TRAVEL_MS + TOP_HOLD_MS;
+      after(t, () => setStageIndex(2)); // travel to Blockchain
+      t += TOP_TRAVEL_MS + TOP_HOLD_MS;
+      after(t, () => setStageIndex(3)); // travel to Checkmark
+      t += TOP_TRAVEL_MS + TOP_HOLD_MS;
+      after(t, () => setVisible(false)); // fade out at Checkmark
+      t += TOP_FADE_MS + 300; // brief invisible pause before next loop
+      after(t, runCycle);
+    };
+
+    runCycle();
+    return () => { cancelled = true; timeouts.forEach(clearTimeout); };
+  }, []);
+
+  const ballStyle = {
+    left: `${TOP_STAGE_POSITIONS[stageIndex]}%`,
+    opacity: visible ? 1 : 0,
+    transition: `left ${TOP_TRAVEL_MS}ms cubic-bezier(.4,0,.2,1), opacity ${TOP_FADE_MS}ms ease`,
+  };
+
+  // Glow classes below fire from the same `stageIndex`/`visible` state
+  // driving the ball, so "arrives and glows" is guaranteed rather than
+  // hoped-for — each icon glows exactly when the ball's stage matches
+  // its own index and the ball is actually visible.
+  const glow = (index: number) =>
+    stageIndex === index && visible
+      ? { filter: 'brightness(1.35) drop-shadow(0 0 14px rgba(255,138,61,0.75))', transition: 'filter 0.4s ease' }
+      : { filter: 'brightness(1) drop-shadow(0 0 0 transparent)', transition: 'filter 0.4s ease' };
+
   return (
-    <div className="rounded-card p-8 md:p-9 mb-8" style={{ background: '#16003B' }}>
-      {/* REBUILT again this round (direct correction): "remove the
-          line" — the track element is gone entirely, only the ball
-          remains. And "the ball does not reach its end and go back to
-          the beginning but a new ball starts" — switched from React-
-          state-driven position (a CSS transition on `left`, which
-          visibly slid backward every time the state looped back to
-          stage 0) to the same continuous fade-in/fade-out keyframe
-          already used for the vertical trust-chain diagram: each cycle
-          starts a fresh, invisible ball at the System icon that fades
-          in, travels to the checkmark, fades out, and only then does
-          the next cycle begin — no backward slide, no visible track. */}
+    <div className="rounded-card p-10 md:p-12 mb-8" style={{ background: '#16003B' }}>
       <div className="relative flex flex-wrap items-center justify-center gap-10 md:gap-16">
-        <span className="flow-packet-horizontal" aria-hidden="true" />
-        <span className="flow-packet-horizontal flow-packet-horizontal--delay" aria-hidden="true" />
+        <span className="flow-packet-horizontal" style={ballStyle} aria-hidden="true" />
 
         {/* System */}
-        <div className="w-16 h-20 flex items-center justify-center relative icon-float">
+        <div className="w-16 h-20 flex items-center justify-center relative icon-float" style={glow(0)}>
           <div className="absolute inset-0 m-auto w-16 h-16 rounded-none rotate-45" style={{ background: 'linear-gradient(135deg, #1c4378, #143360)' }} />
           <div
             className="absolute inset-0 m-auto w-16 h-16 rounded-none rotate-45"
@@ -306,7 +362,7 @@ const TopDiagram = () => {
         <span className="text-ink_text-muted hidden md:block">—</span>
 
         {/* AI */}
-        <div className="w-20 h-20 relative flex items-center justify-center">
+        <div className="w-20 h-20 relative flex items-center justify-center" style={glow(1)}>
           <div className="absolute w-10 h-10 rounded-none rotate-45" style={{ background: 'linear-gradient(135deg, #1c4378, #143360)' }} aria-hidden="true" />
           <div className="absolute w-16 h-16 rounded-full" style={{ background: 'radial-gradient(circle at 40% 35%, #FF8A3D 0%, #F26A1B 55%, #a23d08 100%)', boxShadow: '0 0 24px 6px rgba(255,138,61,0.45)' }} />
           <span className="absolute w-20 h-6 border rounded-full icon-spin" style={{ borderColor: 'rgba(255,138,61,0.5)' }} aria-hidden="true" />
@@ -316,7 +372,7 @@ const TopDiagram = () => {
         <span className="text-ink_text-muted hidden md:block">—</span>
 
         {/* Blockchain */}
-        <div className="w-16 h-20 flex items-center justify-center">
+        <div className="w-16 h-20 flex items-center justify-center" style={glow(2)}>
           <div className="relative" style={{ width: 64, height: 40 }}>
             <div className="absolute left-0 bottom-0 w-7 h-7 rounded-none rotate-45 icon-drift-a" style={{ background: 'linear-gradient(135deg, #d4540f, #a23d08)' }} />
             <div className="absolute left-4 bottom-0 w-7 h-7 rounded-none rotate-45 icon-drift-b" style={{ background: 'linear-gradient(135deg, #F26A1B, #c24d0c)' }} />
@@ -324,11 +380,16 @@ const TopDiagram = () => {
           </div>
         </div>
 
-        {/* Checkmark */}
-        <div className="w-20 h-20 flex items-center justify-center">
+        {/* Checkmark — also solidifies (not just glows) when the ball
+            arrives, since "arrival" here means the chain is complete. */}
+        <div className="w-20 h-20 flex items-center justify-center" style={glow(3)}>
           <span
-            className="w-8 h-8 rounded-full border flex items-center justify-center"
-            style={{ borderColor: 'rgba(61,190,122,0.5)', color: '#3DBE7A', background: 'transparent' }}
+            className="w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-300"
+            style={
+              stageIndex === 3 && visible
+                ? { borderColor: '#3DBE7A', color: '#FFFFFF', background: '#3DBE7A', boxShadow: '0 0 14px 3px rgba(61,190,122,0.55)' }
+                : { borderColor: 'rgba(61,190,122,0.5)', color: '#3DBE7A', background: 'transparent' }
+            }
           >
             ✓
           </span>
@@ -352,24 +413,25 @@ const TopDiagram = () => {
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
-        <span className="tag-mono rounded-none px-4 py-2 border border-ink-border">
+        <span className={`tag-mono rounded-none px-4 py-2 border transition-colors ${stageIndex === 1 && visible ? 'border-accent text-accent-light' : 'border-ink-border'}`}>
           1 A system creates a data event
         </span>
         <span className="text-ink_text-muted">—</span>
-        <span className="tag-mono rounded-none px-4 py-2 border border-ink-border">
+        <span className={`tag-mono rounded-none px-4 py-2 border transition-colors ${stageIndex === 2 && visible ? 'border-accent text-accent-light' : 'border-ink-border'}`}>
           2 Decentralized AI verifies it
         </span>
         <span className="text-ink_text-muted">—</span>
-        <span className="tag-mono rounded-none px-4 py-2 border border-ink-border">
+        <span className={`tag-mono rounded-none px-4 py-2 border transition-colors ${stageIndex === 3 && visible ? 'border-accent text-accent-light' : 'border-ink-border'}`}>
           3 It is anchored to the blockchain
         </span>
       </div>
 
       <div className="flex justify-center mt-5">
-        <span className="tag-mono border border-ink-border rounded-none px-5 py-2">
+        <span className={`tag-mono border rounded-none px-5 py-2 transition-colors ${stageIndex === 3 && visible ? 'border-accent tag-mono--accent' : 'border-ink-border'}`}>
           ✓ Now provable, forever
         </span>
       </div>
+
     </div>
   );
 };

@@ -903,24 +903,39 @@ h1.sec-title {
   opacity: 0.75;
 }
 
-/* "See it clearly" TOP diagram, horizontal version of the same
-   continuous technique (direct correction): "the ball does not reach
-   its end and then go back to the beginning but rather a new ball
-   starts." The previous version was React-state-driven with a CSS
-   transition on `left` — every time the state looped back to stage 0,
-   the ball visibly slid backward across the whole row, since a CSS
-   transition animates between whatever two values change, including a
-   jump from 92% back to 8%. Switched to the same fade-in-at-start/
-   fade-out-at-end looping keyframe already used for the vertical
-   trust-chain diagram: each cycle starts a fresh, invisible ball at
-   0% that fades in, travels to 100%, fades out, and only then does the
-   *next* cycle begin — never sliding back through the middle. Track/
-   line removed entirely per direct instruction; only the ball remains. */
+/* "See it clearly" TOP diagram — REBUILT again this round (direct
+   correction): the previous version traveled the *full* 0%-100% span
+   of its container continuously, which wasn't aligned with where the
+   actual icons sit (System/AI/Blockchain/checkmark aren't at the
+   container's literal edges) — "moves from the end of that component
+   to the other end." What was actually wanted: explicit stops at each
+   icon (System -> AI -> Blockchain -> checkmark), holding at each for
+   1 second, still without the backward-slide problem from two rounds
+   ago. A single CSS keyframe handles both at once: explicit percentage
+   stops with the SAME position value held across a span of the
+   timeline (interpolating between two identical values produces no
+   visible movement, which is what creates each 1-second hold), and —
+   critically — a keyframe loop never interpolates from its last frame
+   back to its first when it repeats, it just resets instantly. Doing
+   this with a keyframe rather than a JS-driven CSS *transition* (the
+   approach two rounds ago) is what avoids the slide-back automatically,
+   not an extra fix layered on top of it. Positions match the icon row
+   built two rounds ago (System/AI/Blockchain/checkmark roughly at
+   8/36/64/92% given their gaps and widths). 5s total cycle: ~0.5s
+   travel between each stop, 1s hold at AI/Blockchain/checkmark, with a
+   fade in/out at the very start/end so the instant reset happens while
+   invisible. */
 @keyframes flow-packet-horizontal {
-  0% { left: 0%; opacity: 0; }
-  6% { opacity: 1; }
-  94% { opacity: 1; }
-  100% { left: 100%; opacity: 0; }
+  0%   { left: 8%;  opacity: 0; }
+  4%   { left: 8%;  opacity: 1; }
+  14%  { left: 36%; opacity: 1; }
+  34%  { left: 36%; opacity: 1; }
+  44%  { left: 64%; opacity: 1; }
+  64%  { left: 64%; opacity: 1; }
+  74%  { left: 92%; opacity: 1; }
+  94%  { left: 92%; opacity: 1; }
+  98%  { left: 92%; opacity: 0; }
+  100% { left: 92%; opacity: 0; }
 }
 .flow-packet-horizontal {
   position: absolute;
@@ -931,10 +946,10 @@ h1.sec-title {
   background: radial-gradient(circle at 35% 35%, #FF8A3D, #a23d08);
   box-shadow: 0 0 12px 4px rgba(255, 138, 61, 0.6);
   transform: translate(-50%, -50%);
-  animation: flow-packet-horizontal 4.5s cubic-bezier(.4, 0, .2, 1) infinite;
+  animation: flow-packet-horizontal 5s cubic-bezier(.4, 0, .2, 1) infinite;
 }
 .flow-packet-horizontal--delay {
-  animation-delay: 2.25s;
+  animation-delay: 2.5s;
   width: 7px;
   height: 7px;
   opacity: 0.75;

@@ -51,7 +51,18 @@ export const ThreeSteps = ({ headingLevel = 'h3' }: { headingLevel?: 'h1' | 'h3'
             correctly as of this same round. */}
         <span className="eyebrow-plain--dark">HOW DOES IT WORK</span>
 
-        <div className="grid md:grid-cols-[1fr_1fr_1.4fr] gap-[10px] rounded-card overflow-hidden mt-6">
+        {/* OVERFLOW FIX (direct instruction): the decorative squares
+            below were already positioned outside the photo's own
+            clipping wrapper (see that inner overflow-hidden div), but
+            this OUTER grid container also had overflow-hidden on it —
+            a second, further-out clip that caught the squares anyway
+            even though they'd escaped the first one. Removed it here:
+            --radius-card is 0px sitewide now (the "no radius" rule),
+            so this overflow-hidden wasn't actually protecting any
+            rounded corners anymore — nothing depends on it, safe to
+            drop so the squares can genuinely float past the photo's
+            edges as intended. */}
+        <div className="grid md:grid-cols-[1fr_1fr_1.4fr] gap-[10px] rounded-card mt-6">
           {/* Photo column */}
           <div className="relative overflow-visible min-h-[280px]" style={{ background: '#16003B' }}>
             <div className="absolute inset-0 overflow-hidden">
@@ -70,21 +81,17 @@ export const ThreeSteps = ({ headingLevel = 'h3' }: { headingLevel?: 'h1' | 'h3'
                 aria-hidden="true"
               />
             </div>
-            {/* SIZE + POSITION FIX (blueprint): these were sized too
-                small relative to how they sit on the live site — sized
-                up, and given room to actually float on top of the
-                photo's border (the wrapper above now clips the photo
-                itself via an inner overflow-hidden div, while these
-                squares sit on the outer, non-clipped element so they
-                can overhang the edge properly instead of being cut
-                off). */}
+            {/* SIZE + POSITION FIX (direct feedback): sized up further
+                still, kept genuinely different sizes from each other
+                (not matching pairs), and nudged inward from the left
+                edge a little rather than sitting flush against it. */}
             <span
-              className="absolute -top-5 left-6 w-8 h-8 hidden md:block z-10"
+              className="absolute -top-7 left-9 w-11 h-11 hidden md:block z-10"
               style={{ background: '#FF6100' }}
               aria-hidden="true"
             />
             <span
-              className="absolute top-3 left-12 w-10 h-10 hidden md:block z-10"
+              className="absolute top-4 left-16 w-14 h-14 hidden md:block z-10"
               style={{ background: '#16003B' }}
               aria-hidden="true"
             />

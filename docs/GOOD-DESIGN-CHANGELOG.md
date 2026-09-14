@@ -4255,3 +4255,90 @@ feature either.
 Verified: `./node_modules/.bin/tsc --noEmit` clean, full
 `./node_modules/.bin/next build` — 26 routes, `/how-it-works` confirmed
 building.
+
+## Round 113 — Top diagram: staged stops (1s each) without reintroducing the slide-back
+
+Direct correction: the ball was traveling the full 0%-100% span of its
+container, not aligned with where System/AI/Blockchain/checkmark
+actually sit — "moves from the end of that component to the other
+end." Wanted instead: explicit stops at each icon, holding 1 second at
+each, System -> AI -> Blockchain -> checkmark.
+
+Rebuilt the keyframe with explicit percentage stops at the actual icon
+positions (8/36/64/92%, matching the icon row's layout), each held
+constant across a span of the timeline — interpolating between two
+identical position values produces no visible movement, which is what
+creates each hold, and travel segments between stops still animate
+smoothly. This achieves the staged behavior without reopening the
+slide-back problem from two rounds ago, because that problem was
+specific to using a JS-state-driven CSS *transition* — a keyframe loop
+never interpolates from its last frame back to its first when it
+repeats, it just resets instantly, which a transition-based approach
+can't do. 5s total cycle: ~0.5s travel between each stop, 1s hold at
+AI/Blockchain/checkmark, with fade in/out at the very start/end so the
+instant reset happens while invisible.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes, `/how-it-works` confirmed
+building.
+
+## Round 114 — ThreeSteps decorative squares: found the real clipping cause
+
+Direct instruction: the two decorative squares on the photo should
+float/overhang past the image's own border, not be constrained to it,
+and should be sized up slightly further.
+
+Found the real cause of why they weren't overflowing despite already
+being positioned outside the photo's own inner clipping wrapper (from
+an earlier round's fix): the *outer* 3-column grid container also had
+`overflow-hidden` on it — a second, further-out clip that caught the
+squares anyway even after they'd escaped the first one. Checked whether
+that outer clip was actually protecting anything (rounded corners,
+typically) before removing it: `--radius-card` is 0px sitewide now (the
+"no radius" rule from a previous round), so `rounded-card` on this
+container doesn't round anything anymore — the overflow-hidden had
+nothing left to protect. Removed it, and confirmed the grid's other two
+columns (the orange panel, the steps list) don't rely on it for
+anything either. Squares sized up again on top of the earlier increase.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes, `/how-it-works` confirmed
+building.
+
+## Round 115 — Top diagram rebuilt again: real stops, synced glow, cleaner boxes
+
+Direct report that the pure-CSS staged keyframe from last round wasn't
+actually making all its stops in practice ("stops at System then moves
+straight to the tick"). Re-checked the keyframe's own syntax and
+couldn't find a structural bug in it — but since I have no way to
+directly render and inspect a running CSS animation in this
+environment, rather than keep guessing at keyframe percentages,
+switched to a fully JS-driven approach where every stop is an explicit,
+debuggable step instead of something inferred from independent CSS
+timing.
+
+**Glow on arrival, added**: each icon (System, AI, Blockchain,
+checkmark) now visibly glows exactly when the ball's real state says
+it has arrived there — genuinely synced, since it's driven by the same
+state controlling the ball's position, not a guess at matching
+independent timelines. The checkmark specifically also solidifies to
+solid green (not just a glow) on arrival, since that arrival means the
+whole chain completed.
+
+**The original slide-back bug avoided on purpose, not by accident**:
+the reset back to System only happens while the ball is invisible
+(opacity 0), and stays invisible for the full travel duration that
+jump takes, only fading back in once it's already sitting at System
+with nothing left to visibly slide across the row.
+
+**ThreeSteps decorative squares**: sized up further, kept genuinely
+different sizes from each other (already were, kept that), and nudged
+inward from the left edge rather than sitting flush against it.
+
+**Padding added to all 3 animation cards** (the top diagram and both
+vertical trust-chain/shared-network diagrams) — p-8/p-9 -> p-10/p-12 —
+for a cleaner, less cramped look overall, per direct feedback.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes, `/how-it-works` confirmed
+building.
