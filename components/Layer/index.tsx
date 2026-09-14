@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 export type LayerStep = {
   number: string;
@@ -54,13 +55,15 @@ const steps: LayerStep[] = [
   },
 ];
 
-// STYLE FIX (Layer Page item 2): mirrored from the old site's
-// /automation page accordion — rows are sharp-cornered (no
-// border-radius), WHITE background boxes with a thin gray border, dark
-// navy text, instead of the previous dark purple `.card` treatment.
-// Previously these rows already had a working "+" expand and click
-// handler; only the color/shape treatment was wrong, not the
-// behavior — kept the interaction, changed the surface.
+// STYLE FIX (direct request): "Similar to how you built the section for
+// WHO WE SERVE... I want you to do the same thing for the very first
+// section on that page [the Layer page]." Rebuilt entirely to match
+// WhoWeServe's specific pattern: the same purple-to-orange diagonal
+// gradient background, the same 2-column layout (intro text left, an
+// expandable list right), and the same click-to-expand "+/−" row
+// behavior with white/80 text throughout — replacing the previous
+// white-card accordion styling (itself mirrored from the old site's
+// /automation page) with this different, now-requested treatment.
 export const Layer = () => {
   const [openId, setOpenId] = useState<string | null>(null);
   const firstRowRef = useRef<HTMLDivElement>(null);
@@ -69,101 +72,89 @@ export const Layer = () => {
     setOpenId((current) => (current === id ? null : id));
   };
 
-  // Makes the "Click any layer..." sentence itself an actual trigger
-  // (item 2: "Ensure that the statement... is clickable"), not just
-  // descriptive text next to clickable rows below it.
   const openFirstRow = () => {
     setOpenId(steps[0].number);
     firstRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
   return (
-    <section id="layer" className="section">
-      <div className="wrap">
-        <div className="sec-header max-w-2xl mx-auto text-center">
-          <span className="eyebrow-plain">HOW IT WORKS</span>
-          <h1 className="sec-title">One layer. Five jobs. Verifiable end to end.</h1>
-          <p className="sec-sub sec-sub--center">
+    <section
+      id="layer"
+      className="relative overflow-hidden py-[50px] lg:py-[100px]"
+      // BACKGROUND CHANGED (direct feedback): "you have done well but i
+      // will like a different background" — was the same purple-to-
+      // orange diagonal gradient as WhoWeServe; switched to a solid
+      // dark purple instead, keeping everything else about the
+      // WhoWeServe-style layout (2-column, expandable list, white/80
+      // text) exactly as it was.
+      style={{ background: '#16003B' }}
+    >
+      <div className="wrap grid lg:grid-cols-[1fr_1.4fr] gap-12 lg:gap-20 items-start">
+        <RevealOnScroll>
+          <span className="text-xs font-bold tracking-tag uppercase text-white block mb-4">
+            HOW IT WORKS
+          </span>
+          <h2 className="text-white font-bold text-3xl md:text-4xl leading-tight mb-5">
+            One layer. Five jobs. Verifiable end to end.
+          </h2>
+          <p className="text-white/80 text-[20px] font-normal leading-relaxed">
             Five jobs that usually live in five different tools. Echolink brings them
             together into one layer and connects them through deep integration work.{' '}
             <button
               type="button"
               onClick={openFirstRow}
-              className="text-accent-light underline underline-offset-2 hover:text-accent"
+              className="text-white underline underline-offset-2 font-semibold hover:text-[#16003B]"
             >
               Click any layer to see what we do and what it solves.
             </button>
           </p>
-        </div>
+        </RevealOnScroll>
 
-        <div className="flex flex-col gap-4">
+        <RevealOnScroll delayMs={150}>
+        <div className="flex flex-col">
           {steps.map((step, i) => {
             const isOpen = openId === step.number;
             return (
               <div
                 key={step.number}
                 ref={i === 0 ? firstRowRef : undefined}
-                className={`bg-white rounded-none border transition-all ${
-                  step.highlight ? 'border-l-4' : 'border-[#E5E5E5]'
-                } ${isOpen ? 'border-[#FF6100]' : ''}`}
-                style={step.highlight ? { borderLeftColor: '#FF6100' } : undefined}
+                className={`py-6 ${i < steps.length - 1 ? 'border-b border-white/20' : ''}`}
               >
                 <button
                   type="button"
                   onClick={() => toggle(step.number)}
-                  className="w-full text-left flex items-start md:items-center gap-6 p-6 md:p-7"
+                  className="flex items-start gap-5 w-full text-left"
                 >
-                  <span
-                    className="flex-shrink-0 w-12 h-12 rounded-none border flex items-center justify-center font-mono font-bold text-sm"
-                    style={{ borderColor: '#16003B', color: '#FF6100' }}
-                  >
+                  <span className="font-bold text-sm text-white flex-shrink-0 mt-0.5 w-8">
                     {step.number}
                   </span>
-                  <span className="flex-1 min-w-0">
-                    <span className="block font-bold text-lg mb-2" style={{ color: '#16003B' }}>
-                      {step.title}
-                    </span>
-                    <span className="block text-[#434343] text-sm leading-relaxed max-w-2xl">
-                      {step.description}
-                    </span>
-                  </span>
-                  <span
-                    className="hidden md:block font-mono text-xs tracking-tag uppercase"
-                    style={{ color: step.highlight ? '#FF6100' : '#707070' }}
-                  >
-                    {step.tag}
-                  </span>
-                  <span
-                    className={`text-2xl leading-none flex-shrink-0 transition-transform ${
-                      isOpen ? 'rotate-45' : ''
-                    }`}
-                    style={{ color: '#FF6100' }}
-                    aria-hidden="true"
-                  >
-                    +
-                  </span>
-                </button>
-
-                {isOpen && (
-                  <div className="px-6 md:px-7 pb-7 flex flex-col gap-3">
-                    <div className="bg-[#F7F7F9] rounded-none p-5 border border-[#E5E5E5]">
-                      <p className="text-sm leading-relaxed text-[#434343]">
-                        <span className="font-bold" style={{ color: '#FF6100' }}>What we do:</span>{' '}
-                        {step.whatWeDo}
-                      </p>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between gap-4">
+                      <h4 className="text-white font-bold mb-1">{step.title}</h4>
+                      <span className="text-white/70 text-xl leading-none flex-shrink-0">
+                        {isOpen ? '−' : '+'}
+                      </span>
                     </div>
-                    <div className="bg-[#F7F7F9] rounded-none p-5 border border-[#E5E5E5]">
-                      <p className="text-sm leading-relaxed text-[#434343]">
-                        <span className="font-bold" style={{ color: '#FF6100' }}>What it solves:</span>{' '}
-                        {step.whatItSolves}
-                      </p>
-                    </div>
+                    <p className="text-white/80 text-sm leading-relaxed">{step.description}</p>
+                    {isOpen && (
+                      <div className="mt-4 pt-4 border-t border-white/15 flex flex-col gap-3 text-sm leading-relaxed">
+                        <p>
+                          <span className="font-bold text-white">What we do: </span>
+                          <span className="text-white/80">{step.whatWeDo}</span>
+                        </p>
+                        <p>
+                          <span className="font-bold text-white">What it solves: </span>
+                          <span className="text-white/80">{step.whatItSolves}</span>
+                        </p>
+                      </div>
+                    )}
                   </div>
-                )}
+                </button>
               </div>
             );
           })}
         </div>
+        </RevealOnScroll>
       </div>
     </section>
   );

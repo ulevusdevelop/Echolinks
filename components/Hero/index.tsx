@@ -3,57 +3,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 
-// Hand-drawn-style connector arrows, reproducing the old site's signature
-// device: loose white curves with arrowheads threading through the photo
-// grid. Approximated as smooth bezier paths, not traced from the original
-// — still an approximation, flagged honestly rather than claimed exact.
-// viewBox resized to 380x570 to match the corrected diagonal-cascade
-// collage geometry (see the geometry fix below). NO explicit z-index
-// here anymore — it renders first in the DOM and the photos/square
-// render after with no z-index of their own, so normal stacking order
-// already puts the photos above the lines. Previously this had z-10,
-// which incorrectly forced the lines to always paint on top of the
-// images instead of passing behind them.
-// Hand-drawn-style connector arrows, reproducing the old site's signature
-// device: loose white curves with arrowheads threading through the photo
-// grid.
-//
-// REBUILT AGAIN this round, direct feedback: the previous rebuild
-// (thicker strokes, tighter crossing curves) still didn't look as good
-// as it should, nowhere near the quality bar Industries' curve sets.
-// Traced the reference more carefully this time rather than
-// approximating from memory: it has two long, GRACEFUL curves each
-// spanning nearly the full height of the collage — one starting
-// off-canvas at the top and sweeping down to an arrowhead in the
-// lower-middle area, the other starting at the bottom photo and
-// sweeping up to an arrowhead near the top — crossing once, roughly in
-// the middle. The previous rebuild's curves were shorter and bent more
-// sharply, which reads as busier and less confident than one long,
-// smooth sweep per line. Rebuilt with gentler control points so each
-// curve reads as a single graceful arc rather than a multi-bend path.
-const ArrowLines = () => (
-  <svg
-    viewBox="0 0 420 630"
-    fill="none"
-    className="absolute inset-0 w-full h-full pointer-events-none"
-    aria-hidden="true"
-  >
-    <path
-      d="M410 0 C 300 110, 260 260, 350 360 C 385 400, 365 480, 385 555"
-      stroke="rgba(255,255,255,0.92)"
-      strokeWidth="4"
-      strokeLinecap="round"
-    />
-    <path
-      d="M15 615 C 150 555, 130 400, 260 300 C 320 254, 305 160, 365 85"
-      stroke="rgba(255,255,255,0.78)"
-      strokeWidth="4"
-      strokeLinecap="round"
-    />
-    <path d="M385 555 l-19 10 l5 -22 Z" fill="rgba(255,255,255,0.92)" />
-    <path d="M365 85 l-6 22 l-16 -16 Z" fill="rgba(255,255,255,0.78)" />
-  </svg>
-);
+// REMOVED (direct instruction): "Completely remove the lines on the
+// Hero section." The ArrowLines component that used to render here
+// (three rebuilds across earlier rounds, chasing the old site's
+// hand-drawn connector-line device) is gone entirely, not just hidden
+// — deleted rather than left as unused dead code, consistent with how
+// this codebase already treats anything removed by direct feedback.
 
 // Real placeholder photography (via Picsum, a widely-used dev/placeholder
 // image service — actual photographs, not fabricated content, and not
@@ -139,7 +94,15 @@ export const Hero = () => {
           larger gap-24 (set earlier this round) is what keeps the two
           from reading as cramped now that the row is wider again. */}
       <div className="wrap relative">
-        <div className="grid lg:grid-cols-[1fr_420px] gap-24 items-center py-20 lg:py-32">
+        {/* WIDTH FIX (direct correction): text column needs to occupy
+            at least 65% of the row's width — the previous 1.4fr/380px
+            ratio didn't guarantee that at every viewport size. Switched
+            to an explicit percentage split (65%/1fr) so the text column
+            is always exactly 65%, with the image column taking
+            whatever's left. Gap reduced slightly (24->16) since a 65/35
+            split leaves less room for a wide gap than the previous,
+            more generous ratio did. */}
+        <div className="grid lg:grid-cols-[65%_1fr] gap-16 items-center py-20 lg:py-32">
         {/* MOTION FIX (Homepage item 1): "the header should have a
             fly-in animation from the bottom, as it is in the original
             website." Wrapped the text column in RevealOnScroll (an
@@ -157,7 +120,18 @@ export const Hero = () => {
               render at .sec-title's 700 (the H2 tier) instead of the
               spec's 700-800 H1 tier — same reason its size already had
               its own override below, just extended to weight too. */}
-          <h1 className="sec-title !text-[44px] md:!text-[58px] !leading-[65px] !font-extrabold">
+          {/* TYPOGRAPHY FIX — exact values from the live production
+              site's own computed CSS (blueprint): font-size 44px below
+              1024px (line-height 1.2em there specifically), 53px from
+              1024-1423px, 64px above 1423px (line-height 65px at both
+              of the wider tiers). Weight now comes from the h1.sec-title
+              rule alone (600, corrected from 800 — see that rule's own
+              comment) — the redundant !font-extrabold override that
+              used to sit here is gone; having two different !important
+              weight declarations competing for the same property was
+              exactly what produced the "crossed out" conflicting rules
+              flagged directly. */}
+          <h1 className="sec-title !text-[44px] !leading-[1.2] lg:!text-[53px] lg:!leading-[65px] min-[1423px]:!text-[64px]">
             Where AI, automation, and blockchain{' '}
             <span className="text-accent">work as one</span>.
           </h1>
@@ -230,7 +204,6 @@ export const Hero = () => {
             height: 630,
           }}
         >
-          <ArrowLines />
           <div style={{ gridColumn: 1, gridRow: 1, width: 210, height: 210 }}>
             <PlaceholderPhoto
               seed="echolink-team-collab"

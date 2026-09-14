@@ -1,4 +1,5 @@
 import React from 'react';
+import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 export const NotACryptoPlay = () => {
   return (
@@ -23,17 +24,20 @@ export const NotACryptoPlay = () => {
         }}
       />
       <div className="wrap relative grid md:grid-cols-2 gap-12 items-center">
+        <RevealOnScroll>
         <div>
           <span className="tag-mono tag-mono--accent">LET&apos;S BE CLEAR</span>
           <h2 className="sec-title mt-3">We are not a crypto play.</h2>
-          <p className="text-ink_text-secondary text-base leading-relaxed mt-5 max-w-md">
+          <p className="text-ink_text-secondary text-[20px] font-normal leading-relaxed mt-5 max-w-md">
             No token. No coin. No speculation. We are an integration company
             that uses blockchain as a trust tool, the same way you use a
             database. Your buyers never touch crypto, and they never need to
             understand it.
           </p>
         </div>
+        </RevealOnScroll>
 
+        <RevealOnScroll delayMs={150}>
         <div className="flex flex-col gap-3">
           {[
             { text: 'Not a token or coin to buy', positive: false },
@@ -62,6 +66,7 @@ export const NotACryptoPlay = () => {
             </div>
           ))}
         </div>
+        </RevealOnScroll>
       </div>
     </section>
   );

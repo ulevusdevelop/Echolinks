@@ -58,9 +58,9 @@ export default function WhitePapersPage() {
         <meta property="og:description" content="Practical guides on EDI, API, and FACET implementation, and where integration and automation are headed next." />
       </Head>
 
-      <section className="relative overflow-hidden pt-28 pb-20" style={{ background: '#16003B' }}>
+      <section className="relative overflow-hidden pt-44 pb-20" style={{ background: '#16003B' }}>
         <div className="wrap">
-          <h1 className="text-white font-bold text-4xl md:text-5xl">White Papers</h1>
+          <h1 className="text-white !font-bold text-4xl md:text-5xl">White Papers</h1>
         </div>
       </section>
 

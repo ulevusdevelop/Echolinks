@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { RevealOnScroll } from '@/components/RevealOnScroll';
 import {
   LinkIcon,
   CalendarDaysIcon,
@@ -22,18 +23,35 @@ const checklist = [
   { title: 'Agentic execution.', description: 'Decentralized agents act inside your systems under policy controls you set.' },
 ];
 const sizedFor = [
-  { tag: 'FOR INDIVIDUALS', title: 'People & everyday use', description: 'Personal AI you control, that keeps your data yours. Verifiable, private, and simple.' },
-  { tag: 'FOR ENTREPRENEURS', title: 'Founders & small business', description: 'AI agents that run real work, sales, finance, operations, so a lean team moves like a big one.' },
-  { tag: 'FOR ENTERPRISE', title: 'Large organizations', description: 'Decentralized AI across many systems and teams, under policy controls, with full audit trails.' },
+  { tag: 'FOR INDIVIDUALS', title: 'People & everyday use', description: 'Personal AI you control, that keeps your data yours. Verifiable, private, and simple, no company or technical team required.' },
+  { tag: 'FOR ENTREPRENEURS', title: 'Founders & small business', description: 'AI agents that run real work, sales, finance, operations, so a lean team moves like a big one, with every action provable.' },
+  { tag: 'FOR ENTERPRISE', title: 'Large organizations', description: 'Decentralized AI across many systems and teams, under policy controls, with full audit trails and no vendor lock-in.' },
 ];
 const serviceCards = [
   { title: 'Enterprise integration', description: 'EDI, APIs, ERP, WMS, MES, SCADA, and HL7/FHIR connected without rip and replace.', Icon: LinkIcon },
-  { title: 'Project scheduling, controls & EVM', description: 'CPM schedules, baselines, earned value, and reporting tied to live data.', link: { label: 'See project controls', href: '/project-controls' }, Icon: CalendarDaysIcon },
-  { title: 'Automation & robotics', description: 'Robots, fleets, and line controls wired into your systems, output anchored to a trust record.', Icon: CogIcon },
-  { title: 'Blockchain trust layer', description: 'Cryptographic provenance for every AI decision, agent action, and machine transaction.', Icon: ShieldCheckIcon },
+  { title: 'Project scheduling, controls & EVM', description: 'CPM schedules, baselines, earned value, and reporting tied to live cost and progress data.', link: { label: 'See project controls', href: '/project-controls' }, Icon: CalendarDaysIcon },
+  { title: 'Automation & robotics', description: 'Robots, fleets, and line controls wired into your systems and proving completed work, with output anchored to a trust record.', Icon: CogIcon },
+  { title: 'Blockchain trust layer', description: 'Cryptographic provenance for every AI decision, agent action, and machine transaction. Audit-ready by design.', Icon: ShieldCheckIcon },
   { title: 'Verifiable traceability', description: 'Tamper-proof provenance for airlines, air taxis, supply chain, pharma, food, and luxury goods.', link: { label: 'See traceability', href: '/traceability' }, Icon: MagnifyingGlassIcon },
   { title: 'Training & enablement', description: 'Hands-on cohorts and role-based tracks so your team can run what we build.', link: { label: 'See training', href: '/training' }, Icon: AcademicCapIcon },
 ];
+// CONTENT RESTORATION (sitewide content-completeness scan): checked
+// every string in this file against the reference line by line, not
+// just heading/structure match. Found 6 trimmed descriptions across
+// sizedFor and serviceCards — each missing its closing clause compared
+// to the reference:
+//   - "People & everyday use" was missing "no company or technical
+//     team required."
+//   - "Founders & small business" was missing "with every action
+//     provable."
+//   - "Large organizations" was missing "and no vendor lock-in."
+//   - "Project scheduling..." said "tied to live data" where the
+//     reference says "tied to live cost and progress data."
+//   - "Automation & robotics" was missing "and proving completed
+//     work."
+//   - "Blockchain trust layer" was missing its second sentence,
+//     "Audit-ready by design."
+// All 6 restored to the reference's exact wording above.
 
 // `headingLevel` fixes a real heading-hierarchy gap found during a
 // sitewide h1 audit: used standalone on /services (needs h1, nothing
@@ -60,7 +78,8 @@ export const CoreServices = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h
           <path d="M274 24 l14 -4 l-6 15 Z" fill="rgba(255,96,0,0.18)" />
         </svg>
         <div className="wrap relative">
-          <div className="sec-header max-w-xl">
+        <RevealOnScroll>
+          <div className="sec-header max-w-2xl">
             <span className="eyebrow-plain">WHAT WE DO</span>
             <Heading className="sec-title">Core services. Decentralized AI leads.</Heading>
             <p className="sec-sub">
@@ -68,14 +87,16 @@ export const CoreServices = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h
               Start with one. Most clients start with decentralized AI.
             </p>
           </div>
+        </RevealOnScroll>
 
           {/* STYLE FIX (Layer Page item 4): inner box switched from the
               dark `.card` treatment to a sharp-cornered white box with
               dark text, per the reference — "make the inner box a sharp
               rectangle and white, the words can be dark." */}
+        <RevealOnScroll delayMs={150}>
           <div className="bg-white rounded-none grid lg:grid-cols-[1.3fr_1fr] gap-12 p-8 md:p-12">
             <div>
-              <span className="font-mono text-xs font-bold tracking-tag uppercase" style={{ color: '#FF6100' }}>
+              <span className="text-xs font-bold tracking-tag uppercase" style={{ color: '#FF6100' }}>
                 FLAGSHIP SERVICE
               </span>
               <h3 className="text-2xl font-bold mt-3 mb-4" style={{ color: '#16003B' }}>
@@ -106,7 +127,7 @@ export const CoreServices = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h
             </div>
 
             <div className="bg-[#F7F7F9] rounded-none p-6 border border-[#E5E5E5]">
-              <span className="font-mono text-xs font-bold tracking-tag uppercase" style={{ color: '#FF6100' }}>
+              <span className="text-xs font-bold tracking-tag uppercase" style={{ color: '#FF6100' }}>
                 ● WHY DECENTRALIZED
               </span>
               <div className="flex flex-col gap-4 mt-6">
@@ -128,7 +149,9 @@ export const CoreServices = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h
               </div>
             </div>
           </div>
+        </RevealOnScroll>
 
+        <RevealOnScroll delayMs={250}>
           <div className="mt-24">
             <p className="tag-mono mb-8">DECENTRALIZED AI, SIZED FOR WHO YOU ARE</p>
             <div className="grid md:grid-cols-3 gap-6">
@@ -143,6 +166,7 @@ export const CoreServices = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h
               ))}
             </div>
           </div>
+        </RevealOnScroll>
         </div>
       </section>
 
@@ -156,6 +180,7 @@ export const CoreServices = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h
           purple/white section rule. */}
       <section className="bg-white py-[50px] lg:py-[100px]">
         <div className="wrap">
+        <RevealOnScroll>
           <div className="grid md:grid-cols-3 gap-x-10 gap-y-12">
             {serviceCards.map((card) => (
               <div key={card.title}>
@@ -179,6 +204,7 @@ export const CoreServices = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h
               </div>
             ))}
           </div>
+        </RevealOnScroll>
         </div>
       </section>
     </>

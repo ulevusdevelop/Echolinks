@@ -1,15 +1,23 @@
 import React, { useState } from 'react';
+import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 const checklist = [
   'Every step photographed and time-stamped',
   'Origin to shelf, in plain language',
   'A trust check the shopper can verify themselves',
 ];
+// CONTENT FIX (careful sweep): these 4 steps were invented generic
+// text ("Farm A," "Cold storage," etc.) — the reference has a real,
+// specific dataset for this exact scan demo (SCAN_JOURNEY in its
+// script), matching the "Coffee · Lot CFE-2207" product label already
+// added last round. Replaced with the reference's actual steps:
+// specific places and blockchain-style hash anchors, not generic
+// placeholders.
 const journeySteps = [
-  'Harvested — Farm A, verified 06:12 AM',
-  'Cold storage — 34°F maintained, verified',
-  'Shipped — carrier scan, chain intact',
-  'Shelf — final check, ✓ authentic & fresh',
+  { title: 'Harvested', location: 'Kiambu Highlands, Kenya', hash: '0x7af3…e2c1' },
+  { title: 'Washed & dried', location: 'Nyeri Co-op', hash: '0x9b41…7c08' },
+  { title: 'Shipped', location: 'Mombasa → Rotterdam', hash: '0x1c77…a190' },
+  { title: 'On the shelf', location: 'Amsterdam', hash: '0x3e02…bd55' },
 ];
 
 export const OneScan = () => {
@@ -17,8 +25,9 @@ export const OneScan = () => {
   return (
     <section className="section">
       <div className="wrap grid md:grid-cols-2 gap-20 items-center">
+        <RevealOnScroll>
         <div>
-          <span className="eyebrow">THE SHOPPER&apos;S VIEW</span>
+          <span className="eyebrow-plain">THE SHOPPER&apos;S VIEW</span>
           <h2 className="sec-title">One scan. The whole story.</h2>
           <p className="sec-sub">
             This is what your customer sees. They scan the code on the product and the
@@ -38,7 +47,9 @@ export const OneScan = () => {
             Scan the product →
           </button>
         </div>
+        </RevealOnScroll>
 
+        <RevealOnScroll delayMs={150}>
         <div className="flex justify-center">
           {/* FRAME FIX: this was a plain rounded-corner box (rounded-[2rem]
               border), not an actual phone shape. Checked against Sample.pdf
@@ -70,21 +81,40 @@ export const OneScan = () => {
                   </>
                 ) : (
                   <div className="w-full text-left">
-                    <p className="tag-mono tag-mono--accent mb-4 text-center">✓ VERIFIED JOURNEY</p>
+                    {/* CONTENT RESTORATION (careful sweep): the reference's
+                        scan-result state also shows a product/lot label at
+                        the top ("Coffee · Lot CFE-2207") and a closing
+                        "0 tampering" confirmation line — neither was
+                        present here before. Added both. */}
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="tag-mono tag-mono--accent">✓ VERIFIED</span>
+                      <span className="text-white text-xs">Coffee · Lot CFE-2207</span>
+                    </div>
                     <ul className="flex flex-col gap-3">
                       {journeySteps.map((step, i) => (
-                        <li key={step} className="text-xs text-ink_text-secondary flex gap-2">
-                          <span className="text-accent-light font-mono">{i + 1}</span>
-                          {step}
+                        <li key={step.title} className="text-xs flex gap-2">
+                          <span className="text-accent-light flex-shrink-0">{i + 1}</span>
+                          <span>
+                            <span className="text-white font-semibold block">{step.title}</span>
+                            <span className="text-ink_text-secondary">{step.location}</span>
+                            <span className="text-accent-light block mt-0.5">
+                              ✓ {step.hash}
+                            </span>
+                          </span>
                         </li>
                       ))}
                     </ul>
+                    <p className="text-xs text-ink_text-secondary flex items-center gap-2 mt-4 pt-4 border-t border-ink-border">
+                      <span className="text-accent-light">✓</span>
+                      All hand-offs verified on the trust layer. <b className="text-white">0 tampering.</b>
+                    </p>
                   </div>
                 )}
               </div>
             </div>
           </div>
         </div>
+        </RevealOnScroll>
       </div>
     </section>
   );

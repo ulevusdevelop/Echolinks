@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 const points = [
   {
@@ -34,7 +35,8 @@ export const WhyDecentralized = () => {
   return (
     <section id="why-decentralized" className="relative bg-[#FFFFFF] py-[50px] lg:py-[100px]">
       <div className="wrap">
-        <div className="max-w-2xl mx-auto text-center mb-16">
+        <RevealOnScroll>
+        <div className="max-w-4xl mx-auto text-center mb-16">
           <span className="tag-mono !text-[#B24300] mb-4 inline-block">
             WHY DECENTRALIZED AI
           </span>
@@ -42,19 +44,21 @@ export const WhyDecentralized = () => {
             Your systems already do the work. They can&apos;t yet prove it, or
             protect you.
           </h2>
-          <p className="text-[#434343] text-base leading-relaxed">
+          <p className="text-[#434343] text-[20px] font-normal leading-relaxed">
             You do not move off what you run. You add a layer on top of it. Here is
             the honest reason that layer matters, and how it protects you.
           </p>
         </div>
+        </RevealOnScroll>
 
-        <div className="max-w-3xl mx-auto border-t border-[#16003B]/15">
+        <RevealOnScroll delayMs={150}>
+        <div className="max-w-5xl mx-auto border-t border-[#16003B]/15">
           {points.map((point) => (
             <div
               key={point.number}
               className="grid md:grid-cols-[80px_1fr] gap-4 md:gap-10 py-8 border-b border-[#16003B]/15"
             >
-              <span className="text-[#B24300] font-mono font-bold text-2xl">
+              <span className="text-[#B24300] font-bold text-2xl">
                 {point.number}
               </span>
               <div>
@@ -72,8 +76,10 @@ export const WhyDecentralized = () => {
             </div>
           ))}
         </div>
+        </RevealOnScroll>
 
-        <div className="max-w-2xl mx-auto text-center mt-14 border border-[#16003B]/20 rounded-card p-8">
+        <RevealOnScroll delayMs={250}>
+        <div className="max-w-4xl mx-auto text-center mt-14 border border-[#16003B]/20 rounded-card p-8">
           <span className="tag-mono !text-[#B24300]">THE HONEST PART</span>
           <p className="text-[#434343] text-sm leading-relaxed mt-4 mb-6">
             You do not need to rip out a thing. Your systems keep running the work
@@ -86,6 +92,7 @@ export const WhyDecentralized = () => {
             Talk through your setup →
           </Link>
         </div>
+        </RevealOnScroll>
       </div>
     </section>
   );

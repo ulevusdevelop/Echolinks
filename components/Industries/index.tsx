@@ -7,20 +7,13 @@ import { RevealOnScroll } from '@/components/RevealOnScroll';
 // of industry names on the left with underline dividers, a heading +
 // paragraph on the right, and a curved orange decorative line in the
 // corner.
+// REMOVED "Energy" (direct instruction) — reverts the earlier addition
+// back to the original 4-item list.
 const industries = ['Healthcare', 'Retail', 'Manufacturing', 'Transportation'];
 
 export const Industries = () => {
   return (
     <section className="relative overflow-hidden py-[50px] lg:py-[100px]" style={{ background: '#16003B' }}>
-      {/* SCALE + SHAPE FIX: checked directly against the old homepage's
-          own Industries-area decoration — it's a thick, bold curve
-          sweeping the FULL height of the section from the top edge down
-          to the bottom-right corner, not a thin (2px stroke) squiggle
-          contained in a small 260x180 box in the corner, which is what
-          this had become. Rebuilt as a full-height sweep with a much
-          heavier stroke, matching the reference's actual scale and
-          confidence. Dropped the small arrowhead — the reference crop
-          doesn't show one, just a clean uninterrupted sweep. */}
       <svg
         viewBox="0 0 400 800"
         fill="none"
@@ -36,19 +29,29 @@ export const Industries = () => {
         />
       </svg>
 
-      <div className="wrap grid md:grid-cols-2 gap-12 items-center relative">
+      <div className="wrap grid md:grid-cols-[0.85fr_1.15fr] gap-12 items-center relative">
         <RevealOnScroll>
           <ul className="flex flex-col">
-            {/* BOLDER (direct feedback): was border-b (1px) at 20%
-                opacity — quite faint against the dark purple background.
-                Doubled both thickness and opacity for real visual
-                weight. */}
-            {industries.map((name, i) => (
+            {/* EXTRA LINE (direct instruction): the last item had no
+                bottom divider (by design, to avoid a trailing line with
+                nothing below it) — added one more line under
+                Transportation too, so every item now has a divider,
+                including the last. */}
+            {industries.map((name) => (
               <li
                 key={name}
-                className={`py-5 ${i < industries.length - 1 ? 'border-b-2 border-white/40' : ''}`}
+                className="py-5 border-b-2 border-white"
               >
-                <span className="text-white font-bold text-lg tracking-wide uppercase">
+                <span
+                  style={{
+                    fontFamily: 'var(--font-syne), sans-serif',
+                    fontSize: '21px',
+                    fontWeight: 900,
+                    textTransform: 'uppercase',
+                    lineHeight: '49px',
+                    color: '#FFFFFF',
+                  }}
+                >
                   {name}
                 </span>
               </li>
@@ -57,10 +60,17 @@ export const Industries = () => {
         </RevealOnScroll>
 
         <RevealOnScroll delayMs={150}>
-          <h2 className="text-white font-bold text-3xl md:text-4xl leading-tight mb-5">
+          <h2
+            className="mb-5"
+            style={{ fontFamily: 'var(--font-syne), sans-serif', fontWeight: 600, lineHeight: '49px', color: '#FFFFFF', fontSize: 'clamp(30px, 3.5vw, 40px)' }}
+          >
             Industries
           </h2>
-          <p className="text-white/70 text-base leading-relaxed max-w-md">
+          {/* WIDENED FURTHER (direct instruction: "spread out even
+              more") — max-w-lg -> max-w-xl, plus the grid ratio itself
+              shifted to give this column more of the row (0.9/1.1 ->
+              0.85/1.15). */}
+          <p className="text-white text-[20px] font-normal leading-relaxed max-w-xl">
             Our managed service solutions are customizable to meet your unique
             business needs. Whether you are a small business or a large corporation,
             we have a plan that fits your budget and requirements.

@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 type IndustryHeroProps = {
   title: string;
@@ -35,12 +36,12 @@ export const IndustryHero = ({ title, description, photoSeed }: IndustryHeroProp
   // 64px is actually LESS than the real fixed-header height (44px logo
   // + 16px top/bottom padding at desktop = 76px) — that would have
   // caused actual header overlap, not just tight spacing. Every other
-  // page-top hero section sitewide (5 of them) already uses pt-28
+  // page-top hero section sitewide (5 of them) already uses pt-44
   // (112px) for exactly this header-clearance purpose. Matched that
   // instead of inventing a new value, fixing both the overlap bug and
   // an inconsistency in the same move.
   return (
-    <section className="relative overflow-hidden pt-28 pb-16 md:pb-20">
+    <section className="relative overflow-hidden pt-44 pb-16 md:pb-20">
       <Image
         src={`https://picsum.photos/seed/${photoSeed}/1600/500`}
         alt=""
@@ -58,14 +59,16 @@ export const IndustryHero = ({ title, description, photoSeed }: IndustryHeroProp
         }}
       />
       <div className="wrap relative flex flex-col justify-center">
-        <span className="font-mono text-xs font-bold tracking-tag uppercase text-white/80 mb-3">
+        <RevealOnScroll>
+        <span className="text-xs font-bold tracking-tag uppercase text-white/80 mb-3">
           INDUSTRIES
         </span>
-        <h1 className="text-white font-bold text-4xl md:text-5xl mb-4 max-w-xl">
+        <h1 className="text-white !font-bold text-4xl md:text-5xl mb-4 max-w-xl">
           {title}
         </h1>
-        <p className="text-white/80 text-sm max-w-lg mb-6">{description}</p>
+        <p className="text-white text-[20px] font-normal max-w-lg mb-6">{description}</p>
         <span className="text-white text-2xl" aria-hidden="true">↓</span>
+        </RevealOnScroll>
       </div>
     </section>
   );

@@ -14,7 +14,7 @@ export default function ProjectControlsPage() {
         <meta property="og:title" content="Project Controls & EVM — Echolink Solutions" />
         <meta property="og:description" content="Know where the project really stands. CPM schedules, earned value, and reporting wired to your live systems." />
       </Head>
-      <div className="pt-28">
+      <div className="pt-44">
         <ProjectControls />
       </div>
     </>

@@ -24,7 +24,7 @@ export default function AccountPage() {
 
   if (loading) {
     return (
-      <section className="section--page !pt-28 !pb-20 text-center">
+      <section className="section--page !pt-44 !pb-20 text-center">
         <p className="text-ink_text-secondary">Loading your account…</p>
       </section>
     );
@@ -46,7 +46,7 @@ export default function AccountPage() {
 
       <section className="section--page !pt-32">
         <div className="wrap max-w-2xl">
-          <span className="eyebrow">MY ACCOUNT</span>
+          <span className="eyebrow-plain">MY ACCOUNT</span>
           <h1 className="sec-title mb-8">Welcome back, {user.name}.</h1>
 
           <div className="card mb-6">
@@ -61,7 +61,7 @@ export default function AccountPage() {
                     {user.activeMemberships.map((m) => (
                       <span
                         key={m}
-                        className="tag-mono border border-ink-border rounded-pill px-3 py-1.5"
+                        className="tag-mono border border-ink-border rounded-none px-3 py-1.5"
                       >
                         {m}
                       </span>

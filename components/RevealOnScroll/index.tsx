@@ -46,14 +46,19 @@ export const RevealOnScroll = ({
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-out ${
-        visible
-          ? 'opacity-100 translate-y-0'
-          : variant === 'up'
-          ? 'opacity-0 translate-y-8'
-          : 'opacity-0'
-      } ${className}`}
-      style={{ transitionDelay: `${delayMs}ms` }}
+      className={`${className}`}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'none' : variant === 'up' ? 'translateY(22px)' : 'none',
+        // EXACT VALUES from the live site's own computed CSS
+        // (blueprint): translateY(22px) — not Tailwind's translate-y-8
+        // (32px), which was an approximation — and the precise
+        // cubic-bezier(.2,.7,.2,1) easing curve on both opacity and
+        // transform, rather than Tailwind's ease-out utility (a
+        // different, only visually-similar curve).
+        transition: 'opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1)',
+        transitionDelay: `${delayMs}ms`,
+      }}
     >
       {children}
     </div>

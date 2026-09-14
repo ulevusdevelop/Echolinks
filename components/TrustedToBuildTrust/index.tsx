@@ -1,9 +1,10 @@
 import React from 'react';
+import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 const clients = [
   { status: 'DELIVERED', name: 'Aetna Health', tags: 'BLOCKCHAIN TRUST LAYER · DECENTRALIZED AI', description: 'Delivered a verifiable trust layer and decentralized AI for enterprise healthcare workflows, anchoring data integrity and auditable AI decisions.', delivered: true },
-  { status: 'PROTOTYPE IN DEVELOPMENT', name: 'DFO Retail Group', region: 'Canada', tags: 'SUPPLY-CHAIN PROVENANCE · VERIFIABLE AI', description: 'Building a farm-to-shelf integrity prototype: photo-verified hand-offs, AI exception checks, and tamper-proof records across the retail supply chain.', delivered: false },
-  { status: 'PROTOTYPE IN DEVELOPMENT', name: 'Oando', region: 'Oil & gas, Africa', tags: 'ASSET TRACEABILITY · DECENTRALIZED AI', description: 'Building a traceability prototype for energy operations: verifiable asset and volume records with auditable, on-chain provenance.', delivered: false },
+  { status: 'PROTOTYPE IN DEVELOPMENT', name: 'DFO Retail Group', region: 'Canada', tags: 'SUPPLY-CHAIN PROVENANCE · VERIFIABLE AI', description: 'Building a farm-to-shelf provenance prototype: photo-verified hand-offs, AI exception checks, and tamper-proof records across the retail supply chain.', delivered: false },
+  { status: 'PROTOTYPE IN DEVELOPMENT', name: 'Oando', region: 'Oil & Gas · Africa', tags: 'ASSET TRACEABILITY · DECENTRALIZED AI', description: 'Building a traceability and integrity prototype for energy operations: verifiable asset and volume records with auditable, on-chain provenance.', delivered: false },
   { status: 'PROTOTYPE IN DEVELOPMENT', name: 'Western Beef Supermarket', region: 'United States', tags: 'SUPPLY-CHAIN PROVENANCE · VERIFIABLE AI', description: 'Building a fresh-supply-chain prototype: cold-chain verification, photo-proofed hand-offs, and tamper-proof records from supplier to shelf.', delivered: false },
 ];
 
@@ -32,17 +33,20 @@ export const TrustedToBuildTrust = ({ headingLevel = 'h2' }: { headingLevel?: 'h
         <span className="absolute -top-3 left-12 w-5 h-5 bg-white" style={{ border: '2px solid #16003B' }} />
       </span>
       <div className="wrap">
+        <RevealOnScroll>
         <div className="max-w-2xl mx-auto text-center mb-16">
           <span className="eyebrow-plain--dark">PROVEN IN PRODUCTION</span>
           <Heading className="font-bold text-3xl md:text-4xl leading-tight" style={{ color: '#16003B' }}>
             Trusted to build trust.
           </Heading>
-          <p className="text-[#434343] text-base leading-relaxed mt-5 max-w-lg mx-auto">
+          <p className="text-[#434343] text-[20px] font-normal leading-relaxed mt-5 max-w-lg mx-auto">
             From healthcare to retail to energy, we build blockchain trust layers and
             decentralized AI where verifiability and data integrity are not optional.
           </p>
         </div>
+        </RevealOnScroll>
 
+        <RevealOnScroll delayMs={150}>
         <div className="grid md:grid-cols-4 gap-6">
           {clients.map((c) => (
             <div
@@ -55,7 +59,7 @@ export const TrustedToBuildTrust = ({ headingLevel = 'h2' }: { headingLevel?: 'h
               }
             >
               <span
-                className="font-mono text-[10px] tracking-tag uppercase px-3 py-1.5 rounded-pill border inline-block"
+                className="text-[10px] tracking-tag uppercase px-3 py-1.5 rounded-none border inline-block"
                 style={
                   c.delivered
                     ? { color: '#FFFFFF', background: '#FF6100', borderColor: '#FF6100', fontWeight: 700 }
@@ -73,7 +77,7 @@ export const TrustedToBuildTrust = ({ headingLevel = 'h2' }: { headingLevel?: 'h
                 </p>
               )}
               <p
-                className="font-mono text-[10px] tracking-tag uppercase leading-snug mb-4"
+                className="text-[10px] tracking-tag uppercase leading-snug mb-4"
                 style={{ color: c.delivered ? 'rgba(255,255,255,0.5)' : '#707070' }}
               >
                 {c.tags}
@@ -84,6 +88,7 @@ export const TrustedToBuildTrust = ({ headingLevel = 'h2' }: { headingLevel?: 'h
             </div>
           ))}
         </div>
+        </RevealOnScroll>
 
         <p className="text-center mt-10 text-sm" style={{ color: '#707070' }}>
           Aetna engagement delivered. DFO Retail, Oando, and Western Beef prototypes

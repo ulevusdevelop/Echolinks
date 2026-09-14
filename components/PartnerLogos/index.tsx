@@ -1,4 +1,5 @@
 import React from 'react';
+import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 // NEW — mirrored from the old site's About Us page: "Echolink is Proud
 // to Partner With" (Boomi) and "Companies We've Worked With in the
@@ -9,6 +10,7 @@ import React from 'react';
 export const PartnerLogos = () => {
   return (
     <section className="bg-white py-16 border-t border-[#E5E5E5]">
+      <RevealOnScroll>
       <div className="wrap text-center">
         <p className="font-bold text-lg mb-6" style={{ color: '#16003B' }}>
           Echolink is Proud to Partner With
@@ -32,6 +34,7 @@ export const PartnerLogos = () => {
           </span>
         </div>
       </div>
+      </RevealOnScroll>
     </section>
   );
 };

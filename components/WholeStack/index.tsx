@@ -1,4 +1,5 @@
 import React from 'react';
+import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 const rows = [
   { label: 'Enterprise integration', value: 'EDI, APIs, ERP, WMS, MES, SCADA, HL7/FHIR.' },
@@ -46,14 +47,15 @@ export const WholeStack = () => {
       </svg>
 
       <div className="wrap relative">
-        <div className="max-w-xl mb-14">
+        <RevealOnScroll>
+        <div className="max-w-2xl mb-14">
           <span className="tag-mono !text-[#FF6100] mb-4 inline-block">
             THE CATEGORY WE OWN
           </span>
           <h2 className="text-[#16003B] font-bold text-3xl md:text-4xl leading-tight mb-5">
             The whole stack, assembled into one layer.
           </h2>
-          <p className="text-[#4A4560] text-base leading-relaxed">
+          <p className="text-[#4A4560] text-[20px] font-normal leading-relaxed">
             The market today is specialized: strong AI agent platforms, capable
             blockchain builders, deep integration providers, each excellent at
             their piece. The opportunity is bringing those pieces together.
@@ -86,16 +88,21 @@ export const WholeStack = () => {
           delivers the outcome, trust, automation, and compliance, in the
           language enterprise buyers already speak.
         </p>
+        </RevealOnScroll>
 
-        {/* Bridge card — see the component-level comment above for why
-            this is positioned this way. Sized up from the original
-            small pill so it reads as a deliberate object straddling
-            the boundary, not a slightly-repositioned version of what
-            was there before. Negative bottom margin (desktop only —
-            the overlap effect doesn't help on narrow mobile layouts,
-            where it would just look like a layout bug) pulls it down
-            so its bottom half visually crosses past this section's own
-            padding into whatever renders next. */}
+        {/* Bridge card — deliberately left OUTSIDE the RevealOnScroll
+            wrapper above: it needs the negative-margin overlap
+            positioning described here to stay exact, and
+            RevealOnScroll's own transform/opacity transition risks
+            interfering with that carefully-tuned straddle effect.
+            Sized up from the original small pill so it reads as a
+            deliberate object straddling the boundary, not a slightly-
+            repositioned version of what was there before. Negative
+            bottom margin (desktop only — the overlap effect doesn't
+            help on narrow mobile layouts, where it would just look
+            like a layout bug) pulls it down so its bottom half
+            visually crosses past this section's own padding into
+            whatever renders next. */}
         <div
           className="relative z-20 inline-flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 rounded-none px-7 py-6 shadow-xl lg:mb-[-70px]"
           style={{ background: '#16003B' }}

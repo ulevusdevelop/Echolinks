@@ -10,8 +10,13 @@ import { useAuth } from '@/context/AuthContext';
 import { SITE_URL } from '@/lib/site';
 
 // Simple (non-mega-menu) top-level items
+// "Lab" added (direct request) — positioned right before "How it
+// works", matching the reference site's own nav order exactly
+// (Services dropdown -> Lab -> How it works -> Traceability ->
+// Insights).
 const navigation = [
   { name: 'The Layer', href: '/layer' },
+  { name: 'Lab', href: '/lab' },
   { name: 'How it works', href: '/how-it-works' },
   { name: 'Project Control', href: '/project-controls' },
   { name: 'Traceability', href: '/traceability' },
@@ -129,29 +134,49 @@ const NavDraw = ({ children }: { children: React.ReactNode }) => (
 // on hover per direction ("the color should remain same") — the
 // nav-draw rectangle is now the only hover feedback, not a color
 // change too.
-// TYPOGRAPHY SYSTEM: added font-medium (500) — spec calls for
-// navigation at 500-600 weight, this had no weight utility at all
-// before, meaning it rendered at the browser/Tailwind default (400),
-// same weight as body text, with nothing distinguishing nav links from
-// ordinary paragraph copy.
-const navLinkClass = 'text-sm font-medium text-[#16003B] transition-colors';
+// TYPOGRAPHY FIX — exact values from the live site's own nav-link CSS
+// (blueprint): Syne, 17px, 400 weight — was Tailwind's text-sm (14px)
+// font-medium (500), an approximation rather than a match.
+const navLinkClass = 'transition-colors text-[#16003B]';
+const navLinkStyle = { fontFamily: 'var(--font-syne), sans-serif', fontSize: '17px', fontWeight: 400 };
 
 const ServicesMegaMenu = () => {
   // Which category's sub-items are currently previewed. Defaults to
   // the first category so the panel isn't empty the instant it opens,
   // before the user has hovered anything.
   const [hovered, setHovered] = useState(0);
+  // Separate from `hovered` above on purpose: `hovered` defaults to 0
+  // so the preview panel has content immediately, but that would make
+  // "CORE SERVICES" incorrectly show as orange even before a real
+  // hover if used for color too. Tracks whether the mouse has actually
+  // entered a category yet, independent of which one is defaulted.
+  const [hasHovered, setHasHovered] = useState(false);
 
   return (
     <Popover className="relative">
       {({ open }) => (
         <>
-          <Popover.Button className={`flex items-center gap-1 outline-none ${navLinkClass}`}>
-            <NavDraw>Services</NavDraw>
-            <FilledTriangle
-              className={`w-2.5 h-2 transition-transform ${open ? 'rotate-180' : ''}`}
-            />
-          </Popover.Button>
+          {/* SPLIT TRIGGER (direct correction): "I wanted to be able to
+              access the services page from the Navbar without there
+              being the addition of a new nav link" — removed the "All
+              Services" nav item from last round and solved it properly
+              instead: "Services" itself is now a real Link straight to
+              /services, with just the small arrow as its own separate
+              Popover.Button controlling the dropdown open/close. Both
+              sit in one flex group so they still read as a single nav
+              item visually, but clicking the word navigates and
+              clicking the arrow toggles the panel — no new top-level
+              link added. */}
+          <span className={`flex items-center gap-1 ${navLinkClass}`} style={navLinkStyle}>
+            <Link href="/services">
+              <NavDraw>Services</NavDraw>
+            </Link>
+            <Popover.Button className="outline-none flex items-center" aria-label="Toggle services menu">
+              <FilledTriangle
+                className={`w-2.5 h-2 transition-transform ${open ? 'rotate-180' : ''}`}
+              />
+            </Popover.Button>
+          </span>
           <Transition
             as={Fragment}
             enter="transition ease-out duration-150"
@@ -178,13 +203,23 @@ const ServicesMegaMenu = () => {
 
                     <ul className="flex flex-col gap-1" onMouseLeave={() => setHovered(0)}>
                       {servicesColumns.map((col, i) => (
-                        <li key={col.title} onMouseEnter={() => setHovered(i)}>
+                        <li key={col.title} onMouseEnter={() => { setHovered(i); setHasHovered(true); }}>
                           <Link
                             href={col.href}
-                            className="block font-mono text-xs tracking-tag uppercase py-3 border-l-2 pl-4 transition-colors font-bold"
+                            className="block text-xs tracking-tag uppercase py-3 border-l-2 pl-4 transition-colors font-bold"
                             style={{
-                              color: 'var(--accent)',
-                              borderColor: hovered === i ? 'var(--accent)' : 'transparent',
+                              // COLOR FIX (direct instruction): category
+                              // labels default to white now, orange only
+                              // on real hover — previously always orange
+                              // regardless of hover state. Uses
+                              // `hasHovered` rather than `hovered ===
+                              // i`, since `hovered` defaults to 0 for
+                              // the preview panel's sake, which would
+                              // otherwise make the first category look
+                              // "hovered" (orange) before any real mouse
+                              // interaction.
+                              color: hasHovered && hovered === i ? 'var(--accent)' : '#FFFFFF',
+                              borderColor: hasHovered && hovered === i ? 'var(--accent)' : 'transparent',
                             }}
                           >
                             {col.title}
@@ -256,7 +291,7 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
             content actually starts/ends on every other section, per
             direct feedback that the previous custom padding didn't
             truly match. */}
-        <nav className="wrap flex items-center justify-between py-3 md:py-4" aria-label="Global">
+        <nav className="wrap flex items-center justify-between py-4 md:py-6" aria-label="Global">
           <Link href="/" className="flex items-center flex-shrink-0">
             {/* Logo swap: was a separate mark icon + "ECHOLINK / SOLUTIONS"
                 text stacked beside it. Per the edit doc, the homepage
@@ -276,12 +311,12 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
           </Link>
 
           <div className="hidden lg:flex lg:items-center lg:gap-x-10">
-            <Link href="/layer" className={navLinkClass}>
+            <Link href="/layer" className={navLinkClass} style={navLinkStyle}>
               <NavDraw>The Layer</NavDraw>
             </Link>
             <ServicesMegaMenu />
             {navigation.slice(1).map((item) => (
-              <Link key={item.name} href={item.href} className={navLinkClass}>
+              <Link key={item.name} href={item.href} className={navLinkClass} style={navLinkStyle}>
                 <NavDraw>{item.name}</NavDraw>
               </Link>
             ))}
@@ -340,7 +375,7 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
               <Link
                 href="/layer"
                 className="text-lg"
-                style={{ color: '#16003B' }}
+                style={{ ...navLinkStyle, color: '#16003B', fontSize: '17px' }}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 The Layer
@@ -366,7 +401,7 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
                       <div key={col.title}>
                         <Link
                           href={col.href}
-                          className="font-mono text-xs tracking-tag uppercase mb-2 inline-block"
+                          className="text-xs tracking-tag uppercase mb-2 inline-block"
                           style={{ color: '#B24300' }}
                           onClick={() => setMobileMenuOpen(false)}
                         >
@@ -391,7 +426,7 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
                   key={item.name}
                   href={item.href}
                   className="text-lg"
-                  style={{ color: '#16003B' }}
+                  style={{ ...navLinkStyle, color: '#16003B', fontSize: '17px' }}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.name}

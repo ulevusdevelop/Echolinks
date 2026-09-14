@@ -10,7 +10,16 @@ module.exports = {
     extend: {
       fontFamily: {
         syne: ['var(--font-syne)', 'sans-serif'],
-        mono: ['var(--font-jetbrains)', 'ui-monospace', 'monospace'],
+        // DANGLING REFERENCE FIXED: this pointed to
+        // var(--font-jetbrains), a CSS variable that no longer exists
+        // since JetBrains Mono was removed from the codebase entirely
+        // (direct instruction: "the font has to be Syne"). Nothing
+        // currently uses the "font-mono" utility class anymore, but
+        // redirected this to Syne as well rather than leaving a broken
+        // reference — if anything ever does use font-mono again, it
+        // gracefully renders in Syne instead of falling through to a
+        // browser-default monospace font.
+        mono: ['var(--font-syne)', 'sans-serif'],
       },
       colors: {
         // CORRECTED (per Echolink Solutions official Brand Guidelines,
@@ -37,8 +46,18 @@ module.exports = {
         },
         ink_text: {
           primary: '#EAF1FA',
-          secondary: '#abb8c3',  // verified 8.90:1 on #16003B
-          muted: '#8b93a0',      // dimmed derivative of #abb8c3
+          // CHANGED TO WHITE (direct instruction): "for all grayish
+          // text on the purple background, change to white." These two
+          // tokens are specifically the dark-background gray text
+          // colors used sitewide (confirmed by the original comment:
+          // "verified 8.90:1 on #16003B") — updating them here cascades
+          // the fix to every usage across the whole site at once,
+          // rather than hunting down each instance individually. The
+          // separate light-section tokens (`light_text`, below) are
+          // untouched — this instruction was specifically about text on
+          // the purple background, not light sections.
+          secondary: '#FFFFFF',
+          muted: '#FFFFFF',
         },
         // Light-section text — #434343 verified 8.94:1+ on cream/white,
         // #665A7D verified 6.32:1 on white (works as secondary on light
@@ -48,9 +67,17 @@ module.exports = {
           body: '#434343',
           secondary: '#665A7D',
         },
+        // NOTE: the actual flame gradient (Training's "2,000 careers"
+        // card) reads from CSS custom properties in globals.css
+        // (--flame-from/--flame-to), not from this Tailwind color —
+        // this entry was never referenced as a Tailwind utility class
+        // anywhere and had drifted out of sync with the real values
+        // (still the pre-Round-84 muddy browns). Kept for reference/
+        // documentation purposes only, synced to the current real
+        // values.
         flame: {
-          from: '#3D1F0A',
-          to: '#2A1608',
+          from: '#16003B',
+          to: '#8B3A0F',
         },
       },
       borderRadius: {

@@ -72,7 +72,10 @@ export const Footer = () => {
             from the link grid below by generous whitespace and a
             single thin rule. This is close to as minimal as a closing
             CTA can be while still reading as its own section. */}
-        <div className="text-center pt-28 md:pt-36 pb-20 md:pb-24 border-b border-ink-border">
+        {/* PADDING FIX (direct feedback): top padding was noticeably
+            larger than bottom (112/144px vs 80/96px) — balanced to
+            match. */}
+        <div className="text-center py-20 md:py-24 border-b border-ink-border">
           <h3 className="text-2xl md:text-3xl font-bold text-white mb-5 max-w-xl mx-auto leading-tight">
             Let&apos;s wire your first verifiable workflow.
           </h3>
@@ -125,13 +128,22 @@ export const Footer = () => {
           <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-10">
             {columns.map((col) => (
               <div key={col.title}>
-                <p className="tag-mono mb-5">{col.title}</p>
+                {/* TYPOGRAPHY FIX — exact values from the live site
+                    (blueprint): column heading Syne/15px/900/white;
+                    link text Syne/14px/400. */}
+                <p
+                  className="mb-5"
+                  style={{ fontFamily: 'var(--font-syne), sans-serif', fontSize: '15px', fontWeight: 900, color: '#FFFFFF' }}
+                >
+                  {col.title}
+                </p>
                 <ul className="flex flex-col gap-3.5">
                   {col.links.map((link) => (
                     <li key={link.name}>
                       <Link
                         href={link.href}
-                        className="text-sm text-ink_text-secondary hover:text-white transition-colors"
+                        className="hover:text-accent-light transition-colors"
+                        style={{ fontFamily: 'var(--font-syne), sans-serif', fontSize: '14px', fontWeight: 400, color: '#FFFFFF' }}
                       >
                         {link.name}
                       </Link>

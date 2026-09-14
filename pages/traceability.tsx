@@ -14,7 +14,7 @@ export default function TraceabilityPage() {
         <meta property="og:title" content="Traceability — Echolink Solutions" />
         <meta property="og:description" content="Prove where anything came from. Tamper-proof provenance for airlines, air taxis, supply chain, pharma, food, and luxury goods." />
       </Head>
-      <div className="pt-28">
+      <div className="pt-44">
         <Traceability />
       </div>
     </>

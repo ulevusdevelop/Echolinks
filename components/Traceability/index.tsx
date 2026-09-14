@@ -2,15 +2,96 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { RevealOnScroll } from '@/components/RevealOnScroll';
 
+// CONTENT RESTORATION (careful sweep): the interactive panel below
+// only showed one flat summary sentence per industry (the `journey`
+// field) — a placeholder-style paraphrase. The reference has a real,
+// fully-authored dataset for this exact feature (TRACE_DATA in its
+// script): each of the 8 industries tracks a specific named item
+// through 4 numbered steps, each with its own title, description, and
+// blockchain-style hash anchor (e.g. "0x4a7f…11c2") — not a single
+// summary line. Replaced `journey: string` with the real structured
+// data below, verbatim from the reference.
 const industries = [
-  { id: 'airlines', title: 'Airlines & aviation', description: 'Parts, maintenance, and flight records.', journey: 'A replacement part is photographed at the supplier, verified on receipt, logged at installation, and anchored to the aircraft maintenance record.' },
-  { id: 'evtol', title: 'Air taxis & eVTOL', description: 'Battery integrity and fleet provenance.', journey: 'Battery cycles, charge history, and swap events are logged per unit, giving a verifiable safety record for every flight.' },
-  { id: 'supply', title: 'Supply chain', description: 'Supplier-to-shelf, photo-verified.', journey: 'Every hand-off from supplier to warehouse to shelf is photographed and time-stamped.' },
-  { id: 'pharma', title: 'Pharma', description: 'Cold chain and anti-counterfeit proof.', journey: 'Temperature logs and chain-of-custody checkpoints are anchored on-chain.' },
-  { id: 'food', title: 'Food', description: 'Farm-to-shelf freshness and origin.', journey: 'Harvest date, handling conditions, and transport are recorded at each step.' },
-  { id: 'hospitals', title: 'Hospitals & clinics', description: 'Medication, samples, and equipment provenance.', journey: 'Medication batches and equipment maintenance are logged with a tamper-proof trail.' },
-  { id: 'luxury', title: 'Luxury goods', description: 'Authenticity and ownership history.', journey: 'Each item is anchored at creation, with ownership transfers logged.' },
-  { id: 'capital', title: 'Capital projects', description: 'Progress claims, milestones, and payment.', journey: 'Milestone completion is photo-verified and tied to payment triggers.' },
+  {
+    id: 'airlines', title: 'Airlines & aviation', description: 'Parts, maintenance, and flight records.',
+    itemTitle: 'Aircraft turbine blade',
+    steps: [
+      { title: 'Forged at supplier', description: 'Serial logged, alloy certified, origin recorded.', hash: '0x4a7f…11c2' },
+      { title: 'Installed on aircraft', description: 'Fitment and torque checked, signed by engineer.', hash: '0x9b22…6df0' },
+      { title: 'Maintenance check', description: 'Inspected, hours logged, condition verified.', hash: '0x1c84…a907' },
+      { title: 'Audit-ready record', description: 'Full life history anchored, provable on demand.', hash: '0x7e03…bb15' },
+    ],
+  },
+  {
+    id: 'evtol', title: 'Air taxis & eVTOL', description: 'Battery integrity and fleet provenance.',
+    itemTitle: 'eVTOL battery pack',
+    steps: [
+      { title: 'Cells manufactured', description: 'Batch and chemistry certified at source.', hash: '0x3d11…88a4' },
+      { title: 'Charge cycles logged', description: 'Every cycle recorded, health tracked live.', hash: '0x6f90…22c1' },
+      { title: 'Pre-flight check', description: 'Integrity verified before each flight.', hash: '0x2b47…d50e' },
+      { title: 'Regulator-ready proof', description: 'Complete cycle history anchored and sealed.', hash: '0x8c12…f773' },
+    ],
+  },
+  {
+    id: 'supply', title: 'Supply chain', description: 'Supplier-to-shelf, photo-verified.',
+    itemTitle: 'Coffee lot CFE-2207',
+    steps: [
+      { title: 'Harvested', description: 'Origin geo-tagged, farm and date recorded.', hash: '0x7af3…e2c1' },
+      { title: 'Processed', description: 'Washed, dried, photographed at each step.', hash: '0x9b41…7c08' },
+      { title: 'Shipped', description: 'Container sealed, route and handlers logged.', hash: '0x1c77…a190' },
+      { title: 'On the shelf', description: 'Buyer can scan and verify the full journey.', hash: '0x3e02…bd55' },
+    ],
+  },
+  {
+    id: 'pharma', title: 'Pharma', description: 'Cold chain and anti-counterfeit proof.',
+    itemTitle: 'Vaccine batch VX-884',
+    steps: [
+      { title: 'Manufactured', description: 'Batch certified, ingredients traced to source.', hash: '0x5a31…44b8' },
+      { title: 'Cold chain logged', description: 'Temperature verified continuously in transit.', hash: '0x2d77…91ca' },
+      { title: 'Pharmacy received', description: 'Seal and condition confirmed on arrival.', hash: '0x8f04…3e21' },
+      { title: 'Anti-counterfeit proof', description: 'Authenticity provable to patient and regulator.', hash: '0x1b63…cc09' },
+    ],
+  },
+  {
+    id: 'food', title: 'Food', description: 'Farm-to-shelf freshness and origin.',
+    itemTitle: 'Grass-fed beef cut',
+    steps: [
+      { title: 'Sourced at farm', description: 'Animal, farm, and date recorded at origin.', hash: '0x6c12…a3f7' },
+      { title: 'Cold chain verified', description: 'Temperature held and logged through transit.', hash: '0x9e40…77b2' },
+      { title: 'Processed & packed', description: 'Handling photographed and time-stamped.', hash: '0x3a81…d104' },
+      { title: 'Farm-to-shelf proof', description: 'Shopper sees the full origin story.', hash: '0x7d29…be55' },
+    ],
+  },
+  {
+    id: 'hospitals', title: 'Hospitals & clinics', description: 'Medication, samples, and equipment provenance.',
+    itemTitle: 'Surgical instrument tray',
+    steps: [
+      { title: 'Sterilized', description: 'Cycle logged, operator and method recorded.', hash: '0x4f21…99a0' },
+      { title: 'Issued to theatre', description: 'Chain of custody signed and time-stamped.', hash: '0x8b34…21cd' },
+      { title: 'Used & tracked', description: 'Procedure linked, usage recorded.', hash: '0x2c90…57e3' },
+      { title: 'Compliance record', description: 'Full handling history anchored and auditable.', hash: '0x6a11…f482' },
+    ],
+  },
+  {
+    id: 'luxury', title: 'Luxury goods', description: 'Authenticity and ownership history.',
+    itemTitle: 'Designer handbag #A2291',
+    steps: [
+      { title: 'Crafted', description: 'Materials and maker certified at origin.', hash: '0x3e77…1a09' },
+      { title: 'Authenticated', description: 'Unique identity sealed to the item.', hash: '0x9c20…84bf' },
+      { title: 'Sold to owner', description: 'Ownership transfer recorded on chain.', hash: '0x1f48…d6e2' },
+      { title: 'Resale-ready proof', description: 'Authenticity and history provable forever.', hash: '0x7b03…aa91' },
+    ],
+  },
+  {
+    id: 'capital', title: 'Capital projects', description: 'Progress claims, milestones, and payment.',
+    itemTitle: 'Milestone MS-14 · Structural steel',
+    steps: [
+      { title: 'Baseline approved', description: 'Schedule baseline sealed, owner approval recorded.', hash: '0x5c19…30ab' },
+      { title: 'Progress claimed', description: 'Field quantities and photos captured at the source.', hash: '0x2a68…c714' },
+      { title: 'Earned value calculated', description: 'EV, CPI, and SPI computed from verified progress.', hash: '0x8d35…41fe' },
+      { title: 'Payment application', description: 'Claim, approval, and payment tied to one provable record.', hash: '0x6b27…9ac3' },
+    ],
+  },
 ];
 const pillars = [
   { title: 'Part & batch traceability', description: 'Every item\u2019s origin, handling, and life recorded, tamper-proof, end to end.' },
@@ -21,7 +102,15 @@ const pillars = [
 ];
 
 export const Traceability = () => {
-  const [activeId, setActiveId] = useState<string | null>(null);
+  // DEFAULT-ACTIVE FIX: this is fully interactive state — the step-by-
+  // step journey (with hash anchors) only ever appeared after clicking
+  // an industry card; before that, the panel showed a generic "select
+  // an industry" placeholder with no real content visible at all. Very
+  // likely why the actual journey content ("Forged at supplier...")
+  // wasn't seen — defaulting to the first industry means the real
+  // content is visible immediately on page load, with the rest still
+  // fully interactive/clickable exactly as before.
+  const [activeId, setActiveId] = useState<string | null>(industries[0].id);
   const active = industries.find((i) => i.id === activeId);
 
   return (
@@ -71,16 +160,28 @@ export const Traceability = () => {
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-5">
+        {/* SPACING FIX (direct feedback: "too tight, especially between
+            the first Row and second Row") — split the gap so rows get
+            more vertical breathing room than columns need
+            horizontally. HOVER FIX (direct instruction): each card now
+            gets a small orange accent square that's invisible by
+            default and appears specifically on hover — not fixed
+            permanently to any one card. */}
+        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-9">
           {industries.map((ind) => (
             <button
               key={ind.id}
               type="button"
               onClick={() => setActiveId(ind.id)}
-              className={`card text-left transition-all hover:-translate-y-0.5 ${
+              className={`group relative card text-left transition-all hover:-translate-y-0.5 ${
                 activeId === ind.id ? 'ring-2 ring-accent' : ''
               }`}
             >
+              <span
+                className="absolute -top-2 -right-2 w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{ background: '#FF6100' }}
+                aria-hidden="true"
+              />
               <h4 className="text-white font-bold text-sm mb-2">{ind.title}</h4>
               <p className="text-ink_text-secondary text-xs leading-relaxed">
                 {ind.description}
@@ -90,17 +191,64 @@ export const Traceability = () => {
         </div>
 
         <div className="card mt-8 max-w-3xl">
-          <span className="tag-mono tag-mono--accent">
-            {active ? active.title.toUpperCase() : 'SELECT AN INDUSTRY'}
-          </span>
-          <h3 className="text-white font-bold text-xl mt-3 mb-3">
-            {active ? `${active.title}: verified journey` : 'Watch a live verified journey'}
-          </h3>
-          <p className="text-ink_text-secondary text-sm leading-relaxed">
-            {active
-              ? active.journey
-              : 'Pick any industry above to see how a real item is verified at every step and locked to a tamper-proof record.'}
-          </p>
+          <div className="flex items-start justify-between gap-4 mb-3">
+            <div>
+              <span className="tag-mono tag-mono--accent">
+                {active ? active.title.toUpperCase() : 'SELECT AN INDUSTRY'}
+              </span>
+              <h3 className="text-white font-bold text-xl mt-3">
+                {active ? active.itemTitle : 'Watch provenance, live'}
+              </h3>
+            </div>
+            {/* Reset button — hidden until an industry is picked,
+                matching the reference's tl-reset behavior. */}
+            {active && (
+              <button
+                type="button"
+                onClick={() => setActiveId(null)}
+                className="tag-mono text-accent-light border border-accent rounded-none px-4 py-2 flex-shrink-0 hover:bg-accent-soft"
+              >
+                Reset
+              </button>
+            )}
+          </div>
+
+          {!active ? (
+            <p className="text-ink_text-secondary text-sm leading-relaxed">
+              Pick any industry above to see how a real item is verified at every step
+              and locked to a tamper-proof record.
+            </p>
+          ) : (
+            <>
+              {/* Numbered steps — each with its own title, description,
+                  and hash anchor, matching the reference's tl-step
+                  markup exactly instead of a single summary sentence. */}
+              <div className="flex flex-col gap-5 mt-5">
+                {active.steps.map((step, i) => (
+                  <div key={step.title} className="flex gap-4">
+                    <span className="number-badge flex-shrink-0">{i + 1}</span>
+                    <div>
+                      <h5 className="text-white font-bold text-sm mb-1">{step.title}</h5>
+                      <p className="text-ink_text-secondary text-xs leading-relaxed mb-1">
+                        {step.description}
+                      </p>
+                      <span className="tag-mono tag-mono--accent !text-[10px]">
+                        ✓ anchored {step.hash}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-start gap-3 mt-6 pt-5 border-t border-ink-border">
+                <span className="text-accent-light font-bold flex-shrink-0">✓</span>
+                <p className="text-ink_text-secondary text-xs leading-relaxed">
+                  Every step verified and anchored. <b className="text-white">0 tampering.</b>{' '}
+                  This is what your customer, auditor, or regulator can check
+                  themselves.
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </section>
@@ -193,7 +341,7 @@ export const Traceability = () => {
         <h2 className="text-white font-bold text-3xl md:text-4xl leading-tight mb-6">
           Start Your Verified Journey
         </h2>
-        <p className="text-white/70 text-base leading-relaxed max-w-2xl mx-auto mb-8">
+        <p className="text-white text-base leading-relaxed max-w-2xl mx-auto mb-8">
           Whether you are proving provenance for a single product line or an entire
           supply chain, we will provide you with the highest-quality expertise, tools,
           and best practices to make it verifiable, end to end.

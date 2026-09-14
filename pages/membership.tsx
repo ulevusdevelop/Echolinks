@@ -42,9 +42,9 @@ export default function MembershipPage() {
         <meta property="og:description" content="Choose a membership plan to unlock the interactive Lab and priority support." />
       </Head>
 
-      <section className="section--page !pt-28 !pb-32">
+      <section className="section--page !pt-44 !pb-32">
         <div className="wrap text-center">
-          <span className="eyebrow">MEMBERSHIP</span>
+          <span className="eyebrow-plain">MEMBERSHIP</span>
           <h1 className="sec-title">Unlock the full layer.</h1>
           <p className="sec-sub sec-sub--center mt-4">
             Membership gets you into the interactive Lab and keeps you close to what

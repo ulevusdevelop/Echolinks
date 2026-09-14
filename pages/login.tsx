@@ -45,7 +45,7 @@ export default function LoginPage() {
           form of its own, but this site already has a working login
           form that shouldn't be thrown away, so the two are combined:
           welcome framing on top, working form below. */}
-      <section className="relative overflow-hidden pt-28 pb-20 text-center" style={{ background: '#16003B' }}>
+      <section className="relative overflow-hidden pt-44 pb-20 text-center" style={{ background: '#16003B' }}>
         <svg
           viewBox="0 0 400 120"
           className="absolute top-16 right-0 w-[400px] h-[120px] pointer-events-none hidden md:block"
@@ -76,7 +76,7 @@ export default function LoginPage() {
         </svg>
 
         <div className="wrap relative">
-          <h1 className="text-white font-bold text-4xl md:text-5xl mb-5">Welcome!</h1>
+          <h1 className="text-white !font-bold text-4xl md:text-5xl mb-5">Welcome!</h1>
           <p className="text-lg mb-10">
             <span style={{ color: '#FF6100' }} className="font-bold">Login</span>
             <span className="text-white"> Or </span>
@@ -96,7 +96,7 @@ export default function LoginPage() {
 
       <section id="login-form" className="section--page !pt-20 !pb-32">
         <div className="wrap max-w-md">
-          <span className="eyebrow">MEMBER LOGIN</span>
+          <span className="eyebrow-plain">MEMBER LOGIN</span>
           <h2 className="sec-title mb-8">Welcome back.</h2>
 
           <form onSubmit={handleSubmit} className="card flex flex-col gap-4">

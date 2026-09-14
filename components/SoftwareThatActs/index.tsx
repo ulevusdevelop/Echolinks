@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 // Verified against the original source HTML directly (previously
 // transcribed from a zoomed screenshot with some values illegible) —
@@ -42,8 +43,9 @@ export const SoftwareThatActs = () => {
     // rather than full-bleed dark slabs.
     <section id="software-that-acts" className="section--light">
       <div className="wrap">
-        <div className="sec-header max-w-xl">
-          <span className="eyebrow">DECENTRALIZED AI AGENTS</span>
+        <RevealOnScroll>
+        <div className="sec-header max-w-2xl">
+          <span className="eyebrow-plain--dark">DECENTRALIZED AI AGENTS</span>
           <h2 className="sec-title" style={{ color: '#16003B' }}>Software that acts, not just answers.</h2>
           <p className="sec-sub" style={{ color: '#434343' }}>
             An agent is AI you give a job, not a chat box you query. It reads
@@ -53,7 +55,9 @@ export const SoftwareThatActs = () => {
             and verifiable.
           </p>
         </div>
+        </RevealOnScroll>
 
+        <RevealOnScroll delayMs={150}>
         <div className="card grid lg:grid-cols-[1.2fr_1fr] gap-10 mb-6">
           <div className="flex flex-col gap-4">
             {checklist.map((item, i) => (
@@ -89,7 +93,9 @@ export const SoftwareThatActs = () => {
             </p>
           </div>
         </div>
+        </RevealOnScroll>
 
+        <RevealOnScroll delayMs={250}>
         <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {agents.map((agent) => (
             <div key={agent.title} className="card">
@@ -100,6 +106,7 @@ export const SoftwareThatActs = () => {
             </div>
           ))}
         </div>
+        </RevealOnScroll>
 
         <div className="flex flex-wrap gap-4">
           <Link href="/lab" className="btn btn--primary">

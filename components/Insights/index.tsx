@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Article } from '@/lib/types';
+import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 const fallbackPosts = [
   {
@@ -57,15 +58,18 @@ export const Insights = ({ posts }: InsightsProps) => {
     // match on all three points.
     <section className="section">
       <div className="wrap">
+        <RevealOnScroll>
         <div className="sec-header max-w-2xl mx-auto text-center">
-          <span className="eyebrow">INSIGHTS</span>
+          <span className="eyebrow-plain">INSIGHTS</span>
           <h2 className="sec-title">Thinking on verifiable AI and trust.</h2>
           <p className="sec-sub sec-sub--center">
             Ideas, updates, and field notes from the work of wiring AI, automation,
             and blockchain into one trusted layer.
           </p>
         </div>
+        </RevealOnScroll>
 
+        <RevealOnScroll delayMs={150}>
         <div className="grid md:grid-cols-3 gap-6">
           {items.map((post, i) => (
             <button
@@ -74,7 +78,7 @@ export const Insights = ({ posts }: InsightsProps) => {
               onClick={() => setOpenIndex(i)}
               className="card text-left group"
             >
-              <span className="eyebrow !text-[11px] !py-1.5 !px-3.5">{post.tag}</span>
+              <span className="eyebrow-plain !text-[11px] !mb-0">{post.tag}</span>
               <h4 className="text-white font-bold text-lg mt-4 mb-2 group-hover:underline">
                 {post.title}
               </h4>
@@ -87,6 +91,7 @@ export const Insights = ({ posts }: InsightsProps) => {
             </button>
           ))}
         </div>
+        </RevealOnScroll>
 
         <p className="text-ink_text-secondary text-sm mt-10 text-center">
           More insights coming soon. Want to be notified?{' '}

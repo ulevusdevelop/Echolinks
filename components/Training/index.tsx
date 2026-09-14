@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 const trainingCards = [
   { title: 'Hands-on, not theory', description: 'Live labs on your own systems and data, not generic demos.' },
@@ -36,19 +37,31 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
     // slab was.
     <section className="section--light">
       <div className="wrap">
-        <div className="sec-header max-w-2xl mx-auto text-center">
+        {/* RESTRUCTURED again (direct correction): reverted the column
+            swap from last round — "class is the build" is back on the
+            left, cards back on the right, matching the original order.
+            The "TRAINING & ENABLEMENT" heading block is no longer
+            inside either column at all — it's now its own full-width
+            row at the top, with the two-column layout (class-is-the-
+            build text left, cards right) as a second row underneath,
+            exactly as described: 2 rows, 2 columns, with the main
+            heading on its own row alone at the top. */}
+        <RevealOnScroll>
+        <div className="max-w-2xl mb-14">
           <span className="eyebrow-plain--dark">TRAINING & ENABLEMENT</span>
-          <Heading className="sec-title" style={{ color: '#16003B' }}>
+          <Heading className="text-left mt-4 mb-5" style={{ color: '#16003B', fontFamily: 'var(--font-syne), sans-serif', fontWeight: 600, lineHeight: '1.25', fontSize: 'clamp(28px, 3vw, 36px)' }}>
             The tech is only half the job. Your people are the other half.
           </Heading>
-          <p className="sec-sub sec-sub--center" style={{ color: '#434343' }}>
+          <p className="text-[20px] font-normal leading-relaxed max-w-md" style={{ color: '#434343' }}>
             Most companies spend heavily integrating AI, blockchain, and automation,
             then leave the people who use it to figure it out alone. That is where the
             value leaks. We close that gap with hands-on training built around your
             actual systems.
           </p>
         </div>
+        </RevealOnScroll>
 
+        <RevealOnScroll delayMs={150}>
         <div className="grid md:grid-cols-[1fr_1.2fr] gap-16 items-start">
           <div>
             <h3 className="font-bold text-xl mb-5" style={{ color: '#16003B' }}>The class is the build</h3>
@@ -72,7 +85,9 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
             ))}
           </div>
         </div>
+        </RevealOnScroll>
 
+        <RevealOnScroll delayMs={250}>
         {/* FIX: this card was still using a full-bleed photo background
             (with a color-multiply overlay) while the rest of the site's
             cards now use the consistent solid/gradient treatment.
@@ -81,7 +96,7 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
             consistent with the rest of the site instead of being the
             one leftover "picture in the background" card. */}
         <div
-          className="mt-20 relative overflow-hidden grid md:grid-cols-[1.4fr_1fr] gap-12 items-center p-8 md:p-12"
+          className="mt-20 relative overflow-hidden grid md:grid-cols-[1.4fr_1fr] gap-12 items-center p-10 md:p-16"
           style={{ background: 'linear-gradient(135deg, var(--flame-from) 0%, var(--flame-to) 100%)' }}
         >
           {/* Subtle growth-path illustration, low-opacity background
@@ -104,7 +119,14 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
             <circle cx="400" cy="20" r="8" fill="#FF6100" />
           </svg>
           <div>
-            <h3 className="text-white font-bold text-2xl mb-5">
+            {/* WEIGHT FIX: the new h3 tag-level typography rule
+                (600 weight, !important) now overrides this element's
+                own font-bold (700) — a side effect of this round's
+                typography system change landing on an h3 that was
+                deliberately bold for extra standout inside this
+                highlight card. Added an explicit !font-bold to win back
+                the intended weight, same pattern used for Hero's h1. */}
+            <h3 className="text-white !font-bold text-2xl mb-5">
               A track record of 2,000 careers, now pointed at what comes next
             </h3>
             <p className="text-ink_text-secondary text-sm leading-relaxed mb-4 max-w-md">
@@ -130,15 +152,17 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               {roles.map((role) => (
-                <span key={role} className="tag-mono border border-ink-border rounded-pill px-3 py-1.5 !text-[10px]">
+                <span key={role} className="tag-mono border border-ink-border rounded-none px-4 py-2 !text-[10px]">
                   {role}
                 </span>
               ))}
             </div>
           </div>
         </div>
+        </RevealOnScroll>
 
-        <div className="mt-14 max-w-xl">
+        <RevealOnScroll delayMs={350}>
+        <div className="mt-14 max-w-2xl">
           <p className="text-sm leading-relaxed mb-6" style={{ color: '#434343' }}>
             Integration gets you the capability. Training is what turns it into
             results. We deliver both, so your investment actually gets used.
@@ -147,6 +171,7 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
             Train your team →
           </Link>
         </div>
+        </RevealOnScroll>
       </div>
 
       {/* NEW this round, mirrored from the old homepage's own "Tech
@@ -183,8 +208,9 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
           className="absolute inset-0"
           style={{ background: 'linear-gradient(180deg, rgba(22,0,59,0.75) 0%, rgba(22,0,59,0.94) 100%)' }}
         />
+        <RevealOnScroll>
         <div className="wrap relative flex flex-col items-center justify-center text-center">
-          <span className="font-mono text-xs font-bold tracking-tag uppercase mb-3" style={{ color: '#FF6100' }}>
+          <span className="text-xs font-bold tracking-tag uppercase mb-3" style={{ color: '#FF6100' }}>
             TRAINING & SUPPORT
           </span>
           <h3 className="text-white font-bold text-3xl md:text-4xl mb-4">Tech Made Easy</h3>
@@ -199,6 +225,7 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
             Learn more →
           </Link>
         </div>
+        </RevealOnScroll>
       </div>
     </section>
   );

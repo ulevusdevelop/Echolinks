@@ -37,15 +37,36 @@
   --accent-soft: rgba(255, 96, 0, 0.14);
 
   --text-primary: #EAF1FA;
-  --text-secondary: #ABB8C3;
-  --text-muted: #6B7C99;
+  /* CHANGED TO WHITE (direct instruction, same as the Tailwind
+     ink_text tokens): all grayish text on the purple background
+     becomes white. */
+  --text-secondary: #FFFFFF;
+  --text-muted: #FFFFFF;
 
-  --flame-from: #3D1F0A;
-  --flame-to: #2A1608;
+  /* CONTRAST + STANDOUT FIX: these two stops measured 1.15:1 contrast
+     against each other — essentially indistinguishable, so this
+     "flame" gradient rendered as a flat, muddy near-black blob instead
+     of a visible gradient, which is very likely why the "2,000 careers"
+     card built with it doesn't stand out. Changed the dark stop to the
+     actual brand purple (#16003B, already used everywhere else) and
+     the light stop to a rich ember orange chosen specifically to keep
+     white text comfortably legible at every point in the gradient
+     (7.75:1 against white, well past the 4.5:1 body-text minimum) while
+     still reading clearly as "flame" — unlike the brand's bright
+     #FF6100, which only manages 3.02:1 against white and would have
+     failed for the card's body paragraph text. */
+  --flame-from: #16003B;
+  --flame-to: #8B3A0F;
 
   --max-width: 1720px;
   --radius-card: 0px;
-  --radius-pill: 999px;
+  /* CHANGED TO 0 (direct instruction — sitewide "no radius" rule,
+     explicitly extended to every section with this same pill/chip
+     behavior): this was 999px (a true pill shape), used by every
+     eyebrow badge and tag/chip across the site. Squared off here so
+     the fix cascades everywhere at once rather than hunting down each
+     usage. */
+  --radius-pill: 0px;
 }
 
 * { box-sizing: border-box; padding: 0; margin: 0; }
@@ -55,10 +76,11 @@ html, body {
   overflow-x: hidden;
   /* Per official Brand Guidelines (4.1/4.2): Syne is used for header,
      sub-header, AND body text — not a heading-only display face paired
-     with a separate body font. Body default now matches --font-syne;
-     the small monospace UI tags (eyebrows, "SYSTEMS OF RECORD" style
-     labels) keep --font-jetbrains, an established distinct treatment
-     the brand guide doesn't address either way. */
+     with a separate body font. As of this round, Syne is used
+     EXCLUSIVELY sitewide (direct instruction: "the font has to be
+     Syne") — the small monospace UI tags (eyebrows, tag/metric text)
+     previously kept JetBrains Mono as a deliberate distinct treatment;
+     that font has been removed from the codebase entirely. */
   font-family: var(--font-syne), sans-serif !important;
   background: var(--bg-page);
   color: var(--text-primary);
@@ -230,7 +252,7 @@ img { max-width: 100%; display: block; }
   color: #16003B;
 }
 .sec-sub--dark {
-  font-size: clamp(17px, 1.1vw, 19px);
+  font-size: 20px;
   font-weight: 400;
   line-height: 1.7;
   color: #434343;
@@ -241,7 +263,9 @@ img { max-width: 100%; display: block; }
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-jetbrains), monospace !important;
+  /* FONT FIX (blueprint): section-intro labels specify Syne, not the
+     monospace font this and the other 3 eyebrow variants were using. */
+  font-family: var(--font-syne), sans-serif !important;
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -257,7 +281,7 @@ img { max-width: 100%; display: block; }
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-jetbrains), monospace !important;
+  font-family: var(--font-syne), sans-serif !important;
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -274,29 +298,34 @@ img { max-width: 100%; display: block; }
    Per the edit doc: "Remove the bubble wrap around HOW WE ENGAGE, HOW
    IT WORKS, WHAT WE DO, WHO WE SERVE, SOLUTIONS WE HANDLE, and
    DECENTRALIZED AI AGENTS BY FUNCTION. Style them more like headings."
-   Bolder + slightly larger than the pill version — a bare label needs
-   more visual weight to still read as a heading once it loses the
-   pill's contrast box. */
+   These are the actual "section-introducing" labels the typography
+   blueprint describes exactly (its "STEP ONE"-style example) — updated
+   to the exact spec: Syne (not monospace), 900 weight (not 700), 14px
+   desktop stepping to 13px at max-width 1024px (was a flat 13px with
+   no responsive step). */
 .eyebrow-plain {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-jetbrains), monospace !important;
-  font-size: 13px;
-  font-weight: 700;
+  font-family: var(--font-syne), sans-serif !important;
+  font-size: 14px;
+  font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--accent-light);
   margin-bottom: 20px;
+}
+@media (max-width: 1024px) {
+  .eyebrow-plain, .eyebrow-plain--dark { font-size: 13px; line-height: 1.2em; }
 }
 
 .eyebrow-plain--dark {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-jetbrains), monospace !important;
-  font-size: 13px;
-  font-weight: 700;
+  font-family: var(--font-syne), sans-serif !important;
+  font-size: 14px;
+  font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #B24300;
@@ -334,20 +363,33 @@ img { max-width: 100%; display: block; }
    H1 treatment automatically anywhere the class lands on a real h1,
    with no component changes needed. */
 h1.sec-title {
+  /* WEIGHT CORRECTED (direct evidence): the live site's own computed
+     CSS for this exact heading shows font-weight: 600, not 800. The
+     800 value here came from this project's own typography-tier
+     system (Round 83), which doesn't match the blueprint's real
+     values for this element. Corrected to match the actual source.
+     Also: Hero's own h1 previously carried a REDUNDANT second
+     !important weight override (Tailwind's !font-extrabold utility) on
+     top of this rule — two different !important declarations for the
+     same property is exactly what produces the "crossed out /
+     overridden" rules visible in DevTools that were flagged directly.
+     Removed the duplicate at the source (Hero's className) so this one
+     rule is the single, clean, non-conflicting source of truth for
+     every h1.sec-title instance sitewide. */
   font-size: clamp(40px, 5.5vw, 60px);
-  font-weight: 800 !important;
+  font-weight: 600 !important;
   line-height: 1.15;
 }
 
 .sec-sub {
-  /* TYPOGRAPHY SYSTEM: this is the "large paragraph / intro" tier in
-     the spec (17-18px mobile, 18-20px desktop), not body text — it was
-     flat 16px before, identical to regular body copy, which meant
-     section intros carried no size distinction from an ordinary
-     paragraph despite visually needing to read as a step up. Also
-     widened max-width slightly (640px -> 700px), within the spec's
-     recommended 650-750px range for paragraph line length. */
-  font-size: clamp(17px, 1.1vw, 19px);
+  /* EXACT VALUE (direct instruction): "most of the body font (ie all
+     paragraphs) using font-family: Syne, font-weight: 400, font-size:
+     20px" — this is the shared class most section-intro paragraphs
+     sitewide already use, so setting it here cascades the exact value
+     broadly rather than needing to hand-edit every instance. Was a
+     17-19px clamp (an earlier round's own typography-tier system);
+     replaced with the flat 20px this instruction specifies. */
+  font-size: 20px;
   font-weight: 400;
   line-height: 1.7;
   color: var(--text-secondary);
@@ -400,6 +442,23 @@ h1.sec-title {
   border-left: 3px solid var(--accent);
 }
 
+/* HOVER-TRIGGERED VARIANT (direct instruction, SixWays specifically):
+   "when I hover over any other box, the style currently applied to the
+   first box appear on the hovered [one]" — .card--highlight above was
+   permanently applied to only one card (via a `highlight: true` data
+   flag). This variant applies the identical background/border/nested-
+   text treatment, but only on :hover, meant to be applied to every
+   card in a set instead of one being permanently singled out. */
+.card--highlight-on-hover:hover {
+  background: linear-gradient(135deg, var(--flame-from) 0%, var(--flame-to) 100%);
+  border-left: 3px solid var(--accent);
+}
+.card--highlight-on-hover:hover :is(h1, h2, h3, h4, h5, h6):not(.btn) { color: #FFFFFF; }
+.card--highlight-on-hover:hover .text-white:not(.btn) { color: #FFFFFF !important; }
+.card--highlight-on-hover:hover .text-ink_text-secondary:not(.btn) { color: #FFFFFF !important; }
+.card--highlight-on-hover:hover .tag-mono:not(.btn) { color: var(--accent-light); }
+.card--highlight-on-hover:hover .tag-mono--accent:not(.btn) { color: var(--accent-light); }
+
 /* Text-color cascade for content nested inside .card — see the note
    above .card for why this exists. Excludes .btn so button styling
    (which has its own deliberate color scheme) is never touched. */
@@ -449,7 +508,10 @@ h1.sec-title {
 }
 
 .tag-mono {
-  font-family: var(--font-jetbrains), monospace !important;
+  /* CONVERTED TO SYNE (direct instruction: "the font has to be Syne")
+     — this was the last shared class still hardcoded to JetBrains
+     Mono, used for metrics/step-numbers/metadata sitewide. */
+  font-family: var(--font-syne), sans-serif !important;
   font-size: 12px;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -471,12 +533,17 @@ h1.sec-title {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-jetbrains), sans-serif;
-  /* TYPOGRAPHY SYSTEM: 13px -> 14px, into the spec's 14-16px button
-     range (was just under it). Weight (600) already matched the spec's
-     500-600 button range, no change needed there. */
+  /* CONSISTENCY SWEEP (direct instruction): "anything I asked you to do
+     ... should be done to all titles and buttons throughout, not just
+     the sections I pointed out." The nav CTA buttons (.btn--ghost-
+     accent) were corrected to Syne/900 weight per the live site's exact
+     button CSS — applying that same font treatment here, to the BASE
+     button class every variant inherits from, so it's consistent
+     everywhere a button appears, not just the nav. Colors/backgrounds
+     per variant are untouched; this only changes the font. */
+  font-family: var(--font-syne), sans-serif;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 900;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   padding: 11px 26px;
@@ -550,7 +617,14 @@ h1.sec-title {
   background: transparent;
   color: #16003B;
   border: 2px solid var(--accent);
-  font-weight: 700;
+  /* Only padding needs its own override now — font-family/weight match
+     the base .btn already (both Syne/900 as of the consistency sweep
+     above), so restating them here would just be the same redundant-
+     declaration problem flagged directly for the Hero heading earlier.
+     Flat 15px/30px padding is still a genuine, deliberate difference
+     from the base .btn's responsive 11px->13px->15px scale, specific
+     to this exact nav-button spec. */
+  padding: 15px 30px;
 }
 .btn--ghost-accent:hover {
   background: var(--accent);
@@ -653,7 +727,8 @@ h1.sec-title {
   align-items: center;
   justify-content: center;
   color: var(--accent-light);
-  font-family: var(--font-jetbrains), monospace !important;
+  /* CONVERTED TO SYNE (direct instruction) — was JetBrains Mono. */
+  font-family: var(--font-syne), sans-serif !important;
   font-weight: 600;
   font-size: 14px;
 }
@@ -697,4 +772,110 @@ h1.sec-title {
 .insight-content a {
   color: #B24300;
   text-decoration: underline;
+}
+
+/* "See it clearly" top diagram — REBUILT this round (direct
+   feedback): the previous version was a continuous CSS-only loop with
+   no real stops and no synchronization with the checkmark. What was
+   actually asked: the packet should travel System -> AI -> Blockchain
+   -> checkmark, pausing a few seconds at each stop, with the checkmark
+   lighting up specifically when the packet arrives there — genuine
+   synchronization needs actual state, not independent CSS timelines
+   that can drift apart, so the packet's position is now driven by
+   React state (see TopDiagram) and only needs a CSS transition here,
+   not a keyframe loop. The icons themselves also needed their own
+   idle motion, independent of the packet: System gently floats up and
+   down like a hovering box, the AI ring rotates continuously around
+   the sphere, and the Blockchain cubes drift irregularly (different
+   amplitude/timing per cube) rather than sitting static. */
+.flow-track {
+  position: relative;
+  height: 2px;
+  background: rgba(255, 138, 61, 0.18);
+}
+.flow-packet {
+  position: absolute;
+  top: 50%;
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 35%, #FF8A3D, #a23d08);
+  box-shadow: 0 0 12px 4px rgba(255, 138, 61, 0.6);
+  transform: translate(-50%, -50%);
+  transition: left 0.9s cubic-bezier(.4, 0, .2, 1);
+}
+
+@keyframes icon-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.icon-float {
+  animation: icon-float 3.2s ease-in-out infinite;
+}
+
+@keyframes icon-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.icon-spin {
+  animation: icon-spin 6s linear infinite;
+}
+
+@keyframes icon-drift-a {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-2px, -5px); }
+}
+@keyframes icon-drift-b {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(3px, -3px); }
+}
+@keyframes icon-drift-c {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-1px, -6px); }
+}
+.icon-drift-a { animation: icon-drift-a 2.6s ease-in-out infinite; }
+.icon-drift-b { animation: icon-drift-b 3.1s ease-in-out infinite .3s; }
+.icon-drift-c { animation: icon-drift-c 2.8s ease-in-out infinite .6s; }
+
+/* "1 - Blockchain is the trust layer" diagram — a continuous vertical
+   traveling-ball animation (direct instruction): a packet leaves ERP AI,
+   travels down through each verify cube to Customer AI, then loops —
+   with a second ball following behind on a delay, "another ball starts
+   and does the same over and over again." Same technique as the "See
+   it clearly" top diagram's horizontal track (a CSS-driven dot along a
+   track spanning the full row), adapted to vertical motion for this
+   diagram's vertical chain layout. Continuous/looping rather than
+   stage-paused, matching what was actually described this time (a ball
+   that just keeps flowing, not one that stops and waits at each node). */
+@keyframes flow-packet-vertical {
+  0% { top: 0%; opacity: 0; }
+  6% { opacity: 1; }
+  94% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+.flow-track-vertical {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(255, 96, 0, 0.15);
+  transform: translateX(-50%);
+}
+.flow-packet-vertical {
+  position: absolute;
+  left: 50%;
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 35%, #FF8A3D, #a23d08);
+  box-shadow: 0 0 12px 4px rgba(255, 138, 61, 0.6);
+  transform: translate(-50%, -50%);
+  animation: flow-packet-vertical 4s cubic-bezier(.4, 0, .2, 1) infinite;
+}
+.flow-packet-vertical--delay {
+  animation-delay: 2s;
+  width: 7px;
+  height: 7px;
+  opacity: 0.75;
 }

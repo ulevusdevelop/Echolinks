@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 // SECTION-WIDE FIX (this pass): checked structure, not just copy, against
 // direct crops of Sample.pdf. Found real structural bugs, not just
@@ -19,24 +20,41 @@ import React, { useState } from 'react';
 //   4. Top diagram's "Blockchain" cluster had 2 overlapping shapes; the
 //      reference shows 3 forming a small stacked cluster.
 
+// CONTENT RESTORATION (careful sweep, cont'd): found the reference's
+// actual click-detail dataset (DIA_INFO) in its script tag — every
+// node's `detail` text below was invented placeholder wording, none of
+// it matching the reference. Replaced with the real text verbatim.
+// Also found two structural gaps this data revealed:
+//   1. "Dynamics 365" is one of the reference's 7 systems in diagram 2;
+//      this list only had 6, missing it entirely.
+//   2. The reference's hand-off "chain" node (the three verify markers
+//      in diagram 1) all share ONE detail text, not three different
+//      invented ones — and diagram 2's BLOCKCHAIN pill and Shared
+//      Decision Network box are themselves clickable with their own
+//      info too, which they weren't here at all.
+const chainDetail = 'Between every AI hand-off, the record is verified and written to the blockchain. If anything was altered, it fails the check, so nothing passes unverified.';
+
 const trustChainNodes = [
-  { id: 'erp', label: 'ERP AI', detail: 'The ERP AI creates a data event, ready to hand off.' },
-  { id: 'verify1', label: 'verify', detail: 'The hand-off is checked and anchored before it moves on.' },
-  { id: 'warehouse', label: 'Warehouse AI', detail: 'The Warehouse AI reads the verified event and acts on it.' },
-  { id: 'verify2', label: 'verify', detail: 'This hand-off is verified too.' },
-  { id: 'supplier', label: 'Supplier AI', detail: 'The Supplier AI receives a verified, tamper-proof instruction.' },
-  { id: 'verify3', label: 'verify', detail: 'The final hand-off is checked and anchored, same as every step before it.' },
-  { id: 'customer', label: 'Customer AI', detail: 'The Customer AI receives the completed, fully verified chain of custody.' },
+  { id: 'erp', label: 'ERP AI', detail: 'An agent on your ERP reads orders and inventory, then decides what to do next, the first link in the chain.' },
+  { id: 'verify1', label: 'verify', detail: chainDetail },
+  { id: 'warehouse', label: 'Warehouse AI', detail: 'An agent on your warehouse system confirms stock and movement before work passes downstream.' },
+  { id: 'verify2', label: 'verify', detail: chainDetail },
+  { id: 'supplier', label: 'Supplier AI', detail: 'An agent coordinating with suppliers, placing and confirming what is needed, under your rules.' },
+  { id: 'verify3', label: 'verify', detail: chainDetail },
+  { id: 'customer', label: 'Customer AI', detail: 'An agent that closes the loop with the customer, delivery, status, and proof of fulfilment.' },
 ];
 
 const sharedNetworkNodes = [
-  { id: 'sap', label: 'SAP ERP', detail: 'Runs its own decentralized AI agent.' },
-  { id: 'salesforce', label: 'Salesforce', detail: 'Its agent handles CRM actions.' },
-  { id: 'oracle', label: 'Oracle ERP', detail: 'A second ERP, a second agent.' },
-  { id: 'primavera', label: 'Primavera P6', detail: 'Schedule and cost data gets its own agent.' },
-  { id: 'wms', label: 'Warehouse WMS', detail: 'Inventory movements logged by a scoped agent.' },
-  { id: 'manufacturing', label: 'Manufacturing', detail: 'Line and machine data feeds its own agent.' },
+  { id: 'sap', label: 'SAP ERP', detail: 'SAP keeps running as-is. Its own AI agent reads and acts on its data under policy controls you set.' },
+  { id: 'salesforce', label: 'Salesforce', detail: 'Your CRM gets its own agent, no migration, no replacement, just an agent that understands your customer data.' },
+  { id: 'oracle', label: 'Oracle ERP', detail: 'Oracle keeps its place. Its agent participates in the shared decision network like every other system.' },
+  { id: 'primavera', label: 'Primavera P6', detail: 'Your schedule gets its own agent. It reads progress and cost, recalculates earned value, and flags slippage and float erosion before it hits the critical path.' },
+  { id: 'dynamics', label: 'Dynamics 365', detail: 'Dynamics runs its own agent, contributing to and drawing from the shared, verified network.' },
+  { id: 'wms', label: 'Warehouse WMS', detail: 'Your warehouse system gets an agent that tracks stock and movement in real time.' },
+  { id: 'manufacturing', label: 'Manufacturing', detail: 'Your shop floor and machines get an agent that reports output and proves completed work.' },
 ];
+const blockchainDetail = chainDetail;
+const networkDetail = "Every system's agent plugs into one network. They share verified decisions instead of working blind in silos, so the whole business acts as one.";
 
 type Node = { id: string; label: string; detail: string };
 
@@ -62,7 +80,13 @@ const TrustChainDiagram = ({
       <h4 className="text-white font-bold mb-3">{title}</h4>
       <p className="text-ink_text-secondary text-sm leading-relaxed mb-8">{description}</p>
 
-      <div className="flex flex-col items-center gap-0">
+      <div className="relative flex flex-col items-center gap-0">
+        {/* Vertical traveling-ball track — sits behind the chain,
+            spans from the first node to the last. */}
+        <div className="flow-track-vertical" aria-hidden="true">
+          <span className="flow-packet-vertical" />
+          <span className="flow-packet-vertical flow-packet-vertical--delay" />
+        </div>
         {nodes.map((node, i) => {
           const isVerify = node.label === 'verify';
           const isActive = activeId === node.id;
@@ -96,7 +120,7 @@ const TrustChainDiagram = ({
               <button
                 type="button"
                 onClick={() => setActiveId(node.id)}
-                className={`w-full max-w-[220px] text-sm font-mono tracking-tag text-center rounded-none py-3 transition-all border bg-ink-600 border-ink-border text-white ${
+                className={`w-full max-w-[220px] text-sm tracking-tag text-center rounded-none py-3 transition-all border bg-ink-600 border-ink-border text-white ${
                   isActive ? 'ring-2 ring-accent scale-[1.02]' : 'hover:border-accent'
                 }`}
               >
@@ -132,14 +156,27 @@ const SharedNetworkDiagram = ({
   description,
   nodes,
   hint,
+  blockchainDetail,
+  networkDetail,
 }: {
   title: string;
   description: string;
   nodes: Node[];
   hint: string;
+  blockchainDetail: string;
+  networkDetail: string;
 }) => {
+  // Extended to a union type so the BLOCKCHAIN pill and Shared Decision
+  // Network box can be selected too, matching the reference — every
+  // node in this diagram is clickable there, not just the system rows.
   const [activeId, setActiveId] = useState<string | null>(null);
-  const active = nodes.find((n) => n.id === activeId);
+  const activeNode = nodes.find((n) => n.id === activeId);
+  const activeDetail =
+    activeId === 'blockchain'
+      ? blockchainDetail
+      : activeId === 'network'
+      ? networkDetail
+      : activeNode?.detail;
 
   return (
     <div className="rounded-card p-8 md:p-9 flex flex-col" style={{ background: '#16003B' }}>
@@ -165,7 +202,7 @@ const SharedNetworkDiagram = ({
                 className="flex items-center gap-3 w-full"
               >
                 <span
-                  className={`flex-1 text-sm font-mono tracking-tag text-center rounded-none py-2.5 border bg-ink-600 border-ink-border text-white transition-all ${
+                  className={`flex-1 text-sm tracking-tag text-center rounded-none py-2.5 border bg-ink-600 border-ink-border text-white transition-all ${
                     isActive ? 'ring-2 ring-accent' : 'hover:border-accent'
                   }`}
                 >
@@ -190,19 +227,34 @@ const SharedNetworkDiagram = ({
             conflict rather than silently dropping that finding: this
             change knowingly overrides a previously-verified source
             detail because the newer, explicit instruction takes
-            priority. */}
-        <span className="tag-mono !text-white bg-accent px-4 py-2 rounded-none font-bold">
+            priority.
+            CLICKABLE (careful sweep): this pill and the Shared Decision
+            Network box below are clickable in the reference too, each
+            with its own info — they were static here before. */}
+        <button
+          type="button"
+          onClick={() => setActiveId('blockchain')}
+          className={`tag-mono !text-white bg-accent px-4 py-2 rounded-none font-bold transition-all ${
+            activeId === 'blockchain' ? 'ring-2 ring-white' : ''
+          }`}
+        >
           BLOCKCHAIN
-        </span>
+        </button>
         <span className="text-ink_text-muted text-xs">↓</span>
-        <div className="bg-ink-600 border border-ink-border rounded-none px-4 py-3 text-center w-full max-w-[220px]">
+        <button
+          type="button"
+          onClick={() => setActiveId('network')}
+          className={`bg-ink-600 border border-ink-border rounded-none px-4 py-3 text-center w-full max-w-[220px] transition-all ${
+            activeId === 'network' ? 'ring-2 ring-accent' : 'hover:border-accent'
+          }`}
+        >
           <span className="text-white font-bold text-sm block">Shared Decision</span>
           <span className="text-ink_text-secondary text-xs">Network</span>
-        </div>
+        </button>
       </div>
 
       <div className="mt-8 bg-ink-900 border border-ink-border rounded-none p-5 min-h-[64px] text-sm text-ink_text-secondary">
-        {active ? active.detail : hint}
+        {activeDetail || hint}
       </div>
     </div>
   );
@@ -212,19 +264,44 @@ const SharedNetworkDiagram = ({
 // caption steps and a "now provable" badge underneath. This is a CSS/SVG
 // approximation of the reference artwork (glowing orb, cube clusters) --
 // close in spirit and layout, not a pixel-identical illustration.
+//
+// STAGE-DRIVEN ANIMATION (direct instruction): the packet now actually
+// travels System -> AI -> Blockchain -> checkmark, pausing at each stop
+// (holds position for a full interval before the state advances, rather
+// than moving continuously), and the checkmark visibly lights up
+// exactly when the packet arrives there, in sync — driven by real React
+// state rather than independent CSS timelines, which can't guarantee
+// that kind of synchronization reliably.
+const STAGE_POSITIONS = [8, 36, 64, 92]; // approx. % position of System/AI/Blockchain/checkmark within the row
+const STAGE_DURATION = 1900; // ms per stop
+
 const TopDiagram = () => {
+  const [stage, setStage] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setStage((s) => (s + 1) % STAGE_POSITIONS.length);
+    }, STAGE_DURATION);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <div className="rounded-card p-8 md:p-9 mb-8" style={{ background: '#16003B' }}>
+      <div className="flow-track mx-4 md:mx-8 mb-2" aria-hidden="true">
+        <span className="flow-packet" style={{ left: `${STAGE_POSITIONS[stage]}%` }} />
+      </div>
       <div className="flex flex-wrap items-center justify-center gap-10 md:gap-16 py-8">
-        {/* System — two-tone shaded diamond, matching the 3D-cube
-            treatment used on the verify/blockchain cubes elsewhere in
-            this section, rather than a flat single-tone shape. */}
+        {/* System — colors corrected to the exact gradients from the
+            live site's own SVG source (blueprint): a cool blue-navy
+            iso-cube (topF/leftF families). Now gently floats up and
+            down continuously (icon-float), independent of the packet's
+            own journey. */}
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-3 relative">
-            <div className="absolute inset-0 rounded-none bg-ink-600 border border-ink-border rotate-45" />
+          <div className="w-16 h-16 mx-auto mb-3 relative icon-float">
+            <div className="absolute inset-0 rounded-none rotate-45" style={{ background: 'linear-gradient(135deg, #1c4378, #143360)' }} />
             <div
-              className="absolute inset-0 rounded-none bg-black/20 rotate-45"
-              style={{ clipPath: 'polygon(0% 50%, 50% 100%, 100% 50%)' }}
+              className="absolute inset-0 rounded-none rotate-45"
+              style={{ background: 'linear-gradient(135deg, #0E2647, #081d38)', clipPath: 'polygon(0% 50%, 50% 100%, 100% 50%)' }}
             />
             <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">
               System
@@ -235,23 +312,16 @@ const TopDiagram = () => {
 
         <span className="text-ink_text-muted hidden md:block">—</span>
 
-        {/* AI — reference shows a solid glowing orange sphere floating
-            above a small diamond platform base, with a thin orbit-ring
-            ellipse around its middle and dark text (not white) on the
-            bright orange fill. Previous version was a translucent
-            circle with white text and no base/ring at all. */}
+        {/* AI — sphere gradient corrected to the exact coreGlow stops
+            from the blueprint (#FF8A3D -> #F26A1B -> #a23d08 radial).
+            The orbit ring now actually rotates continuously
+            (icon-spin), like a ring around a planet, rather than
+            sitting static. */}
         <div className="text-center">
           <div className="w-20 h-24 mx-auto mb-3 relative flex flex-col items-center justify-end">
-            {/* Platform base */}
-            <div className="absolute bottom-1 w-10 h-10 bg-ink-600 border border-ink-border rotate-45 rounded-none" aria-hidden="true" />
-            {/* Glowing sphere */}
-            <div className="absolute bottom-4 w-16 h-16 rounded-full" style={{ background: 'radial-gradient(circle at 35% 30%, #FFB067, var(--accent) 65%)', boxShadow: '0 0 24px 6px rgba(255,96,0,0.45)' }} />
-            {/* Orbit ring */}
-            <span className="absolute bottom-9 w-20 h-6 border rounded-full" style={{ borderColor: 'rgba(255,150,80,0.55)' }} aria-hidden="true" />
-            {/* Text color overridden to white, same reasoning/override
-                as the BLOCKCHAIN box above — this was dark navy after a
-                verified crop in Round 17; flipped for consistency with
-                the new explicit rule. */}
+            <div className="absolute bottom-1 w-10 h-10 rounded-none rotate-45" style={{ background: 'linear-gradient(135deg, #1c4378, #143360)' }} aria-hidden="true" />
+            <div className="absolute bottom-4 w-16 h-16 rounded-full" style={{ background: 'radial-gradient(circle at 40% 35%, #FF8A3D 0%, #F26A1B 55%, #a23d08 100%)', boxShadow: '0 0 24px 6px rgba(255,138,61,0.45)' }} />
+            <span className="absolute bottom-9 w-20 h-6 border rounded-full icon-spin" style={{ borderColor: 'rgba(255,138,61,0.5)' }} aria-hidden="true" />
             <span className="relative z-10 mb-6 text-white font-bold text-sm">AI</span>
           </div>
           <p className="tag-mono tag-mono--accent">verify</p>
@@ -259,55 +329,53 @@ const TopDiagram = () => {
 
         <span className="text-ink_text-muted hidden md:block">—</span>
 
-        {/* Blockchain -- 3-cube cluster, corrected from 2, matching the
-            reference's stacked-block icon. */}
+        {/* Blockchain — bright orange gradient family, matching the
+            blueprint's SVG source. Each of the 3 cubes now drifts
+            irregularly and independently (icon-drift-a/b/c — different
+            amplitude and timing per cube), instead of sitting static. */}
         <div className="text-center">
           <div className="flex items-center justify-center mb-3" style={{ width: 64, height: 40 }}>
-            {/* Color fix: this cluster was bright accent-orange like the
-                verify cubes elsewhere in the section. A close-up crop of
-                the reference shows a distinct muted brown/copper tone
-                for the Blockchain cluster specifically, with a small
-                warm orange highlight on one inner facet — a different,
-                deliberate color from the bright-orange "verify" cubes,
-                not the same element restyled. */}
             <div className="relative w-full h-full">
-              <div className="absolute left-0 bottom-0 w-7 h-7 rounded-none rotate-45" style={{ background: '#6B4A3D' }} />
-              <div className="absolute left-4 bottom-0 w-7 h-7 rounded-none rotate-45" style={{ background: '#5A3D33' }} />
-              <div className="absolute left-2 top-0 w-7 h-7 rounded-none rotate-45" style={{ background: '#8A5A46' }} />
-              <div
-                className="absolute left-2 top-0 w-7 h-7 rounded-none rotate-45"
-                style={{ background: 'radial-gradient(circle at 30% 70%, rgba(255,122,38,0.55), transparent 60%)' }}
-              />
+              <div className="absolute left-0 bottom-0 w-7 h-7 rounded-none rotate-45 icon-drift-a" style={{ background: 'linear-gradient(135deg, #d4540f, #a23d08)' }} />
+              <div className="absolute left-4 bottom-0 w-7 h-7 rounded-none rotate-45 icon-drift-b" style={{ background: 'linear-gradient(135deg, #F26A1B, #c24d0c)' }} />
+              <div className="absolute left-2 top-0 w-7 h-7 rounded-none rotate-45 icon-drift-c" style={{ background: 'linear-gradient(135deg, #FF8A3D, #F26A1B)' }} />
             </div>
           </div>
           <p className="tag-mono">Blockchain</p>
           <p className="tag-mono tag-mono--accent">anchored</p>
         </div>
 
+        {/* Checkmark — lights up (solid green fill, brighter check)
+            specifically when the packet's stage reaches it (stage 3),
+            fading back to a dim outline otherwise. */}
         <span
-          className="w-8 h-8 rounded-full border flex items-center justify-center"
-          style={{ borderColor: '#3DBE7A', color: '#3DBE7A' }}
+          className="w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-500"
+          style={
+            stage === 3
+              ? { borderColor: '#3DBE7A', color: '#FFFFFF', background: '#3DBE7A', boxShadow: '0 0 14px 3px rgba(61,190,122,0.55)' }
+              : { borderColor: 'rgba(61,190,122,0.35)', color: 'rgba(61,190,122,0.5)', background: 'transparent' }
+          }
         >
           ✓
         </span>
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
-        <span className="tag-mono border border-ink-border rounded-pill px-4 py-2">
+        <span className={`tag-mono rounded-none px-4 py-2 border transition-colors ${stage === 0 ? 'border-accent text-accent-light' : 'border-ink-border'}`}>
           1 A system creates a data event
         </span>
         <span className="text-ink_text-muted">—</span>
-        <span className="tag-mono border border-accent text-accent-light rounded-pill px-4 py-2">
+        <span className={`tag-mono rounded-none px-4 py-2 border transition-colors ${stage === 1 ? 'border-accent text-accent-light' : 'border-ink-border'}`}>
           2 Decentralized AI verifies it
         </span>
         <span className="text-ink_text-muted">—</span>
-        <span className="tag-mono border border-ink-border rounded-pill px-4 py-2">
+        <span className={`tag-mono rounded-none px-4 py-2 border transition-colors ${stage === 2 ? 'border-accent text-accent-light' : 'border-ink-border'}`}>
           3 It is anchored to the blockchain
         </span>
       </div>
 
       <div className="flex justify-center mt-5">
-        <span className="tag-mono tag-mono--accent border border-accent rounded-pill px-5 py-2">
+        <span className={`tag-mono border rounded-none px-5 py-2 transition-colors ${stage === 3 ? 'border-accent tag-mono--accent' : 'border-ink-border'}`}>
           ✓ Now provable, forever
         </span>
       </div>
@@ -327,8 +395,9 @@ export const TwoIdeas = () => {
     // same surface.
     <section id="see-it-clearly" className="section--light">
       <div className="wrap">
-        <div className="sec-header max-w-xl mx-auto text-center">
-          <span className="eyebrow--dark">SEE IT CLEARLY</span>
+        <RevealOnScroll>
+        <div className="sec-header max-w-2xl mx-auto text-center">
+          <span className="eyebrow-plain--dark">SEE IT CLEARLY</span>
           <h2 className="sec-title--dark">Two ideas, drawn simply.</h2>
           <p className="sec-sub--dark sec-sub--center">
             If the words &quot;decentralized AI&quot; and &quot;trust layer&quot; feel
@@ -337,7 +406,9 @@ export const TwoIdeas = () => {
         </div>
 
         <TopDiagram />
+        </RevealOnScroll>
 
+        <RevealOnScroll delayMs={150}>
         <div className="grid md:grid-cols-2 gap-8">
           <TrustChainDiagram
             title="1 · Blockchain is the trust layer"
@@ -350,8 +421,11 @@ export const TwoIdeas = () => {
             description="Instead of one AI for everything, each system runs its own agent. They share one verified decision network through blockchain."
             nodes={sharedNetworkNodes}
             hint="Tap any system to see what it does"
+            blockchainDetail={blockchainDetail}
+            networkDetail={networkDetail}
           />
         </div>
+        </RevealOnScroll>
 
         {/* Single shared caption below both cards -- the reference has
             exactly one, not a separate footer duplicated inside each

@@ -44,12 +44,12 @@ export default function EdiApiManagedServicesPage() {
         <meta property="og:description" content="Value-Added EDI and API software solutions, fully managed, with 24x7 monitoring and full ERP and Blockchain integration." />
       </Head>
 
-      <section className="relative overflow-hidden pt-28 pb-20" style={{ background: '#16003B' }}>
+      <section className="relative overflow-hidden pt-44 pb-20" style={{ background: '#16003B' }}>
         <div className="wrap">
-          <span className="font-mono text-xs font-bold tracking-tag uppercase block mb-3" style={{ color: '#FF6100' }}>
+          <span className="text-xs font-bold tracking-tag uppercase block mb-3" style={{ color: '#FF6100' }}>
             MANAGED SERVICES
           </span>
-          <h1 className="text-white font-bold text-4xl md:text-5xl mb-6">
+          <h1 className="text-white !font-bold text-4xl md:text-5xl mb-6">
             EDI/API Managed Services
           </h1>
           <span className="text-white text-2xl" aria-hidden="true">↓</span>

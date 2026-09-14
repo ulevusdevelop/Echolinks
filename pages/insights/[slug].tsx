@@ -40,7 +40,7 @@ function estimateReadTime(html: string): number {
 export default function InsightPostPage({ post }: PostPageProps) {
   if (!post) {
     return (
-      <div className="pt-28"><section className="section--page text-center">
+      <div className="pt-44"><section className="section--page text-center">
         <div className="wrap">
           <h1 className="sec-title">Post not found.</h1>
           <Link href="/insights" className="btn btn--ghost mt-6 inline-flex">
@@ -83,7 +83,7 @@ export default function InsightPostPage({ post }: PostPageProps) {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${post.title} — Echolink Solutions`} />
       </Head>
-      <div className="pt-28"><article className="section--page pb-24">
+      <div className="pt-44"><article className="section--page pb-24">
         <div className="wrap max-w-3xl">
           <Link href="/insights" className="tag-mono tag-mono--accent mb-8 inline-block">
             ← BACK TO INSIGHTS

@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { RevealOnScroll } from '@/components/RevealOnScroll';
 
 // Second light-background beat, mirroring the old site's rhythm: a light
 // section early (CapabilitiesIntro) and a second one late, right before
@@ -42,14 +43,15 @@ export const TrustBand = () => {
           />
         </div>
 
-        <div className="relative max-w-xl">
+        <RevealOnScroll>
+        <div className="relative max-w-2xl">
           <span className="tag-mono !text-[#B24300] mb-4 inline-block">
             THE HONEST PART
           </span>
           <p className="text-[#16003B] font-bold text-2xl md:text-3xl leading-snug mb-6">
             Your systems run the work. We make it trustworthy.
           </p>
-          <p className="text-[#434343] text-sm leading-relaxed mb-8 max-w-sm">
+          <p className="text-[#434343] text-[20px] font-normal leading-relaxed mb-8 max-w-sm">
             No rip and replace. We add the layer that makes it provable, keeps your
             data and AI out of one vendor&apos;s hands, and gives you the audit trail
             regulators are starting to demand.
@@ -58,6 +60,7 @@ export const TrustBand = () => {
             Talk through your setup →
           </Link>
         </div>
+        </RevealOnScroll>
       </div>
     </section>
   );

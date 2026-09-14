@@ -10,17 +10,6 @@ export const CapabilitiesIntro = () => {
   return (
     <section className="relative bg-[#FFFFFF] py-28 lg:py-40 overflow-hidden">
       <div className="wrap relative">
-        {/* COMPOSITION REBUILT this round: direct feedback that the
-            site's layout reads as "flat or predictable." This section
-            was the clearest example — a faint background watermark
-            politely avoided by a cleanly separated text block, two
-            zones with zero interaction between them. Rebuilt with
-            actual layering: the ES mark is bigger and more present
-            (not just barely-visible texture), and the heading's left
-            edge is deliberately allowed to overlap into the mark's
-            space instead of staying clear of it — the kind of
-            intersection that gives a composition depth instead of
-            everything sitting in its own tidy, separate box. */}
         <div
           className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 w-[620px] h-[383px] opacity-[0.16] pointer-events-none"
           aria-hidden="true"
@@ -34,24 +23,31 @@ export const CapabilitiesIntro = () => {
           />
         </div>
 
-        {/* MOTION FIX (Homepage item 2): "Animate the bolded words in
-            the section. Have it float up." The heading is the section's
-            bold text — wrapped in RevealOnScroll ('up' variant) with the
-            paragraph following on a slight delay, so the two pieces
-            arrive as a short staggered sequence rather than a single
-            block popping in at once. */}
-        <div className="relative max-w-2xl ml-[18%] lg:ml-[22%]">
+        {/* REPOSITIONED (blueprint): text block now starts at ~40% of
+            the section width and flows right, left-aligned throughout
+            — replaces the previous 18-22% margin and the deliberate
+            negative-margin overlap-into-the-watermark effect from an
+            earlier round, which isn't what's being asked for here.
+            Container widened slightly (max-w-2xl -> max-w-3xl) per
+            direct instruction. Eyebrow removed entirely. Title and
+            body now use the exact typography read directly off the
+            live site: title Syne/600/line-height 49px, body Syne/20px/
+            400. */}
+        <div className="relative max-w-3xl text-left lg:ml-[40%]">
           <RevealOnScroll>
-            <span className="tag-mono !text-[#B24300] mb-4 inline-block">
-              ENTERPRISE INTEGRATION · DECENTRALIZED AI · PROJECT CONTROLS
-            </span>
-            <h2 className="text-[#16003B] font-bold text-3xl md:text-4xl leading-tight mb-5 relative -ml-[6%] md:-ml-[10%]">
+            <h2
+              className="text-[#16003B] mb-5"
+              style={{ fontFamily: 'var(--font-syne), sans-serif', fontWeight: 600, lineHeight: '49px', fontSize: 'clamp(28px, 3vw, 36px)' }}
+            >
               Enterprise systems, decentralized AI, and project controls, wired
               into one verifiable layer.
             </h2>
           </RevealOnScroll>
           <RevealOnScroll delayMs={150}>
-            <p className="text-[#434343] text-base leading-relaxed max-w-xl">
+            <p
+              className="text-[#434343] leading-relaxed max-w-xl"
+              style={{ fontFamily: 'var(--font-syne), sans-serif', fontWeight: 400, fontSize: '20px' }}
+            >
               One connective layer for the systems you already run, the AI you are
               adding, and the projects you need to prove. No rip and replace, no
               black box, no guessing where things stand.

@@ -139,14 +139,25 @@ export default function InsightsIndexPage({ posts }: InsightsPageProps) {
         />
       </Head>
 
-      <section className="section--page !pt-28 !pb-16">
-        <div className="wrap text-center">
-          <span className="eyebrow">INSIGHTS</span>
-          <h1 className="sec-title">Thinking on verifiable AI and trust.</h1>
-          <p className="sec-sub sec-sub--center mt-4">
+      {/* RESTYLED (direct request): "Organize the first section on the
+          Insights page to have same starting Introductory Look Like
+          Project Controls" — was centered with no down-arrow; now
+          matches ProjectControls' hero exactly: left-aligned content,
+          the same pt-44/pb-20 padding, and the down-arrow. */}
+      <section className="relative overflow-hidden pt-44 pb-20" style={{ background: '#16003B' }}>
+        <div className="wrap">
+          <span className="eyebrow-plain">INSIGHTS</span>
+          <h1 className="text-white !font-bold text-4xl md:text-5xl leading-tight mb-6 max-w-2xl">
+            Thinking on verifiable AI and trust.
+          </h1>
+          <p className="text-white text-base leading-relaxed max-w-xl mb-10">
             Ideas, updates, and field notes from the work of wiring AI, automation, and
             blockchain into one trusted layer.
           </p>
+          {/* Down-arrow removed here specifically (direct instruction)
+              — "Articles" already serves as the section's own visual
+              anchor/label right below, so the arrow was redundant on
+              this page even though other page-top heroes keep it. */}
         </div>
       </section>
 
@@ -154,14 +165,14 @@ export default function InsightsIndexPage({ posts }: InsightsPageProps) {
         <div className="wrap">
           <div className="flex items-center gap-6 pb-8 border-b border-[#E5E5E5] mb-10">
             <span
-              className="font-mono text-xs tracking-tag uppercase px-5 py-2"
+              className="text-xs tracking-tag uppercase px-5 py-2"
               style={{ background: '#16003B', color: '#FFFFFF' }}
             >
               Articles
             </span>
             <Link
               href="/contact"
-              className="ml-auto font-mono text-xs tracking-tag uppercase underline underline-offset-4"
+              className="ml-auto text-xs tracking-tag uppercase underline underline-offset-4"
               style={{ color: '#16003B' }}
             >
               Suggest a topic →

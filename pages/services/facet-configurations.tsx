@@ -80,12 +80,12 @@ export default function FacetConfigurationsPage() {
         <meta property="og:description" content="EPIC EMR FACETS configuration, managed services, and deep expertise across every module of the FACETS healthcare platform." />
       </Head>
 
-      <section className="relative overflow-hidden pt-28 pb-20" style={{ background: '#16003B' }}>
+      <section className="relative overflow-hidden pt-44 pb-20" style={{ background: '#16003B' }}>
         <div className="wrap max-w-2xl">
-          <span className="font-mono text-xs font-bold tracking-tag uppercase block mb-3" style={{ color: '#FF6100' }}>
+          <span className="text-xs font-bold tracking-tag uppercase block mb-3" style={{ color: '#FF6100' }}>
             MANAGED SERVICES
           </span>
-          <h1 className="text-white font-bold text-4xl md:text-5xl mb-6">
+          <h1 className="text-white !font-bold text-4xl md:text-5xl mb-6">
             FACET Configurations
           </h1>
           <p className="text-white/70 text-sm leading-relaxed mb-8">

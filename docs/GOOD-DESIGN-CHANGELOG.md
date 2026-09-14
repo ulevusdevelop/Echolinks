@@ -3007,3 +3007,1091 @@ opacity, quite faint against the dark purple background. Doubled to
 
 Verified: `./node_modules/.bin/tsc --noEmit` clean, full
 `./node_modules/.bin/next build` — 26 routes.
+
+## Round 84 — Hero lines rebuilt a third time (this time actually rendered before shipping), 2,000-careers card fixed
+
+Direct feedback: "the arrows still look like a joke." Stopped guessing
+at bezier coordinates blind. Installed cairosvg in the sandbox,
+rendered the exact previous version (photo grid + arrows) to a real
+PNG, and looked at it — it showed an ugly kinked zigzag, not graceful
+curves. Root cause: the previous version chained two cubic bezier
+segments per curve with no tangent continuity at the join, producing a
+visible kink where they met.
+
+Rebuilt using ONE single cubic bezier per curve (no chained segments,
+so no kink is structurally possible), and iterated through 6 rendered
+versions — checking each as an actual image — until the two curves
+crossed cleanly exactly once with a graceful, ungimmicky sweep.
+Arrowhead angles computed from each curve's actual end-tangent
+direction (previous control point -> endpoint vector) rather than
+eyeballed, so they point exactly where the curve is actually heading.
+
+**Separately, found and fixed why the "2,000 careers" card doesn't
+stand out — two real, compounding causes:**
+1. Its background gradient (`--flame-from`/`--flame-to`, also used by
+   `.card--highlight` elsewhere) goes between two colors that measured
+   1.15:1 contrast against each other — essentially indistinguishable,
+   so it rendered as a flat, muddy near-black blob instead of a visible
+   gradient. Changed the dark stop to the actual brand purple
+   (#16003B) and the light stop to a rich ember orange (#8B3A0F),
+   chosen specifically to keep white text legible at every point in the
+   gradient (7.75:1 against white) — deliberately not the brand's
+   bright #FF6100, which only manages 3.02:1 and would have failed for
+   the card's body paragraph text.
+2. This round's new h3 typography tier (600 weight, !important)
+   silently overrode this heading's existing `font-bold` (700) — a real
+   side effect of Round 83's change. Restored with an explicit
+   `!font-bold` override.
+
+**On (2) specifically**: found 33 total h3/h4 + font-bold instances
+across 20 files affected the same way by Round 83's change. Only fixed
+this one, deliberately — restoring all 33 to 700 would flatten the new
+H3 tier right back into meaninglessness (every real h3 would just
+override it back to 700, same problem the tiered system was built to
+fix, and the spec's own text warns against "making everything bold").
+The other 32 are left at the new, more disciplined 600 default unless
+there's a specific, evidenced reason (like this card) to make an
+individual one heavier.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes.
+
+## Round 85 — Energy added to Industries, Labs page fully built, sitewide missing-sections scan
+
+**Industries list**: added "Energy" as a 5th line below Transportation.
+Not arbitrary — "energy" is already named explicitly in this exact
+page's own CTA copy (TrustedToBuildTrust: "From healthcare to retail to
+energy...") and matches a real listed client (Oando, oil & gas), so
+it's a documented vertical missing from this specific list rather than
+an invented addition. Checked the Footer's separate "Industries &
+Resources" column too — left that one alone, since it only lists
+industries with real dedicated pages (Healthcare, Transportation), and
+there's no `/industries/energy` page to link to yet.
+
+**Labs page, full build.** `pages/lab.tsx` was a placeholder ("full
+build to follow"). Built out completely from the reference HTML's
+"Echolink Labs" section: intro copy, all 6 simulations (Blockchain
+Foundations, The Missing Orders, Schedule Recovery, Trace the Batch,
+Agent Under Policy, Build My City) with their real tags/levels/
+descriptions, and a detail modal per card (reusing the same Dialog
+pattern already established for Insights). Two deliberate adaptations
+from the reference, not oversights:
+- Kept the page's existing `RequireMembership` gate (real account-based
+  auth) instead of rebuilding the reference's separate lightweight
+  name+email capture — one real gate for this page beats two different
+  gating mechanisms doing the same job.
+- The reference's cards each open a genuinely interactive browser
+  simulation (a working blockchain tool, branching scenario games).
+  Building 5-6 real simulations is a substantial engineering project on
+  its own, separate from a content/layout pass. What's built is the
+  complete page and every card's full content, with a working modal and
+  CTA — ready to have real simulations wired in behind each card, not a
+  content stub.
+
+**"Lab" added to the nav** — positioned to match the reference site's
+own order exactly (Services dropdown -> Lab -> How it works ->
+Traceability -> Insights). Confirmed both desktop and mobile menus
+share one `navigation` array, so this one change updates both.
+
+**Sitewide missing-sections scan**, per direct request — not just the
+Labs page. Mapped every section in the reference HTML (Hero, Process,
+Services, Who We Serve, Solutions, Agent Functions, Why Decentralized
+AI, animated How-It-Works explainer + 2 diagrams, Models, Aviation/
+Traceability, Project Controls & EVM, Training, Labs, Shopper Scan,
+Clients, Insights, Stats, closing CTA) against the current site's
+components. Every one already exists and matches, with Labs being the
+sole true gap — confirmed via heading-text matching, not assumption
+(e.g. initially flagged "Models" as possibly missing since no component
+by that name exists, then found it maps exactly to the already-built
+`SixWays` component by its heading, "Six ways to put the layer to
+work.").
+
+**Found, not fixed this round**: while verifying `SixWays` against the
+reference, its 6 model cards are missing the "Solves for you:" line
+present on every card in the reference, and several descriptions are
+trimmed to a single sentence where the reference has two. Not a missing
+section, but a thinned existing one — flagged for a dedicated content
+pass rather than folded into this round.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes.
+
+## Round 86 — Testing bypass for membership-gated content
+
+Direct request: "make sure everything that a logged in member can see,
+all can see," for testing purposes.
+
+Checked for every place membership/auth state affects what's visible
+sitewide, not just the obvious one: `RequireMembership` (currently
+wraps only `/lab`'s content), `account.tsx`, `membership.tsx`, and
+`Layout`'s nav. Only `RequireMembership` actually gates content —
+`account.tsx` is inherently personal (nothing generic to unlock without
+a real account), `membership.tsx` is already fully public (a pricing
+page, just swaps button text depending on login state), and the nav
+already shows every link (including "Lab") to everyone regardless of
+auth — the logged-in/out difference there is only the "My account" vs
+"Contact us" button.
+
+Added one flag, `TESTING_BYPASS_ALL_GATES`, at the top of
+`RequireMembership` itself rather than touching `/lab` directly — this
+is the single choke point every gated page routes through (just one
+today, but any future gated page reuses the same wrapper), so flipping
+one boolean disables every gate at once, and flipping it back restores
+real membership checks everywhere at once too, without needing to hunt
+down usages again in either direction. Clearly marked with a
+"TO RESTORE REAL GATING LATER: set this back to false" comment right at
+the point of the flag.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes.
+
+## Round 87 — Deep content-completeness pass against the reference HTML
+
+Direct request to go through the newly-uploaded reference HTML and
+build everything missing — a deeper pass than the previous round's
+scan, which only checked that each section existed (heading/structure
+match). This round checked actual content within each section, line by
+line against the reference, and found six real components with
+content gaps — some trimmed text, some entire missing features:
+
+**`CoreServices`**: 6 trimmed descriptions found (3 in `sizedFor`, 3 in
+`serviceCards`), each missing its closing clause versus the reference
+— e.g. "Large organizations... with full audit trails" was missing
+"and no vendor lock-in." All 6 restored to the reference's exact
+wording.
+
+**`SixWays`**: missing its eyebrow entirely ("HOW WE ENGAGE" wasn't
+present at all), every description trimmed to one sentence where the
+reference gives two, and — the biggest gap — all 6 cards were missing
+their entire "Solves for you:" paragraph, real content absent, not
+just shortened. All three restored.
+
+**`WhoWeServe`**: every one of the 6 segments was missing its entire
+"What we do for you:" expandable block — an absent interactive feature,
+not trimmed text. Rebuilt with real expand/collapse state and the
+actual content, plus a closing line ("If you run a system, a process,
+or an idea...") that was missing outright.
+
+**`EverythingWeConnect`**: found during verification that a previous
+round's claim of "confirmed against the reference screenshot, all 10
+counts read directly" was wrong for 8 of the 10 categories once checked
+against the actual reference HTML instead of a screenshot crop. More
+significant than the count errors: the reference doesn't summarize each
+category in a sentence at all — it lists actual named technology/
+protocol chips (e.g. "EDI X12", "APIs", "ERP" as individual tags). The
+one-sentence-per-category version here was standing in for a
+structurally different piece of UI. Rebuilt with the real chip lists
+and corrected counts.
+
+**`AgentGrid`**: found a genuine internal contradiction — the section's
+own heading says "All 13 run on one decentralized AI agent layer," but
+only 12 agents were listed, because "Project management" and "Project
+controls" had been merged into one combined entry. Split back into the
+two distinct roles the reference actually has, restoring the true 13.
+Also: every agent was missing its "What it solves:" content (same
+missing-feature pattern as WhoWeServe, fixed the same way), and all 4
+"pillar" descriptions (Decentralized, Policy-controlled, Verifiable,
+Shared context) were trimmed to their first clause.
+
+**`ThreeSteps`**: found a genuine label mix-up, not just a trim — this
+section's eyebrow read "HOW WE ENGAGE," but per the reference that
+phrase belongs to the Six Ways section (which correctly carries it as
+of this same round); this section's actual reference eyebrow is
+"How does it work" — confirmed by this very component's own file
+comment, which already said it was mirrored from the old homepage's
+"How does it work?" section. Corrected the label and the internal
+anchor id (`how-we-engage` -> `process`, matching the reference,
+confirmed unreferenced elsewhere before renaming). Also restored a
+missing second sentence in the intro paragraph.
+
+**Confirmed already complete, no changes needed**: `WhyDecentralized`
+matches the reference in full — all 3 points, both description and
+"protects" text, the closing "Honest part" block, all present and
+accurate.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes.
+
+**Not yet re-verified at this depth this round**: ProjectControls,
+Training, Traceability, OneScan, TrustedToBuildTrust, Insights, and
+StatsBar were checked in earlier rounds but not re-diffed line-by-line
+against this specific reference file the way the sections above were.
+Given the pattern found here (a previous "confirmed matching" claim
+turned out to be wrong for EverythingWeConnect), these are worth the
+same depth of re-check in a follow-up pass rather than assumed correct.
+
+## Round 88 — Restored the "Get your lab pass" section on /lab
+
+Direct feedback: the "Get your lab pass" section (heading, copy, name+
+email form) was missing from the Labs page build. Correct catch — when
+the page was first built, that section's real content got dropped
+along with the gating mechanism it also implements in the reference,
+which shouldn't have happened; only the *gating* needed adapting, not
+the content itself.
+
+Restored the section in full — heading, exact copy ("One name, one
+email, and you are in. The pass unlocks every simulation below and
+keeps your progress for this session."), and a working form (name,
+email, "Enter the lab" button, a "LAB PASS ACTIVE · [name]" state on
+submit). Scoped its job correctly given the page's real architecture:
+since `RequireMembership` already controls who can reach this page at
+all, this form is now a session-scoped personalization step rather
+than a second, competing access gate stacked on top of the first —
+doing what its own copy says ("keeps your progress for this session")
+without asking an already-logged-in member to clear a second gate to
+see content they already have access to.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes, `/lab` confirmed built.
+
+## Round 89 — Sitewide deduplication: every component now lives on exactly one page
+
+Direct feedback: some components repeat themselves across different
+pages, which reads poorly for anyone navigating between them. Scanned
+every page's component usage sitewide (not just the pages already
+under discussion) and found **8 components duplicated in full across
+two pages each**:
+
+| Component | Was duplicated on | Canonical home kept | Removed from |
+|---|---|---|---|
+| `Training` | index, /training | /training (already `headingLevel="h1"` there — its real page-defining content) | index |
+| `TrustedToBuildTrust` | index, /clients | /clients (same reasoning, `headingLevel="h1"`) | index |
+| `ThreeSteps` | /layer, /how-it-works | /how-it-works (`headingLevel="h1"` there) | /layer |
+| `CoreServices` | /layer, /services | /services (`headingLevel="h1"` there) | /layer |
+| `EverythingWeConnect` | /layer, /services | /services (services-catalog content) | /layer |
+| `SixWays` | /layer, /services | /layer ("six ways to put *the layer* to work" is conceptually about the layer, not the service catalog) | /services |
+| `OneScan` | index, /how-it-works | index (a proof/demo section, not methodology-specific) | /how-it-works |
+| `StatsBar` | index, /clients | index (general company proof, not client-specific) | /clients |
+
+For each, kept the copy on whichever page the component's own props
+already signaled as its real, page-defining content (`headingLevel=
+"h1"` usage), or — where neither page had that signal (SixWays,
+OneScan, StatsBar) — kept it on the page its actual subject matter
+fits best, rather than an arbitrary pick.
+
+**Removing sections reopened the dark/white rhythm problem fixed in
+Rounds 78-79**, since the removed sections weren't just deleted but
+had been part of each page's alternation. Reordered what's left on
+both affected pages rather than just deleting in place:
+- **Homepage**: moved `TrustBand` earlier (ahead of `OneScan`) — without
+  this, Industries (dark) would have sat directly against OneScan
+  (dark) with nothing between them. Now: Hero(D) CapabilitiesIntro(W)
+  Industries(D) TrustBand(W) OneScan(D) StatsBar(W) Insights(D) — full
+  alternation.
+- **Layer page**: moved `WhyDecentralized` to sit between `WhoWeServe`
+  and `AgentGrid` — without this, WhoWeServe (dark) would have sat
+  directly against AgentGrid (dark). Now: Layer(D) WholeStack(W)
+  NotACryptoPlay(D) SoftwareThatActs(W) WhoWeServe(D) WhyDecentralized(W)
+  AgentGrid(D) TwoIdeas(W) SixWays(D) — full alternation, and arguably a
+  better narrative order too (why decentralized AI matters, explained
+  before the agent examples, not after).
+
+**Checked and confirmed NOT a duplication problem**: `IndustryHero` is
+used on both Healthcare and Transportation, but as a genuine reusable
+template taking different props (title/description/photo) per page —
+the same pattern as any shared UI component, not the same content
+literally repeated. Left unchanged.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes, all pages confirmed
+still building with their now-unique component sets.
+
+## Round 90 — Scroll-reveal animation extended to every section sitewide
+
+Direct observation: scrolling down a page, content smoothly slides up
+into position — but this only existed on 4 components (Hero,
+CapabilitiesIntro, Industries, Traceability), out of dozens sitewide.
+Extended the same effect (the existing, dependency-free
+`RevealOnScroll` — IntersectionObserver + CSS transition, fade + slide
+up) to all 21 remaining section-level components:
+
+Layer, TrustedToBuildTrust, ProjectControls, ThreeSteps, WhoWeServe,
+CoreServices, TwoIdeas, AgentGrid, EverythingWeConnect, SixWays,
+WholeStack, NotACryptoPlay, SoftwareThatActs, Training, OneScan,
+TrustBand, StatsBar, Insights, IndustryHero, PartnerLogos,
+WhyDecentralized.
+
+For each, followed the pattern already established by the 4 existing
+usages: wrap each distinct content block (section header, then main
+content grid/list, then any closing block) individually rather than
+the whole section as one unit, with increasing `delayMs` (150/250/350)
+on each successive block so multi-block sections cascade in rather than
+all appearing at once.
+
+**One deliberate exception**: `WholeStack`'s "bridge card" — a element
+that intentionally straddles the boundary into the next section via
+negative margin — was left outside the wrapper. `RevealOnScroll`'s own
+transform could conflict with that carefully-tuned overlap positioning,
+and the card itself is small enough that its own reveal isn't worth
+that risk.
+
+**Caught a self-introduced syntax error before shipping**: an editing
+script left orphaned comment text in `WholeStack` (a duplicate `*/}` 
+closing a comment that had already been closed, with leftover text
+in between) — caught by `tsc --noEmit`, not visual inspection. Fixed
+and re-verified clean.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes. Confirmed via scan that
+every section-level component (one with a `<section>` tag) now uses
+`RevealOnScroll` — zero remaining gaps.
+
+## Round 91 — Careful sweep: confirmed the flagged section exists, found real gaps elsewhere
+
+Direct report: "Verifiable traceability / Prove where anything came
+from..." couldn't be found on the site. Checked first rather than
+assuming — this exact copy is in `components/Traceability/index.tsx`
+(eyebrow "VERIFIABLE TRACEABILITY", h1 "Prove where anything came
+from.", both paragraphs, the "click any industry" line), the page
+builds cleanly at `/traceability` with no errors, and both the nav and
+footer link to it correctly. This is very likely a stale-deployment
+issue — redeploying this zip should surface it — but rather than stop
+there, used the report as the trigger for the deeper sweep Round 87
+flagged as outstanding (ProjectControls, Training, Traceability,
+OneScan, TrustedToBuildTrust, Insights, StatsBar — "not yet
+re-verified at this depth"). Found real gaps in 5 of those:
+
+**`Traceability`**: one wording drift — the live-viewer panel's default
+heading said "Watch a live verified journey"; the reference's exact
+text is "Watch provenance, live." Corrected.
+
+**`OneScan`**: the scan-result state was missing a product/lot label
+("Coffee · Lot CFE-2207") and a closing "0 tampering" confirmation line
+— both present in the reference, neither built. Added.
+
+**`TrustedToBuildTrust`**: two client description mismatches — DFO
+Retail's card said "farm-to-shelf integrity prototype" where the
+reference says "provenance prototype," and Oando's card was missing
+"and integrity" ("traceability prototype" vs the reference's
+"traceability and integrity prototype"). Also fixed Oando's region
+formatting ("Oil & gas, Africa" -> "Oil & Gas · Africa," matching the
+reference's exact capitalization and separator).
+
+**`ProjectControls`**, the biggest find this round — not wording drift,
+a structural mismatch: the hero's eyebrow said "TECHNOLOGY SOLUTIONS"
+(not in the reference at all) and its H1 was "Project Scheduling,
+Controls & EVM" — which turns out to be the reference's actual
+*eyebrow* text, repositioned as if it were the heading. The reference's
+real H1 is "Know where the project really stands," and an entire
+content block was missing: a left-column "Measured, not guessed" text
+(two paragraphs) that pairs with the capabilities list in a two-column
+split — the same `train-split` pattern Training already uses correctly
+for "The class is the build." The previous version used a heading +
+photo + list layout borrowed from an old-site page template instead;
+the photo doesn't exist in this section's reference at all. Rebuilt:
+corrected hero copy, removed the invented photo, added the missing
+"Measured, not guessed" column, restructured to the real two-column
+layout.
+
+**`StatsBar`**: had 4 stats; the reference's actual "Proof" section has
+3 (15 years / 5 layers / 4 regions). The 4th, "2,000+ people trained,"
+isn't part of this section in the reference — it's already its own
+prominent stat card in Training's "2,000 careers" section elsewhere on
+the site, so including it here duplicated it rather than restoring
+something missing. Removed, adjusted the grid from 4 columns to 3.
+
+**Checked and confirmed complete**: `Insights`' closing note
+("More insights coming soon...") already matches the reference exactly.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes, `/project-controls` and
+`/traceability` both confirmed building cleanly.
+
+## Round 92 — The real live-traceability data, found in the reference's script tag
+
+Direct report of another missing piece: the "AIRLINES & AVIATION /
+Aircraft turbine blade" step-by-step verified journey with hash
+anchors. This was a genuinely missing feature, not a stale-deployment
+question like last round — the interactive panel existed, but only
+showed one flat summary sentence per industry, a paraphrase standing in
+for what the reference actually has.
+
+Found the real data in the reference's `<script>` tag (`TRACE_DATA`) —
+not visible anywhere in the static HTML markup itself, which is why
+earlier passes checking visible text missed it entirely. It's a fully-
+authored dataset: all 8 industries each track a specific named item
+(e.g. "Aircraft turbine blade," "Coffee lot CFE-2207," "Vaccine batch
+VX-884") through 4 numbered steps, each with its own title, description,
+and blockchain-style hash anchor ("0x4a7f…11c2"). Replaced the single
+`journey: string` field with this full structured dataset, verbatim,
+and rebuilt the panel UI to show numbered steps with hash anchors
+instead of one paraphrased sentence, added the missing closing
+verification line ("Every step verified and anchored. 0 tampering...")
+and a working Reset button (clears the selection, matching the
+reference's `resetTrace()`).
+
+**Checked `OneScan` for the same pattern while in this exact area, and
+found it too**: its 4 journey steps were invented generic text ("Farm
+A, verified 06:12 AM," "Cold storage — 34°F maintained")  — the
+reference has a real dataset here as well (`SCAN_JOURNEY`), matching
+the same "Coffee · Lot CFE-2207" product already on the card: specific
+real places (Kiambu Highlands Kenya, Nyeri Co-op, Mombasa → Rotterdam,
+Amsterdam) with their own hash anchors. Replaced the placeholder steps
+with the reference's actual data.
+
+Lesson for future sweeps: script-tag data (JS objects driving dynamic
+content) doesn't show up when checking visible HTML text alone —
+worth explicitly grepping `<script>` blocks for any interactive
+feature's real dataset before assuming a summary paraphrase is the
+full content.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes, `/traceability` confirmed
+building (4.83kB, up from 3.5kB reflecting the real added content).
+
+## Round 93 — Following up on script-tag data: found and fixed 2 more real gaps
+
+Checked every `<script>`-driven data constant in the reference (found
+all 4 by grepping for top-level `const`/`let` declarations —
+TRACE_DATA, SCAN_JOURNEY, already handled Round 92; DIA_INFO and LABS,
+new this round). Confirmed no others exist.
+
+**`TwoIdeas` (`DIA_INFO`)**: every node's click-detail text was
+invented placeholder wording, none matching the reference. Found two
+structural gaps the real data revealed: "Dynamics 365" is one of the
+reference's 7 systems in diagram 2 — this list only had 6, missing it
+outright — and the reference's BLOCKCHAIN pill and Shared Decision
+Network box are themselves clickable with their own info, which they
+weren't here (static spans before this round). Replaced all detail
+text with the reference's real copy, added the missing Dynamics 365
+node, and made the BLOCKCHAIN/Network elements clickable with their own
+detail panels, matching the reference's actual interaction model.
+
+**`/lab` (`LABS`)**: descriptions were paraphrased/invented; the
+reference has real, specific objective text per scenario plus a
+competencies list not present at all. Also found the Blockchain
+Foundations lab links to a genuine external platform
+(echolink-blockchain-platform.onrender.com) — restored as a real link
+opening in a new tab instead of routing through the same modal as the
+scenario cards. Added competency tags to the modal.
+
+**Scope note, restated clearly**: the reference's 4 scenario labs
+(orders, schedule, trace, agent) are each a fully-scripted branching
+quiz underneath — 4 questions per scenario, 3 answer options each,
+with individual feedback text per option, roughly 24 authored
+question-branches total across the 4 scenarios. That is a real
+interactive engine, not a content/layout task — restored the
+accurate surface copy (objective, competencies) that belongs on the
+card and in the modal; the branching question logic itself remains a
+separate, larger build, same scoping as Round 85.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes, `/lab` and `/layer` both
+confirmed building.
+
+## Round 94 — Design system documented, one stale config value found and fixed while scanning
+
+Compiled a full design-system reference (`docs/DESIGN-SYSTEM.md`) by
+scanning `tailwind.config.js`, `styles/globals.css`, and actual
+component usage patterns directly — colors, type scale, spacing,
+component variants, accessibility notes, and a short list of known
+inconsistencies, rather than an aspirational/idealized spec.
+
+Found one real stale value while compiling it: `tailwind.config.js`'s
+`flame` color object still had the pre-Round-84 muddy brown values
+(`#3D1F0A`/`#2A1608`) and was never actually referenced anywhere as a
+Tailwind utility class — the real "2,000 careers" gradient reads from
+CSS custom properties in `globals.css` instead, which were correctly
+updated in Round 84. The config entry had simply drifted out of sync
+since nothing used it to catch the mismatch. Synced it to the current
+real values for anyone using the config file as a reference.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes.
+
+## Round 95 — Homepage overview hub, without re-populating with full sections
+
+Direct request: the homepage should give "a complete overview of
+everything going on on the website," while explicitly not becoming
+overpopulated. This sits in tension with Round 89's deduplication pass,
+which deliberately removed full sections (Training,
+`TrustedToBuildTrust`) from the homepage specifically because they
+were repeating in full elsewhere — reconciled by building one new,
+compact hub section instead of re-adding those sections wholesale.
+
+New component: `SiteOverview`. One card per major destination — The
+Layer, Services, How it works, Project Controls, Traceability,
+Training, Labs, Clients (8 total, matching the main nav plus the two
+sections one level down in the footer) — each using that destination's
+own real H1 and a one-sentence trim of its own real intro copy, not an
+invented summary, linking straight to the full page. Deliberately
+scoped to these 8 primary pages rather than every sub-page (EDI/API,
+ERP, FACET, Healthcare, Transportation, White Papers) — going a level
+deeper than that would be the exact overpopulation the request warned
+against.
+
+Placed right after `Industries` so visitors get the full site map
+early, before the more specific proof sections (OneScan, StatsBar,
+Insights) that follow. Homepage rhythm after insertion: Hero(D)
+CapabilitiesIntro(W) Industries(D) SiteOverview(W) TrustBand(W)
+OneScan(D) StatsBar(W) Insights(D) — one minor white-white pair
+(SiteOverview/TrustBand) results, the same accepted lesser tradeoff
+used elsewhere on this exact page versus reintroducing a dark-dark
+pair.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes, homepage confirmed
+building (6.98kB, up from 6.03kB reflecting the new section).
+
+## Round 95 — Homepage overview request: already solved, verified rather than duplicated
+
+Direct request: the homepage should give a complete overview of
+everything on the site, even content that lives elsewhere, without
+becoming overpopulated. Started building a new component for this
+(`ExploreEverything`) before discovering `components/SiteOverview`
+already exists, already wired into `pages/index.tsx`, with its own
+code comment describing this exact same request and rationale —
+this appears to have been completed in an earlier part of this
+conversation not visible in this session's immediate context.
+
+Rather than ship a redundant, unused second component alongside a
+working one, deleted the newly-built duplicate and verified the
+existing solution properly instead of assuming it was correct:
+- Confirmed all 8 tiles (Layer, Services, How it works, Project
+  Controls, Traceability, Training, Echolink Labs, Clients) use each
+  destination page's own real H1 and a trim of its own real intro
+  copy — not invented summaries, consistent with the "restore real
+  copy" principle from recent sweeps.
+- Confirmed the scoping rationale is sound: limited to the 8 primary
+  destinations (matching the main nav plus Training/Clients, one level
+  down in the footer), explicitly not descending into sub-pages
+  (EDI/API, ERP, FACET, Healthcare, Transportation, White Papers) —
+  which the component's own comment notes would be the overpopulation
+  the request specifically warned against.
+- Re-verified the homepage's background rhythm claim in code rather
+  than trusting the comment: Hero(D) CapabilitiesIntro(W) Industries(D)
+  SiteOverview(W) TrustBand(W) OneScan(D) StatsBar(W) Insights(D) —
+  confirmed accurate, zero dark-dark pairs, one accepted white-white
+  pair.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes.
+
+## Round 96 — SiteOverview removed by direct feedback
+
+Direct feedback: "the links on the navbar and footer already do this."
+Correct — the `SiteOverview` hub section (added the round before,
+during the prior session context) duplicated navigation the site
+already provides, rather than adding anything the nav/footer didn't
+already cover. Removed:
+- The `<SiteOverview />` usage and its import from `pages/index.tsx`.
+- The component itself, deleted entirely rather than left in as
+  unused dead code — consistent with how this codebase already treats
+  anything removed by direct feedback (the Layer page's jump-nav
+  removal took the same approach: delete the component, don't orphan
+  it).
+
+Homepage is back to exactly its pre-SiteOverview state and rhythm:
+Hero(D) CapabilitiesIntro(W) Industries(D) TrustBand(W) OneScan(D)
+StatsBar(W) Insights(D) — full alternation, the same verified-good
+order from before SiteOverview was ever added, so no further rhythm
+work was needed here.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes.
+
+## Round 97 — Homepage rebuilt with real, substantial sections, duplication accepted on purpose
+
+Direct instruction: bring back real content even if it means
+duplicating a dedicated page's sections — a genuine overview needs
+actual substance on the page, not a promise that the content exists
+elsewhere. This follows two earlier attempts at the same underlying
+goal (a complete-feeling homepage): Round 89 removed Training and
+TrustedToBuildTrust from here as duplicates; Round 95/96 tried a
+link-card hub instead of duplication, then removed it as redundant
+with the nav/footer. This round accepts duplication as the right
+tradeoff instead.
+
+**Restored** `Training` and `TrustedToBuildTrust` to the homepage,
+exactly as they were before Round 89.
+
+**Added** `Layer` (the "One layer, five jobs" breakdown) to the
+homepage for the first time — this had never had any homepage presence
+at all, even in the original pre-Round-89 version, so restoring the
+old duplicates alone still wouldn't have covered it.
+
+**Deliberately left off, flagged rather than silently skipped**:
+Traceability, Project Controls, Services, and Labs. Each is built as a
+multi-section page component with its own dark "page hero" (its own
+header-clearance padding, its own eyebrow/H1 meant to open a page) —
+dropping one of those into the middle of the homepage scroll as-is
+would read as a second, out-of-place hero appearing mid-page, not a
+homepage section. Covering these too needs a purpose-built homepage-
+sized version of each, not a literal copy-paste of the page component,
+which is a larger, separate piece of work.
+
+**Rhythm re-verified in code, not assumed**: Hero(D) CapabilitiesIntro(W)
+Industries(D) Training(W) Layer(D) TrustedToBuildTrust(W) OneScan(D)
+TrustBand(W) StatsBar(W) Insights(D) — checked every section's actual
+class against this exact order before shipping. Zero dark-dark pairs;
+one accepted white-white pair at the end (TrustBand/StatsBar), the
+same lesser-tradeoff precedent already used elsewhere rather than
+letting two darks sit back to back.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes, homepage confirmed
+building (10.6kB, up from prior size reflecting the real content
+added).
+
+## Round 98 — Full homepage coverage: Services, Project Controls, Traceability, and Labs added
+
+Direct instruction to finish the job flagged at the end of Round 97 —
+build genuine homepage coverage for the four areas still missing:
+Traceability, Project Controls, Services, Labs.
+
+Built four new, purpose-sized components rather than reusing the full
+page components directly — each of those pages has its own dark "page
+hero" baked in (header-clearance padding, an eyebrow/H1 meant to open
+a page), so dropping one in wholesale mid-scroll would have read as a
+second, out-of-place hero appearing out of nowhere rather than a
+homepage section:
+
+- **`ServicesPreview`**: real copy from `CoreServices`' own heading/
+  intro, the 6 service titles as a scannable list (not the full icon-
+  grid-with-descriptions), link to `/services`.
+- **`ProjectControlsPreview`**: real copy from `ProjectControls`' hero,
+  the 4 metrics (CPI/SPI/EAC/VAR) as a compact card row, link to
+  `/project-controls`.
+- **`TraceabilityPreview`**: real copy from `Traceability`'s hero, the
+  8 industries as a static grid (no click-to-see-journey interaction —
+  that's what the full interactive viewer with real step/hash-anchor
+  data on the dedicated page is for), link to `/traceability`.
+- **`LabsPreview`**: real copy from the Labs page's own intro, the 5
+  simulation titles as a chip row (no "Get your lab pass" gate or
+  per-lab modals here), link to `/lab`.
+
+All four use copy pulled directly from each full page's own existing
+data — none of it invented — condensed to fit a single homepage
+section instead of that page's full multi-section structure.
+
+**Insertion order and rhythm**: inserting sections one at a time into
+an already-alternating sequence always collides with one neighbor (two
+adjacent slots are already opposite colors, so a single insert can only
+avoid one of them). Inserted the 4 new sections as two matched pairs
+instead (each pair internally alternating: Services(W)/ProjectControls
+(D), then Traceability(D)/Labs(W)), which preserves full alternation
+across the whole page. Final 14-section order, verified against each
+component's actual background class in code, not assumed: Hero(D)
+CapabilitiesIntro(W) Industries(D) Training(W) Layer(D)
+ServicesPreview(W) ProjectControlsPreview(D) TrustedToBuildTrust(W)
+TraceabilityPreview(D) LabsPreview(W) OneScan(D) TrustBand(W)
+StatsBar(W) Insights(D) — zero dark-dark pairs, one accepted
+white-white pair at the end (same precedent used throughout this
+page's history).
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes, homepage confirmed
+building (11.6kB).
+
+## Round 99 — Full blueprint pass: exact production CSS applied sitewide
+
+Direct instruction, with an unusually authoritative source attached —
+actual computed CSS class definitions read directly off the live
+production Elementor site. Worked through the full list:
+
+**Removed**: `Layer` ("HOW IT WORKS") from the homepage. The Hero
+connector lines, completely — component deleted, not hidden.
+
+**Hero**: text column widened relative to the image column
+(`1fr_420px` -> `1.4fr_380px`). H1 corrected to the exact 3-tier
+breakpoint cascade from the blueprint (44px/1.2 line-height below
+1024px, 53px/65px from 1024-1423px, 64px/65px above 1423px) — the
+previous version only had 2 tiers at Tailwind's default breakpoints,
+not a match for the real cascade.
+
+**CapabilitiesIntro**: eyebrow removed entirely; text repositioned to
+start at ~40% width and flow right, left-aligned (replacing an earlier
+round's deliberate negative-margin overlap effect, which isn't what
+was being asked for here); container widened; exact title (Syne/600/
+line-height 49px) and body (Syne/20px/400) typography applied.
+
+**`RevealOnScroll`**: corrected to the exact blueprint values —
+`translateY(22px)` (was an approximated 32px) and the precise
+`cubic-bezier(.2,.7,.2,1)` curve (was Tailwind's different `ease-out`).
+
+**`TwoIdeas` ("See it clearly")**: moved from `/layer` to `/how-it-
+works` (its real home per the blueprint's page structure), removed
+from `/layer` to avoid recreating a duplicate. Diagram colors corrected
+to the exact gradient stops from the blueprint's own SVG source — this
+also caught and corrected a real conflict: an earlier round had set the
+Blockchain cluster to muddy brown based on a screenshot crop, but the
+blueprint's actual SVG shows it should be the same bright-orange family
+as the AI sphere. The blueprint (live computed CSS/SVG) is the more
+authoritative source, so this corrects that earlier finding.
+
+**`ThreeSteps`**: 10px gap added between the 3 columns; the photo's
+floating decorative squares sized up and repositioned to properly
+overhang the image border (previously clipped by the same
+`overflow-hidden` that clips the photo — split into an inner wrapper
+for the photo and an outer one for the squares so they can overhang
+correctly); exact typography applied throughout (orange step label:
+Syne/14px/900/34px line-height; white step title: Syne/33px/600/34px
+line-height; body: Syne/15px/400/23px line-height, changed from gray to
+white).
+
+**Sitewide gray-to-white**: updated the root color tokens (`ink_text.
+secondary`/`muted` in both `tailwind.config.js` and the matching CSS
+custom properties) so the fix cascades to every dark-section gray text
+usage at once, rather than hunting down each instance. Also manually
+converted translucent white text (`text-white/70` etc., which reads as
+grayish) in the sections clearly on the purple background: Industries,
+ProjectControls, Traceability, WhoWeServe.
+
+**Industries**: "Energy" removed (reverts an earlier addition); exact
+heading typography (Syne/21px/900/uppercase/49px line-height); divider
+lines changed from 40%-opacity white to fully white; paragraph
+widened.
+
+**Footer**: exact column-heading (Syne/15px/900/white) and link
+(Syne/14px/400) typography.
+
+**Navbar**: links corrected to Syne/17px/400 (desktop, mobile, and the
+Services dropdown trigger all updated); `.btn--ghost-accent` (the nav
+CTA buttons) corrected to Syne/900 weight/flat 15px-30px padding,
+replacing the base `.btn`'s JetBrains Mono/600 weight/responsive
+padding for this specific variant.
+
+**Training**: the centered section header merged into the left column
+instead, left-aligned, reading as one cohesive column with "The class
+is the build" rather than a centered banner floating above a left/
+right split.
+
+**Sitewide "no radius" rule, extended from a request about one specific
+card**: found 18 pill-shaped chip/tag instances across 10 files
+(`rounded-pill`) plus the shared `.eyebrow`/`.eyebrow--dark` classes
+(via the root `--radius-pill` variable, now 0) plus one more instance
+using raw Tailwind `rounded-full` on a text chip in
+`EverythingWeConnect` that the first pass missed — converted all of
+them to square. Left genuine circular icon/decorative elements alone
+(AI badges, the ThreeSteps "?" badge, checkmarks, a status-pulse dot)
+since those are actual circles, not pill-shaped text chips, and
+squaring them would misread the instruction's intent.
+
+**Training's "2,000+" card**: padding increased (p-8/p-12 ->
+p-10/p-16) so content sits further from the edges; the "Integration
+gets you the capability..." paragraph widened (max-w-xl -> max-w-2xl).
+
+**Flagged, not resolved**: "the missing section from traceability is
+still not there" — checked and `TraceabilityPreview` is confirmed
+present and wired into the homepage in code. Without more detail this
+remains unresolved; needs clarification on what's specifically being
+looked for.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes, `/how-it-works` confirmed
+building with `TwoIdeas` included (4.91kB).
+
+## Round 100 — Traceability default-state fix, Hero weight correction, sitewide consistency sweep
+
+**Traceability, real fix**: the step-by-step journey content (hash
+anchors, numbered steps) was fully interactive React state — it only
+ever rendered after clicking an industry card. Before that, the panel
+showed a generic placeholder with no real content visible. Defaulted
+the first industry (Airlines & aviation) to active on page load, so
+the actual content is visible immediately, fully interactive/
+clickable exactly as before otherwise.
+
+**Hero heading weight, corrected with direct evidence**: the live
+site's actual computed CSS for this heading is font-weight 600 — this
+project's own typography-tier system (Round 83) had it at 800, and
+Hero's own className carried a second, redundant `!font-extrabold`
+override stacked on top of the CSS rule's own `!important`, which is
+exactly what produces "crossed out / overridden" declarations in
+DevTools. Removed the duplicate at the source, corrected the single
+remaining rule (`h1.sec-title`) to weight 600. Same redundancy pattern
+found and cleaned up in `.btn--ghost-accent` (see below).
+
+**Hero width**: text column switched from an `fr`-unit ratio (which
+didn't guarantee a specific percentage) to an explicit 65%/1fr split,
+so it's always exactly 65% at every viewport width.
+
+**Sitewide consistency sweep, per direct instruction — "anything I
+asked you to do... should be done to all titles and buttons
+throughout, not just the sections I pointed out"**:
+- Updated the base `.btn` class (not just `.btn--ghost-accent`) to
+  Syne/900 weight, cascading the nav button's exact font treatment to
+  every button variant sitewide at once — colors/backgrounds per
+  variant untouched, only the font.
+- Removed 13 boxed "eyebrow" pill badges across 12 files (Insights,
+  SoftwareThatActs, OneScan, SixWays, ProjectControlsPreview,
+  TraceabilityPreview, TwoIdeas, RequireMembership, login, lab, account,
+  membership) — converted to the plain-text eyebrow style (no box),
+  matching the two examples pointed out (INSIGHTS, HOW WE ENGAGE) but
+  applied to every other instance of the same pattern found sitewide,
+  not just those two.
+
+**Navbar**: Services dropdown category labels now default to white,
+orange only on real hover (previously always orange) — used a separate
+`hasHovered` flag since the existing `hovered` index defaults to 0 for
+the preview panel's sake, which would otherwise have made the first
+category look permanently "hovered." Added "All Services" as its own
+direct nav link to `/services` (the dropdown trigger's click-to-open
+behavior made converting it into a real link directly too risky to
+touch safely). Padding increased (py-3/py-4 -> py-4/py-6).
+
+**Training**: swapped the two grid columns — text block moved from left
+to right, cards now on the left.
+
+**Layer page**: added `LayerIntro`, a new opening hero matching
+ProjectControls' exact structure (eyebrow/H1/intro/down-arrow/pt-28),
+sitting above the existing Layer component's own content. Layer's own
+heading downgraded from h1 to h2 accordingly, since LayerIntro now
+provides the page's real h1. Rhythm note: this adds one more dark-dark
+pair at the very start of the page (LayerIntro/Layer), on top of the
+one already unavoidable at the end given the page's 5-dark/3-light
+split — treated consistently with that existing precedent rather than
+force-fixed with an artificial insert.
+
+**Insights page**: first section restyled to match ProjectControls'
+intro exactly — left-aligned instead of centered, added the down-arrow,
+matching padding.
+
+**Industries**: added a bottom divider under the last item (every item
+now has one, not just the first three); widened further (max-w-lg ->
+max-w-xl, grid ratio 0.9/1.1 -> 0.85/1.15).
+
+**WhyDecentralized**: widened all three content blocks (max-w-2xl/3xl
+-> max-w-3xl/4xl).
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes.
+
+**Not yet done, given the scope of this round — flagged rather than
+silently skipped**: restyling Layer's own first section to match
+WhoWeServe's specific gradient/expandable-list pattern; a more
+significant rebuild of the "See it clearly" animation (the moving-
+packet SVG motion from the reference wasn't added, only its colors
+were corrected last round); a full title/body-level sweep beyond the
+systemic base-class fixes (every individual heading wasn't hand-
+checked against the exact blueprint values, though the base Syne/
+weight cascade now reaches all of them).
+
+## Round 101 — Layer's WhoWeServe-style restyle, real animation added to "See it clearly"
+
+**Layer's first content section rebuilt** (direct request: "Similar to
+how you built the section for WHO WE SERVE... do the same thing for
+the very first section on that page"): replaced the white-card
+accordion styling (itself mirrored from the old site's /automation
+page in an earlier round) with WhoWeServe's exact pattern instead — the
+same purple-to-orange diagonal gradient background, the same 2-column
+layout (intro text left, an expandable list right), the same click-to-
+expand "+/−" row behavior with white/80 text throughout. All 5 steps'
+existing content (numbers, titles, descriptions, "what we do"/"what it
+solves") carried over unchanged — copy wasn't touched, only the visual
+treatment, per what was actually asked.
+
+**Real animation added to "See it clearly"'s top diagram** (direct
+feedback: "even the animation has still not been added" — last round
+only corrected this diagram's colors, not its motion). The reference's
+own animation is an SVG `animateMotion` tracing a path through fixed
+icon coordinates — but this diagram uses a responsive flex layout, so
+icon positions shift at every breakpoint, and a hardcoded SVG path
+would misalign constantly rather than degrade gracefully. Built an
+equivalent CSS-only traveling-packet effect instead: two small glowing
+dots animate along a horizontal track spanning the full row width at
+any viewport size, giving the same "data flowing through the pipeline"
+impression without being tied to coordinates that only work at one
+specific width.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes.
+
+**Still outstanding**: a full title-by-title manual check against every
+exact blueprint value (the systemic base-class fixes — Syne everywhere,
+consistent button weight, white text on dark sections — now reach most
+elements automatically, but individual headings haven't each been
+hand-verified against their own specific blueprint numbers the way
+Hero, ThreeSteps, Industries, and Footer/Navbar were this pass).
+
+## Round 102 — Final cleanup: widths, arrow removal, verification
+
+Finished the remaining items from the previous large batch:
+
+**Widened further, per direct feedback**: `WholeStack`'s "THE CATEGORY
+WE OWN" intro block (max-w-xl -> max-w-2xl). Found and fixed the same
+narrow-intro pattern in two more Layer-page components while doing
+this sweep, not just the one named — `SoftwareThatActs` and
+`CoreServices` both used the identical `sec-header max-w-xl` pattern
+as `SixWays`, widened all three consistently (max-w-xl -> max-w-2xl).
+`WhyDecentralized` widened a second time, further than the previous
+round's pass (max-w-3xl/4xl -> max-w-4xl/5xl across its three content
+blocks).
+
+**Insights down-arrow removed**, specifically on that page only —
+other page-top heroes keep theirs; this one already has "Articles" as
+its own visual anchor right below, making the arrow redundant there
+specifically.
+
+**Contact page padding**: confirmed already covered by the sitewide
+`pt-28` -> `pt-36` sweep from the previous round — no further change
+needed.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes, all confirmed building
+including `/layer`, `/insights`, `/lab`, `/traceability`, `/project-
+controls`.
+
+## Round 103 — The real paragraph sweep, and a sitewide eyebrow font-family fix
+
+Direct, fair pushback: an earlier round claimed a "sitewide" paragraph
+fix that was actually only the shared `.sec-sub` class — most actual
+paragraphs across the site (15 components' worth) used their own
+one-off `text-base`/`text-sm` classes, untouched by that fix. Also
+confirmed the likely deployment issue causing "nothing looks different"
+— each delivered zip is a fresh, standalone copy; it doesn't update
+whatever local dev server is already running.
+
+**Real paragraph sweep, this time**: went through every component
+individually rather than trusting one shared class to cascade
+everywhere. Found and fixed 15 lead paragraphs using `text-base`
+(16px) or `text-sm` (14px) instead of the specified Syne/400/20px:
+`EverythingWeConnect`, `Industries`, `Layer`, `LayerIntro`,
+`NotACryptoPlay`, `ProjectControls`, `TrustedToBuildTrust`,
+`WhoWeServe`, `WholeStack`, `WhyDecentralized`, `Training`,
+`IndustryHero`, `LabsPreview`, `ServicesPreview`, `TraceabilityPreview`,
+`TrustBand`. Scoped deliberately to each section's main lead paragraph
+(the "sec-sub" role) — small card descriptions, tags, badges, button
+text, and footer links were left at their existing sizes, since forcing
+20px there would visibly break several card layouts. Flagged this
+scoping choice directly rather than silently deciding it.
+
+**Bigger, previously-missed gap found while doing this**: all 4 shared
+eyebrow classes (`.eyebrow`, `.eyebrow--dark`, `.eyebrow-plain`,
+`.eyebrow-plain--dark`) — used for every section-intro label sitewide,
+dozens of instances — were hardcoded to JetBrains Mono, not Syne. The
+blueprint's own "STEP ONE"-style example specifies Syne for exactly
+this kind of label. Fixed at the shared-class level so it cascades
+everywhere at once: `.eyebrow-plain`/`.eyebrow-plain--dark` (the actual
+"section-introducing" labels per the edit doc — HOW WE ENGAGE, WHAT WE
+DO, WHO WE SERVE, etc.) now match the blueprint's exact spec — Syne,
+900 weight (was 700), 14px stepping to 13px at max-width 1024px (was a
+flat 13px with no responsive step). `.eyebrow`/`.eyebrow--dark` (the
+pill-shaped variants, still used on a handful of pages) got the same
+font-family correction for consistency, without changing their
+existing weight/size. Left `.tag-mono` alone — a broader-purpose class
+(metrics, step numbers, metadata) that isn't specifically a section-
+intro label, so it wasn't clearly covered by this instruction.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes.
+
+## Round 104 — Root-cause font bug found, H1 weight bug fixed, remaining width/padding gaps closed
+
+**The real font bug, finally found.** Not a deployment issue this
+time: `pages/_app.tsx`'s outer `<main>` wrapper carried a `font-mono`
+Tailwind class alongside the Syne font variable. That's a real, directly-
+applied `font-family: monospace-stack` declaration on `<main>` itself —
+every element that inherits its font rather than setting an explicit
+override of its own (most body text and paragraphs) was computing to a
+monospace font, not Syne, because that inheritance starts from
+`<main>`'s own declaration, not from the `html`/`body` rule further up
+the tree. Headings mostly looked right because many carry their own
+explicit Syne `!important` rules layered on top — which is exactly why
+this read as "some things are Syne, most aren't" rather than an
+obviously total failure. Removed the stray class. This is very likely
+the actual root cause behind both the "fonts haven't changed" and
+"paragraphs still look wrong" reports.
+
+**H1 weight bug, found and fixed at the mechanism level.** Direct
+evidence: LayerIntro's h1 had `style={{ fontWeight: 600 }}` in the
+actual rendered HTML, yet still computed heavier. Root cause: CSS
+cascade priority ranks "important author styles" (any stylesheet rule
+with `!important`) above "normal inline styles" — regardless of the
+inline style's specificity. A bare `h1 { font-weight: 800 !important }`
+rule (from the Round 83 typography-tier system) was winning over the
+inline override entirely. Fixed by switching to a real Tailwind utility
+class with its own `!` important modifier (`!font-semibold`) instead of
+an inline style — class-level `!important` has real specificity and
+correctly beats the bare tag rule.
+
+**Checked for the same bug elsewhere and found 9 more h1s affected**:
+`IndustryHero`, `ProjectControls`, `contact.tsx`, `facet-configurations
+.tsx`, `edi-api-managed-services.tsx`, `erp-managed-services.tsx`,
+`login.tsx`, `white-papers.tsx`, `insights/index.tsx` — all used plain
+`font-bold` (700, no `!important`), meaning all of them were silently
+rendering at 800 instead of their intended 700. Upgraded all 9 to
+`!font-bold` so they actually render at their intended weight.
+
+**Width gaps closed, found while re-sweeping rather than assumed
+complete**: `EverythingWeConnect` ("SOLUTIONS WE HANDLE") was missed
+entirely by the earlier width sweep — it doesn't use the `sec-header`
+class pattern that sweep searched for, so it stayed at the original
+narrow `max-w-xl`/`max-w-3xl`. Widened both blocks (max-w-3xl/4xl).
+Same miss found and fixed in `TwoIdeas` ("See it clearly") and
+`TrustBand`. `LayerIntro`'s h1 and paragraph also widened further per
+direct feedback (max-w-3xl/2xl -> max-w-4xl/3xl).
+
+**Header clearance increased again**, more substantially this time:
+`pt-36` (144px) still wasn't enough per direct feedback — bumped to
+`pt-44` (176px) across the same 20 files, consistently.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes.
+
+## Round 105 — Syne, with zero exceptions: the real scope of the font bug
+
+Direct feedback: "the font has to be Syne." The `_app.tsx` fix last
+round addressed one real bug, but a much bigger one was still sitting
+in plain sight: a sitewide search for Tailwind's literal `font-mono`
+utility class (completely different from this project's own custom
+`.tag-mono` class — same-looking name, unrelated mechanism) turned up
+**28 instances across 17 files** rendering in monospace regardless of
+any other fix — components as central as `Layer`, `Layout`'s nav
+dropdown, `CoreServices`, `WhoWeServe`, `ProjectControls`, `Training`,
+`TrustedToBuildTrust`, and 4 of the smaller service pages, plus the
+shared `.tag-mono` and `.number-badge` CSS classes themselves, which
+had JetBrains Mono hardcoded as a deliberate "distinct technical
+treatment" from an early round. Removed the Tailwind class from every
+instance (careful not to touch `.tag-mono`, a different string that
+happens to share four letters), and converted both shared classes to
+Syne.
+
+With every usage gone, removed JetBrains Mono from the codebase
+entirely rather than leaving an unused font loaded — no `next/font`
+import, no `--font-jetbrains` variable, no `jetbrainsMono` export.
+Syne is now the only typeface referenced anywhere in the project.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean (confirms nothing
+else referenced the removed export), full `./node_modules/.bin/next
+build` — 26 routes, JS bundle slightly smaller with one fewer font to
+load.
+
+## Round 106 — Insights orange boxes, the last font gap, and the trust-chain animation
+
+**Insights orange square boxes, found**: the per-card tags
+(PERSPECTIVE, FIELD NOTES, PROJECT CONTROLS) used `className="eyebrow
+!text-[11px] !py-1.5 !px-3.5"` — the boxed pill-background eyebrow
+variant with extra modifier classes appended. The earlier sweep that
+converted every boxed eyebrow to the plain-text version only searched
+for the *exact* string `className="eyebrow"`, so this one — same class,
+different surrounding text — was invisible to that search. Converted
+to `eyebrow-plain`. Then swept specifically for this exact miss pattern
+(`eyebrow`/`eyebrow--dark` with anything appended) sitewide and
+confirmed no other instances exist.
+
+**The real remaining font gap, found**: `tailwind.config.js`'s own
+`fontFamily.mono` theme extension still pointed to
+`var(--font-jetbrains)` — a CSS variable that no longer exists since
+JetBrains Mono was removed from the codebase entirely last round.
+Confirmed via exhaustive search that nothing currently uses the
+`font-mono` utility class (so this wasn't actively breaking anything
+today), but redirected it to Syne anyway rather than leave a dangling
+reference to a deleted variable sitting in the config — defensive
+correctness, not just cleanup. Also ran one more fully exhaustive
+search across every `.tsx` and `.css` file for any `font-family`
+declaration that isn't Syne: none exist. If a paragraph still doesn't
+look right after this, it's very likely the same deployment/cache
+issue flagged in earlier rounds rather than a remaining code gap.
+
+**Traveling-ball animation added to "1 · Blockchain is the trust
+layer"**: a continuous vertical packet now travels from ERP AI down
+through each verify cube to Customer AI, then loops, with a second
+ball following on a 2-second delay ("another ball starts and does the
+same over and over again") — same underlying technique as the "See it
+clearly" top diagram's horizontal track (a CSS-driven dot along a
+positioned track), adapted to vertical motion for this diagram's
+vertical chain layout, and continuous/looping rather than pausing at
+each stop, matching what was actually described here.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes.

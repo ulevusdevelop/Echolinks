@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { RevealOnScroll } from '@/components/RevealOnScroll';
 import {
   UserIcon,
   BuildingStorefrontIcon,
@@ -8,13 +9,50 @@ import {
   HeartIcon,
 } from '@heroicons/react/24/outline';
 
+// CONTENT RESTORATION (sitewide content-completeness scan): every
+// segment here was missing its entire "What we do for you:" block —
+// not trimmed text, a whole piece of content absent from all 6 cards.
+// The reference makes each row expandable (a "+" toggle revealing this
+// text); restored both the content and the expand/collapse behavior,
+// using useState the same way other expandable content already does
+// elsewhere on the site rather than inventing a new pattern.
 const segments = [
-  { title: 'Individuals & creators', description: 'Solo founders and professionals who want AI, automation, and verifiable records without a big team or budget.', Icon: UserIcon },
-  { title: 'Small business', description: 'Shops, clinics, and local operators who want to connect their tools and prove their work, simply.', Icon: BuildingStorefrontIcon },
-  { title: 'Startups & scale-ups', description: 'Fast-moving teams that need integration and AI agents that grow with them, not against them.', Icon: RocketLaunchIcon },
-  { title: 'Enterprise', description: 'Large organizations wiring many systems, machines, and AI into one auditable, compliant whole.', Icon: BuildingOffice2Icon },
-  { title: 'Capital projects & programs', description: 'Owners, contractors, and program offices that need schedules, cost, and earned value they can defend.', Icon: BriefcaseIcon },
-  { title: 'Hospitals & clinics', description: 'Care providers connecting clinical systems and records, with patient data kept private and every action verifiable.', Icon: HeartIcon },
+  {
+    title: 'Individuals & creators',
+    description: 'Solo founders and professionals who want AI, automation, and verifiable records without a big team or budget.',
+    solves: 'We set you up with personal AI and automation you fully control, plus tamper-proof records of your work, so you can move like a bigger operation while keeping your data private and your costs low.',
+    Icon: UserIcon,
+  },
+  {
+    title: 'Small business',
+    description: 'Shops, clinics, and local operators who want to connect their tools and prove their work, simply.',
+    solves: 'We connect the tools you already use and add AI agents that handle the busywork, so you spend less time on admin and can prove your work to customers and regulators without extra effort.',
+    Icon: BuildingStorefrontIcon,
+  },
+  {
+    title: 'Startups & scale-ups',
+    description: 'Fast-moving teams that need integration and AI agents that grow with them, not against them.',
+    solves: 'We wire your stack together and deploy AI agents that scale as you grow, so you ship faster, avoid technical debt, and keep a verifiable record investors and partners can trust.',
+    Icon: RocketLaunchIcon,
+  },
+  {
+    title: 'Enterprise',
+    description: 'Large organizations wiring many systems, machines, and AI into one auditable, compliant whole.',
+    solves: 'We integrate your many systems, machines, and AI under one verifiable layer with policy controls and full audit trails, so you get automation at scale without losing compliance or control.',
+    Icon: BuildingOffice2Icon,
+  },
+  {
+    title: 'Capital projects & programs',
+    description: 'Owners, contractors, and program offices that need schedules, cost, and earned value they can defend.',
+    solves: 'We build and maintain the CPM schedule, run earned value against a controlled baseline, and automate reporting from your live cost and progress data, so status is measured instead of estimated and every revision is traceable.',
+    Icon: BriefcaseIcon,
+  },
+  {
+    title: 'Hospitals & clinics',
+    description: 'Care providers connecting clinical systems and records, with patient data kept private and every action verifiable.',
+    solves: 'We connect your clinical systems and records, add AI that assists care under strict privacy rules, and anchor every action to a tamper-proof trail, so coordination improves and compliance is provable.',
+    Icon: HeartIcon,
+  },
 ];
 
 // STYLE FIX (Layer Page item 6): corrected this round. Previously
@@ -27,6 +65,8 @@ const segments = [
 // authoritative source for this named section, so it wins over the
 // earlier general-purpose mirroring example.
 export const WhoWeServe = () => {
+  const [openTitle, setOpenTitle] = useState<string | null>(null);
+
   return (
     <section
       id="who-we-serve"
@@ -40,38 +80,66 @@ export const WhoWeServe = () => {
       // invented one in between.
       style={{ background: 'linear-gradient(135deg, #16003B 0%, #FF6100 100%)' }}
     >
-      <div className="wrap grid lg:grid-cols-[1fr_1.4fr] gap-12 lg:gap-20 items-center">
+      <div className="wrap grid lg:grid-cols-[1fr_1.4fr] gap-12 lg:gap-20 items-start">
+        <RevealOnScroll>
         <div>
-          <span className="font-mono text-xs font-bold tracking-tag uppercase text-white/70 block mb-4">
+          <span className="text-xs font-bold tracking-tag uppercase text-white block mb-4">
             WHO WE SERVE
           </span>
           <h2 className="text-white font-bold text-3xl md:text-4xl leading-tight mb-5">
             Not just for enterprises.
           </h2>
-          <p className="text-white/80 text-base leading-relaxed">
+          <p className="text-white text-[20px] font-normal leading-relaxed">
             The same verifiable layer scales to fit you, whether you are one person
             with an idea or a global company with a thousand systems. You start where
             you are and grow from there.
           </p>
         </div>
+        </RevealOnScroll>
 
+        <RevealOnScroll delayMs={150}>
         <div className="flex flex-col">
-          {segments.map((seg, i) => (
-            <div
-              key={seg.title}
-              className={`flex items-start gap-5 py-6 ${
-                i < segments.length - 1 ? 'border-b border-white/20' : ''
-              }`}
-            >
-              <seg.Icon className="w-6 h-6 text-white flex-shrink-0 mt-0.5" strokeWidth={1.75} />
-              <div>
-                <h4 className="text-white font-bold mb-1">{seg.title}</h4>
-                <p className="text-white/80 text-sm leading-relaxed">{seg.description}</p>
+          {segments.map((seg, i) => {
+            const isOpen = openTitle === seg.title;
+            return (
+              <div
+                key={seg.title}
+                className={`py-6 ${i < segments.length - 1 ? 'border-b border-white/20' : ''}`}
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenTitle(isOpen ? null : seg.title)}
+                  className="flex items-start gap-5 w-full text-left"
+                >
+                  <seg.Icon className="w-6 h-6 text-white flex-shrink-0 mt-0.5" strokeWidth={1.75} />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between gap-4">
+                      <h4 className="text-white font-bold mb-1">{seg.title}</h4>
+                      <span className="text-white text-xl leading-none flex-shrink-0">
+                        {isOpen ? '−' : '+'}
+                      </span>
+                    </div>
+                    <p className="text-white text-sm leading-relaxed">{seg.description}</p>
+                    {isOpen && (
+                      <div className="mt-4 pt-4 border-t border-white/15 text-sm leading-relaxed">
+                        <span className="font-bold text-white">What we do for you: </span>
+                        <span className="text-white">{seg.solves}</span>
+                      </div>
+                    )}
+                  </div>
+                </button>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
+        </RevealOnScroll>
       </div>
+
+      {/* MISSING CLOSING LINE, restored — was absent entirely. */}
+      <p className="text-white text-sm text-center mt-16 max-w-2xl mx-auto">
+        If you run a system, a process, or an idea, there is a version of this layer
+        sized for you.
+      </p>
     </section>
   );
 };
