@@ -203,7 +203,7 @@ export default function InsightsIndexPage({ posts }: InsightsPageProps) {
                     <h2 className="font-bold text-xl leading-snug mb-3" style={{ color: '#16003B' }}>
                       {post.title}
                     </h2>
-                    <p className="text-sm leading-relaxed mb-4" style={{ color: '#707070' }}>
+                    <p className="text-base leading-relaxed mb-4" style={{ color: '#707070' }}>
                       {post.excerpt}
                     </p>
                     {isRealPosts ? (
@@ -284,7 +284,7 @@ export default function InsightsIndexPage({ posts }: InsightsPageProps) {
                           {openPost.title}
                         </Dialog.Title>
                         <div
-                          className="text-sm leading-relaxed space-y-4 [&_p]:mb-4"
+                          className="text-base leading-relaxed space-y-4 [&_p]:mb-4"
                           style={{ color: '#434343' }}
                           dangerouslySetInnerHTML={{ __html: openPost.content }}
                         />

@@ -41,22 +41,40 @@ export const IndustryHero = ({ title, description, photoSeed }: IndustryHeroProp
   // instead of inventing a new value, fixing both the overlap bug and
   // an inconsistency in the same move.
   return (
-    <section className="relative overflow-hidden pt-44 pb-16 md:pb-20">
-      <Image
-        src={`https://picsum.photos/seed/${photoSeed}/1600/500`}
-        alt=""
-        fill
-        sizes="100vw"
-        className="object-cover"
-        unoptimized
-        priority
-      />
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            'linear-gradient(135deg, rgba(255,97,0,0.55) 0%, rgba(22,0,59,0.85) 65%, rgba(22,0,59,0.95) 100%)',
-        }}
+    <section className="relative pt-44 pb-16 md:pb-20">
+      <div className="absolute inset-0 overflow-hidden">
+        <Image
+          src={`https://picsum.photos/seed/${photoSeed}/1600/500`}
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover"
+          unoptimized
+          priority
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(135deg, rgba(255,97,0,0.55) 0%, rgba(22,0,59,0.85) 65%, rgba(22,0,59,0.95) 100%)',
+          }}
+        />
+      </div>
+      {/* NEW (direct request): a strategically-placed floating accent
+          square, same device as ThreeSteps' photo column — genuinely
+          overhangs the section's own bottom edge rather than being
+          clipped to it, which needed the image moved into its own
+          inner overflow-hidden wrapper first (same fix ThreeSteps
+          needed) since this outer section previously clipped
+          everything including any floating decoration. Used sparingly
+          — this is one of only two new placements sitewide, chosen
+          because this hero sits on both industry pages (Healthcare,
+          Transportation) already has real photo content worth
+          accenting. */}
+      <span
+        className="absolute -bottom-6 right-10 w-14 h-14 hidden md:block z-10"
+        style={{ background: '#FF6100' }}
+        aria-hidden="true"
       />
       <div className="wrap relative flex flex-col justify-center">
         <RevealOnScroll>

@@ -98,7 +98,7 @@ export const EverythingWeConnect = () => {
         </div>
         </RevealOnScroll>
 
-        <p className="text-center mt-10 text-sm" style={{ color: '#707070' }}>
+        <p className="text-center mt-10 text-base" style={{ color: '#707070' }}>
           A selection of what we connect, not the full list.
         </p>
       </div>

@@ -51,7 +51,7 @@ export default function ErpManagedServicesPage() {
           <h1 className="text-white !font-bold text-4xl md:text-5xl mb-6">
             ERP Managed Services
           </h1>
-          <p className="text-white/70 text-sm leading-relaxed mb-8">
+          <p className="text-white text-base leading-relaxed mb-8">
             Echolink Solutions offer a range of services related to ERP systems,
             including installation, configuration, customization, integration,
             training, and ongoing support. We are responsible for maintaining your ERP
@@ -83,7 +83,7 @@ export default function ErpManagedServicesPage() {
                   <c.Icon className="w-6 h-6 text-white" strokeWidth={1.75} />
                 </span>
                 <h4 className="font-bold mb-2" style={{ color: '#FF6100' }}>{c.title}</h4>
-                <p className="text-[#434343] text-sm leading-relaxed">{c.description}</p>
+                <p className="text-[#434343] text-base leading-relaxed">{c.description}</p>
               </div>
             ))}
           </div>
@@ -96,7 +96,7 @@ export default function ErpManagedServicesPage() {
             <h2 className="text-white font-bold text-2xl md:text-3xl leading-tight mb-5">
               We Understand Your Organization Pain Points
             </h2>
-            <p className="text-white/70 text-sm leading-relaxed">
+            <p className="text-white text-base leading-relaxed">
               Often, organizations selecting new technology have outgrown their
               current systems and are using Excel to hold the ship together. We help
               these organizations move more rationally, logically, and aligned.
@@ -122,7 +122,7 @@ export default function ErpManagedServicesPage() {
               {weHelpYou.map((item, i) => (
                 <p
                   key={item}
-                  className={`text-white/70 text-sm leading-relaxed py-3 ${
+                  className={`text-white/70 text-base leading-relaxed py-3 ${
                     i < weHelpYou.length - 1 ? 'border-b border-white/15' : ''
                   }`}
                 >
@@ -144,7 +144,7 @@ export default function ErpManagedServicesPage() {
               {industriesLeft.map((item, i) => (
                 <p
                   key={item}
-                  className={`text-sm py-3 ${i < industriesLeft.length - 1 ? 'border-b border-[#E5E5E5]' : ''}`}
+                  className={`text-base py-3 ${i < industriesLeft.length - 1 ? 'border-b border-[#E5E5E5]' : ''}`}
                   style={{ color: '#16003B' }}
                 >
                   {item}
@@ -155,7 +155,7 @@ export default function ErpManagedServicesPage() {
               {industriesRight.map((item, i) => (
                 <p
                   key={item}
-                  className={`text-sm py-3 ${i < industriesRight.length - 1 ? 'border-b border-[#E5E5E5]' : ''}`}
+                  className={`text-base py-3 ${i < industriesRight.length - 1 ? 'border-b border-[#E5E5E5]' : ''}`}
                   style={{ color: '#16003B' }}
                 >
                   {item}

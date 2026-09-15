@@ -102,7 +102,7 @@ export const CoreServices = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h
               <h3 className="text-2xl font-bold mt-3 mb-4" style={{ color: '#16003B' }}>
                 Decentralized AI
               </h3>
-              <p className="text-[#434343] text-sm leading-relaxed mb-8 max-w-md">
+              <p className="text-[#434343] text-base leading-relaxed mb-8 max-w-md">
                 AI that does not depend on one vendor, one model, or one black box. We
                 run AI across decentralized infrastructure with verifiable inference,
                 so every output can be checked, every decision has provenance, and no
@@ -159,7 +159,7 @@ export const CoreServices = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h
                 <div key={item.title} className="card">
                   <span className="tag-mono tag-mono--accent">{item.tag}</span>
                   <h4 className="text-white font-bold mt-3 mb-2">{item.title}</h4>
-                  <p className="text-ink_text-secondary text-sm leading-relaxed">
+                  <p className="text-ink_text-secondary text-base leading-relaxed">
                     {item.description}
                   </p>
                 </div>
@@ -193,7 +193,7 @@ export const CoreServices = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h
                 <h4 className="font-bold mb-2" style={{ color: '#FF6100' }}>
                   {card.title}
                 </h4>
-                <p className="text-[#434343] text-sm leading-relaxed">
+                <p className="text-[#434343] text-base leading-relaxed">
                   {card.description}{' '}
                   {card.link && (
                     <Link href={card.link.href} className="font-medium" style={{ color: '#FF6100' }}>

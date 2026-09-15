@@ -76,14 +76,14 @@ export const WholeStack = () => {
               <span className="block text-[#16003B] font-bold text-sm mb-1">
                 {row.label}
               </span>
-              <span className="block text-[#4A4560] text-xs leading-relaxed">
+              <span className="block text-[#4A4560] text-base leading-relaxed">
                 {row.value}
               </span>
             </div>
           ))}
         </div>
 
-        <p className="text-[#4A4560] text-sm leading-relaxed mt-8 mb-10 max-w-xl">
+        <p className="text-[#4A4560] text-base leading-relaxed mt-8 mb-10 max-w-xl">
           We are the connective trust layer that hides the complexity and
           delivers the outcome, trust, automation, and compliance, in the
           language enterprise buyers already speak.

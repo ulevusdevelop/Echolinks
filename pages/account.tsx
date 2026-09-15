@@ -74,7 +74,7 @@ export default function AccountPage() {
                 <h3 className="text-white font-bold text-lg mt-2 mb-3">
                   No active membership
                 </h3>
-                <p className="text-ink_text-secondary text-sm leading-relaxed mb-4">
+                <p className="text-ink_text-secondary text-base leading-relaxed mb-4">
                   You&apos;re logged in, but don&apos;t currently have an active
                   membership plan. Upgrade to unlock member-only content like the
                   interactive Lab.

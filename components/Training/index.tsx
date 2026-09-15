@@ -65,12 +65,15 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
         <div className="grid md:grid-cols-[1fr_1.2fr] gap-16 items-start">
           <div>
             <h3 className="font-bold text-xl mb-5" style={{ color: '#16003B' }}>The class is the build</h3>
-            <p className="text-sm leading-relaxed mb-5 max-w-sm" style={{ color: '#434343' }}>
+            {/* FONT SIZE FIX (direct instruction, exact example
+                quoted): text-sm (14px) -> text-base (16px), matching
+                the standard body tier applied consistently below too. */}
+            <p className="text-base leading-relaxed mb-5 max-w-sm" style={{ color: '#434343' }}>
               We do not teach from slides about someone else&apos;s example. Your team
               learns by building and operating your real workflows, the same agents,
               integrations, schedules, and trust records they will use on Monday.
             </p>
-            <p className="text-sm font-semibold leading-relaxed max-w-sm" style={{ color: '#16003B' }}>
+            <p className="text-base font-semibold leading-relaxed max-w-sm" style={{ color: '#16003B' }}>
               By the end, your people are not just trained. They are running it.
             </p>
           </div>
@@ -78,7 +81,7 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
             {trainingCards.map((c) => (
               <div key={c.title} className="card !py-5 border-l-2 border-l-accent">
                 <h4 className="text-white font-bold text-sm mb-1">{c.title}</h4>
-                <p className="text-ink_text-secondary text-xs leading-relaxed">
+                <p className="text-ink_text-secondary text-base leading-relaxed">
                   {c.description}
                 </p>
               </div>
@@ -129,7 +132,11 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
             <h3 className="text-white !font-bold text-2xl mb-5">
               A track record of 2,000 careers, now pointed at what comes next
             </h3>
-            <p className="text-ink_text-secondary text-sm leading-relaxed mb-4 max-w-md">
+            {/* FONT SIZE FIX (direct instruction, exact examples
+                quoted): both paragraphs here were text-sm (14px) —
+                bumped to text-base (16px), the standard body tier,
+                same as elsewhere in this pass. */}
+            <p className="text-ink_text-secondary text-base leading-relaxed mb-4 max-w-md">
               Echolink Solutions has trained more than 2,000 people into technology
               careers through its institute, built on enterprise integration and
               healthcare IT. The platform and the method carry forward. The curriculum
@@ -137,7 +144,7 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
               automation and robotics, verifiable traceability, and project controls
               with earned value.
             </p>
-            <p className="text-ink_text-secondary text-sm leading-relaxed mb-6 max-w-md">
+            <p className="text-ink_text-secondary text-base leading-relaxed mb-6 max-w-md">
               Same approach as every client engagement. The class is the build, on real
               systems, with technical and business skills taught together.
             </p>
@@ -163,7 +170,7 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
 
         <RevealOnScroll delayMs={350}>
         <div className="mt-14 max-w-2xl">
-          <p className="text-sm leading-relaxed mb-6" style={{ color: '#434343' }}>
+          <p className="text-base leading-relaxed mb-6" style={{ color: '#434343' }}>
             Integration gets you the capability. Training is what turns it into
             results. We deliver both, so your investment actually gets used.
           </p>
@@ -195,18 +202,31 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
           vertical padding, so the band grows to fit its content with
           consistent space above and below, regardless of how many
           lines the paragraph wraps to at any given width. */}
-      <div className="relative mt-24 overflow-hidden py-20 md:py-28">
-        <Image
-          src="https://picsum.photos/seed/echolink-tech-made-easy/1600/500"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover"
-          unoptimized
-        />
-        <div
-          className="absolute inset-0"
-          style={{ background: 'linear-gradient(180deg, rgba(22,0,59,0.75) 0%, rgba(22,0,59,0.94) 100%)' }}
+      <div className="relative mt-24 py-20 md:py-28">
+        <div className="absolute inset-0 overflow-hidden">
+          <Image
+            src="https://picsum.photos/seed/echolink-tech-made-easy/1600/500"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover"
+            unoptimized
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(180deg, rgba(22,0,59,0.75) 0%, rgba(22,0,59,0.94) 100%)' }}
+          />
+        </div>
+        {/* NEW (direct request): second of only two new floating-square
+            placements sitewide — this band already has real photo
+            content, and now that the image sits in its own inner
+            overflow-hidden wrapper (same restructure IndustryHero
+            needed), this square can genuinely overhang the band's
+            edge instead of being clipped to it. */}
+        <span
+          className="absolute -top-6 left-10 w-12 h-12 hidden md:block z-10"
+          style={{ background: '#FF6100' }}
+          aria-hidden="true"
         />
         <RevealOnScroll>
         <div className="wrap relative flex flex-col items-center justify-center text-center">
@@ -214,7 +234,16 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
             TRAINING & SUPPORT
           </span>
           <h3 className="text-white font-bold text-3xl md:text-4xl mb-4">Tech Made Easy</h3>
-          <p className="text-white/70 text-sm leading-relaxed max-w-xl mb-8">
+          {/* FONT SIZE FIX (direct instruction): this was text-sm
+              (14px), one of the specific examples flagged as too small.
+              Bumped to text-base (16px) — the standard body tier, one
+              notch below .sec-sub's 20px lead-paragraph tier, keeping
+              the hierarchy distinction intact rather than making every
+              paragraph the same size. Also converted from text-white/70
+              (translucent, reads grayish) to full white, consistent
+              with the sitewide gray-to-white pass on purple
+              backgrounds. */}
+          <p className="text-white text-base leading-relaxed max-w-xl mb-8">
             Our training institute has helped more than 2,000 people transition into
             roles like Integration Developer, EDI Analyst, ERP Consultant, API
             Developer, and HL7/FHIR Specialist. A hands-on learning platform built to

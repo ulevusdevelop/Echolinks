@@ -119,9 +119,9 @@ export const WhoWeServe = () => {
                         {isOpen ? '−' : '+'}
                       </span>
                     </div>
-                    <p className="text-white text-sm leading-relaxed">{seg.description}</p>
+                    <p className="text-white text-base leading-relaxed">{seg.description}</p>
                     {isOpen && (
-                      <div className="mt-4 pt-4 border-t border-white/15 text-sm leading-relaxed">
+                      <div className="mt-4 pt-4 border-t border-white/15 text-base leading-relaxed">
                         <span className="font-bold text-white">What we do for you: </span>
                         <span className="text-white">{seg.solves}</span>
                       </div>
@@ -136,7 +136,7 @@ export const WhoWeServe = () => {
       </div>
 
       {/* MISSING CLOSING LINE, restored — was absent entirely. */}
-      <p className="text-white text-sm text-center mt-16 max-w-2xl mx-auto">
+      <p className="text-white text-base text-center mt-16 max-w-2xl mx-auto">
         If you run a system, a process, or an idea, there is a version of this layer
         sized for you.
       </p>

@@ -107,7 +107,7 @@ export default function ContactPage() {
           {status === 'success' ? (
             <div className="border-l-2 pl-6" style={{ borderColor: '#FF6100' }}>
               <h3 className="font-bold mb-2" style={{ color: '#16003B' }}>Message sent.</h3>
-              <p className="text-sm" style={{ color: '#434343' }}>
+              <p className="text-base" style={{ color: '#434343' }}>
                 Thanks for reaching out — we&apos;ll get back to you at the email you
                 provided, usually within one business day.
               </p>
@@ -254,7 +254,7 @@ export default function ContactPage() {
                 />
               </div>
 
-              <p className="text-xs leading-relaxed" style={{ color: '#707070' }}>
+              <p className="text-base leading-relaxed" style={{ color: '#707070' }}>
                 Echolink Solutions is committed to protecting and respecting your
                 privacy. Please confirm that you agree with our privacy policy by
                 checking the box below.
@@ -272,7 +272,7 @@ export default function ContactPage() {
               </label>
 
               {status === 'error' && (
-                <p className="text-sm text-red-600 bg-red-50 border border-red-200 px-4 py-3">
+                <p className="text-base text-red-600 bg-red-50 border border-red-200 px-4 py-3">
                   {errorMsg}
                 </p>
               )}

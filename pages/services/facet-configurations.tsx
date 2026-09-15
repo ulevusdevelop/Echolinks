@@ -88,7 +88,7 @@ export default function FacetConfigurationsPage() {
           <h1 className="text-white !font-bold text-4xl md:text-5xl mb-6">
             FACET Configurations
           </h1>
-          <p className="text-white/70 text-sm leading-relaxed mb-8">
+          <p className="text-white text-base leading-relaxed mb-8">
             Our EPIC EMR FACETS configuration helps in implementing and managing the
             FACETS platform to reduce planned administrative costs, improve business
             processes and deliver better value for care management solutions. We have
@@ -130,7 +130,7 @@ export default function FacetConfigurationsPage() {
                 {cat.items.map((item, i) => (
                   <p
                     key={item}
-                    className={`text-sm leading-relaxed py-4 ${
+                    className={`text-base leading-relaxed py-4 ${
                       i < cat.items.length - 1 ? 'border-b border-[#E5E5E5]' : ''
                     }`}
                     style={{ color: '#434343' }}

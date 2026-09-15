@@ -65,10 +65,10 @@ export const WhyDecentralized = () => {
                 <h4 className="text-[#16003B] font-bold text-lg mb-2">
                   {point.title}
                 </h4>
-                <p className="text-[#434343] text-sm leading-relaxed mb-3">
+                <p className="text-[#434343] text-base leading-relaxed mb-3">
                   {point.description}
                 </p>
-                <p className="text-sm leading-relaxed text-[#434343]">
+                <p className="text-base leading-relaxed text-[#434343]">
                   <span className="text-[#16003B] font-bold">How it protects you:</span>{' '}
                   {point.protects}
                 </p>
@@ -81,7 +81,7 @@ export const WhyDecentralized = () => {
         <RevealOnScroll delayMs={250}>
         <div className="max-w-4xl mx-auto text-center mt-14 border border-[#16003B]/20 rounded-card p-8">
           <span className="tag-mono !text-[#B24300]">THE HONEST PART</span>
-          <p className="text-[#434343] text-sm leading-relaxed mt-4 mb-6">
+          <p className="text-[#434343] text-base leading-relaxed mt-4 mb-6">
             You do not need to rip out a thing. Your systems keep running the work
             exactly as they do now. We add the layer that makes it provable, keeps
             your data and AI out of one vendor&apos;s hands, and gives you the audit

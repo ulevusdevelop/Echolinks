@@ -82,7 +82,7 @@ export const TrustedToBuildTrust = ({ headingLevel = 'h2' }: { headingLevel?: 'h
               >
                 {c.tags}
               </p>
-              <p className="text-xs leading-relaxed" style={{ color: c.delivered ? 'rgba(255,255,255,0.85)' : '#434343' }}>
+              <p className="text-base leading-relaxed" style={{ color: c.delivered ? 'rgba(255,255,255,0.85)' : '#434343' }}>
                 {c.description}
               </p>
             </div>
@@ -90,7 +90,7 @@ export const TrustedToBuildTrust = ({ headingLevel = 'h2' }: { headingLevel?: 'h
         </div>
         </RevealOnScroll>
 
-        <p className="text-center mt-10 text-sm" style={{ color: '#707070' }}>
+        <p className="text-center mt-10 text-base" style={{ color: '#707070' }}>
           Aetna engagement delivered. DFO Retail, Oando, and Western Beef prototypes
           shown with permission.
         </p>

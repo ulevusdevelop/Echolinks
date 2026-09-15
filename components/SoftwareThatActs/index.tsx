@@ -67,7 +67,7 @@ export const SoftwareThatActs = () => {
                 </span>
                 <div>
                   <h4 className="text-white font-bold text-sm mb-1">{item.title}</h4>
-                  <p className="text-ink_text-secondary text-xs leading-relaxed">
+                  <p className="text-ink_text-secondary text-base leading-relaxed">
                     {item.description}
                   </p>
                 </div>
@@ -87,7 +87,7 @@ export const SoftwareThatActs = () => {
                 </div>
               ))}
             </div>
-            <p className="text-ink_text-secondary text-xs leading-relaxed">
+            <p className="text-ink_text-secondary text-base leading-relaxed">
               Agents are powerful because they act on their own. They are safe
               because they cannot act outside the rules you give them.
             </p>
@@ -100,7 +100,7 @@ export const SoftwareThatActs = () => {
           {agents.map((agent) => (
             <div key={agent.title} className="card">
               <h4 className="text-white font-bold text-sm mb-2">{agent.title}</h4>
-              <p className="text-ink_text-secondary text-xs leading-relaxed">
+              <p className="text-ink_text-secondary text-base leading-relaxed">
                 {agent.description}
               </p>
             </div>

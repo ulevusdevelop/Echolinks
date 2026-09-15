@@ -37,7 +37,7 @@ export const OneScan = () => {
           </p>
           <ul className="flex flex-col gap-3 mt-8">
             {checklist.map((item) => (
-              <li key={item} className="flex gap-3 text-sm text-ink_text-secondary">
+              <li key={item} className="flex gap-3 text-base text-ink_text-secondary">
                 <span className="text-accent-light">✓</span>
                 {item}
               </li>

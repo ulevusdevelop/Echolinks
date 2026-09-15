@@ -180,7 +180,7 @@ export default function LabPage() {
             <div className="card grid md:grid-cols-2 gap-10 items-center mb-16">
               <div>
                 <h3 className="text-white font-bold text-xl mb-3">Get your lab pass</h3>
-                <p className="text-ink_text-secondary text-sm leading-relaxed mb-5">
+                <p className="text-ink_text-secondary text-base leading-relaxed mb-5">
                   One name, one email, and you are in. The pass unlocks every simulation
                   below and keeps your progress for this session.
                 </p>
@@ -237,7 +237,7 @@ export default function LabPage() {
                       <span className="tag-mono">{lab.level}</span>
                     </div>
                     <h3 className="text-white font-bold text-lg mb-2">{lab.title}</h3>
-                    <p className="text-ink_text-secondary text-sm leading-relaxed mb-6 flex-1">
+                    <p className="text-ink_text-secondary text-base leading-relaxed mb-6 flex-1">
                       {lab.description}
                     </p>
                     <span className="text-sm font-semibold text-accent-light">
@@ -256,7 +256,7 @@ export default function LabPage() {
                       <span className="tag-mono">{lab.level}</span>
                     </div>
                     <h3 className="text-white font-bold text-lg mb-2">{lab.title}</h3>
-                    <p className="text-ink_text-secondary text-sm leading-relaxed mb-6 flex-1">
+                    <p className="text-ink_text-secondary text-base leading-relaxed mb-6 flex-1">
                       {lab.description}
                     </p>
                     <span className={`text-sm font-semibold ${lab.comingSoon ? 'text-ink_text-muted' : 'text-accent-light'}`}>
@@ -315,7 +315,7 @@ export default function LabPage() {
                       <Dialog.Title className="text-white font-bold text-2xl mb-4">
                         {open.title}
                       </Dialog.Title>
-                      <p className="text-ink_text-secondary text-sm leading-relaxed mb-6">
+                      <p className="text-ink_text-secondary text-base leading-relaxed mb-6">
                         {open.description}
                       </p>
                       {open.competencies && (

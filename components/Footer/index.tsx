@@ -79,7 +79,7 @@ export const Footer = () => {
           <h3 className="text-2xl md:text-3xl font-bold text-white mb-5 max-w-xl mx-auto leading-tight">
             Let&apos;s wire your first verifiable workflow.
           </h3>
-          <p className="text-ink_text-secondary text-sm md:text-base leading-relaxed max-w-lg mx-auto mb-10">
+          <p className="text-ink_text-secondary text-base leading-relaxed max-w-lg mx-auto mb-10">
             Bring one system, one decision you need to trust, and one process you
             want a machine to run. We will scope the integration and the proof in a
             single working session.
@@ -117,9 +117,9 @@ export const Footer = () => {
                 className="object-contain"
               />
             </span>
-            <p className="text-sm font-bold text-white mt-4">Echolink Solutions</p>
+            <p className="text-base font-bold text-white mt-4">Echolink Solutions</p>
             <p className="tag-mono mt-1">VERIFIABLE INTEGRATION LAYER</p>
-            <p className="text-ink_text-secondary text-sm mt-4 max-w-xs leading-relaxed">
+            <p className="text-ink_text-secondary text-base mt-4 max-w-xs leading-relaxed">
               The connective trust layer for enterprise systems, decentralized AI,
               agents, and robotics.
             </p>
@@ -155,15 +155,15 @@ export const Footer = () => {
 
             <div>
               <p className="tag-mono mb-5">CONTACT</p>
-              <p className="text-sm text-ink_text-secondary">
+              <p className="text-base text-ink_text-secondary">
                 <Link href="/contact" className="hover:text-white">
                   Contact form →
                 </Link>
               </p>
-              <p className="text-sm text-ink_text-secondary mt-3">
+              <p className="text-base text-ink_text-secondary mt-3">
                 info@echolinksolutions.com
               </p>
-              <p className="text-sm text-ink_text-secondary mt-3">
+              <p className="text-base text-ink_text-secondary mt-3">
                 Anderson, South Carolina
               </p>
             </div>

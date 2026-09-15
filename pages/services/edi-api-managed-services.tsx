@@ -70,7 +70,7 @@ export default function EdiApiManagedServicesPage() {
                 <h4 className="font-bold mb-2" style={{ color: '#FF6100' }}>
                   {c.title}
                 </h4>
-                <p className="text-[#434343] text-sm leading-relaxed">{c.description}</p>
+                <p className="text-[#434343] text-base leading-relaxed">{c.description}</p>
               </div>
             ))}
           </div>
@@ -83,7 +83,7 @@ export default function EdiApiManagedServicesPage() {
             {engagement.map((item, i) => (
               <p
                 key={item}
-                className={`text-white/70 text-sm leading-relaxed py-4 ${
+                className={`text-white/70 text-base leading-relaxed py-4 ${
                   i < engagement.length - 1 ? 'border-b border-white/15' : ''
                 }`}
               >
@@ -95,7 +95,7 @@ export default function EdiApiManagedServicesPage() {
             {engagement2.map((item, i) => (
               <p
                 key={item}
-                className={`text-white/70 text-sm leading-relaxed py-4 ${
+                className={`text-white/70 text-base leading-relaxed py-4 ${
                   i < engagement2.length - 1 ? 'border-b border-white/15' : ''
                 }`}
               >

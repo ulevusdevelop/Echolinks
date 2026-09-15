@@ -97,7 +97,7 @@ export const Layer = () => {
           <h2 className="text-white font-bold text-3xl md:text-4xl leading-tight mb-5">
             One layer. Five jobs. Verifiable end to end.
           </h2>
-          <p className="text-white/80 text-[20px] font-normal leading-relaxed">
+          <p className="text-white text-[20px] font-normal leading-relaxed">
             Five jobs that usually live in five different tools. Echolink brings them
             together into one layer and connects them through deep integration work.{' '}
             <button
@@ -135,16 +135,16 @@ export const Layer = () => {
                         {isOpen ? '−' : '+'}
                       </span>
                     </div>
-                    <p className="text-white/80 text-sm leading-relaxed">{step.description}</p>
+                    <p className="text-white text-base leading-relaxed">{step.description}</p>
                     {isOpen && (
-                      <div className="mt-4 pt-4 border-t border-white/15 flex flex-col gap-3 text-sm leading-relaxed">
+                      <div className="mt-4 pt-4 border-t border-white/15 flex flex-col gap-3 text-base leading-relaxed">
                         <p>
                           <span className="font-bold text-white">What we do: </span>
-                          <span className="text-white/80">{step.whatWeDo}</span>
+                          <span className="text-white">{step.whatWeDo}</span>
                         </p>
                         <p>
                           <span className="font-bold text-white">What it solves: </span>
-                          <span className="text-white/80">{step.whatItSolves}</span>
+                          <span className="text-white">{step.whatItSolves}</span>
                         </p>
                       </div>
                     )}

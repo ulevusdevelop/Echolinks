@@ -146,11 +146,11 @@ export const Traceability = () => {
             <div className="absolute inset-0 mix-blend-color" style={{ background: '#16003B' }} aria-hidden="true" />
           </div>
           <div className="flex flex-col">
-            <p className="text-ink_text-secondary text-sm leading-relaxed py-4 border-b border-ink-border">
+            <p className="text-ink_text-secondary text-base leading-relaxed py-4 border-b border-ink-border">
               A tamper-proof record for high-stakes industries, from airlines and air
               taxis to the goods on your shelf.
             </p>
-            <p className="text-ink_text-secondary text-sm leading-relaxed py-4 border-b border-ink-border">
+            <p className="text-ink_text-secondary text-base leading-relaxed py-4 border-b border-ink-border">
               Every part, batch, and hand-off, photographed, verified, and anchored so
               it cannot be faked.
             </p>
@@ -183,7 +183,7 @@ export const Traceability = () => {
                 aria-hidden="true"
               />
               <h4 className="text-white font-bold text-sm mb-2">{ind.title}</h4>
-              <p className="text-ink_text-secondary text-xs leading-relaxed">
+              <p className="text-ink_text-secondary text-base leading-relaxed">
                 {ind.description}
               </p>
             </button>
@@ -214,7 +214,7 @@ export const Traceability = () => {
           </div>
 
           {!active ? (
-            <p className="text-ink_text-secondary text-sm leading-relaxed">
+            <p className="text-ink_text-secondary text-base leading-relaxed">
               Pick any industry above to see how a real item is verified at every step
               and locked to a tamper-proof record.
             </p>
@@ -229,7 +229,7 @@ export const Traceability = () => {
                     <span className="number-badge flex-shrink-0">{i + 1}</span>
                     <div>
                       <h5 className="text-white font-bold text-sm mb-1">{step.title}</h5>
-                      <p className="text-ink_text-secondary text-xs leading-relaxed mb-1">
+                      <p className="text-ink_text-secondary text-base leading-relaxed mb-1">
                         {step.description}
                       </p>
                       <span className="tag-mono tag-mono--accent !text-[10px]">
@@ -241,7 +241,7 @@ export const Traceability = () => {
               </div>
               <div className="flex items-start gap-3 mt-6 pt-5 border-t border-ink-border">
                 <span className="text-accent-light font-bold flex-shrink-0">✓</span>
-                <p className="text-ink_text-secondary text-xs leading-relaxed">
+                <p className="text-ink_text-secondary text-base leading-relaxed">
                   Every step verified and anchored. <b className="text-white">0 tampering.</b>{' '}
                   This is what your customer, auditor, or regulator can check
                   themselves.
@@ -270,13 +270,13 @@ export const Traceability = () => {
         <div className="grid md:grid-cols-[1fr_1.2fr] gap-16 items-start">
           <div>
             <h3 className="font-bold text-xl mb-5" style={{ color: '#16003B' }}>One problem, every industry</h3>
-            <p className="text-sm leading-relaxed mb-5 max-w-sm" style={{ color: '#434343' }}>
+            <p className="text-base leading-relaxed mb-5 max-w-sm" style={{ color: '#434343' }}>
               High-value goods pass through a web of operators, makers, handlers,
               regulators, and insurers, each holding a piece of the truth. When
               something is audited, recalled, or grounded, the full history has to be
               proven fast, and proven untouched.
             </p>
-            <p className="text-sm leading-relaxed max-w-sm" style={{ color: '#434343' }}>
+            <p className="text-base leading-relaxed max-w-sm" style={{ color: '#434343' }}>
               That is a verifiable integration problem. The exact thing we do, applied
               wherever trust matters most.
             </p>
@@ -289,7 +289,7 @@ export const Traceability = () => {
                 style={{ borderLeftColor: '#FF6100', background: '#F7F7F9' }}
               >
                 <h4 className="font-bold text-sm mb-1" style={{ color: '#16003B' }}>{p.title}</h4>
-                <p className="text-xs leading-relaxed" style={{ color: '#434343' }}>
+                <p className="text-base leading-relaxed" style={{ color: '#434343' }}>
                   {p.description}
                 </p>
               </div>
@@ -298,7 +298,7 @@ export const Traceability = () => {
         </div>
 
         <div className="mt-16 max-w-2xl">
-          <p className="text-sm italic leading-relaxed mb-6" style={{ color: '#434343' }}>
+          <p className="text-base italic leading-relaxed mb-6" style={{ color: '#434343' }}>
             From the aircraft overhead to the food on your table, the same verifiable
             layer gives every party one tamper-proof record they can check themselves.
             We started with the hardest cases and built it to apply anywhere trust

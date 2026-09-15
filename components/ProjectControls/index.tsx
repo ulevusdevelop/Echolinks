@@ -77,13 +77,13 @@ export const ProjectControls = () => {
             <h2 className="font-bold text-2xl md:text-3xl leading-tight mb-5" style={{ color: '#16003B' }}>
               Measured, not guessed
             </h2>
-            <p className="text-[#434343] text-sm leading-relaxed mb-5 max-w-sm">
+            <p className="text-[#434343] text-base leading-relaxed mb-5 max-w-sm">
               Most projects report status from a spreadsheet that was accurate last
               week. We build the CPM schedule, set the baseline, and connect cost and
               progress data to it, so variance shows up while there is still time to
               act on it.
             </p>
-            <p className="text-[#434343] text-sm leading-relaxed max-w-sm">
+            <p className="text-[#434343] text-base leading-relaxed max-w-sm">
               Because this runs on the same verifiable layer, the baseline, every
               revision, and every progress claim can be anchored, so what was
               approved and when is provable later.
@@ -97,7 +97,7 @@ export const ProjectControls = () => {
                 key={c.title}
                 className={`py-4 ${i < capabilities.length - 1 ? 'border-b border-[#E5E5E5]' : ''}`}
               >
-                <p className="text-[#434343] text-sm leading-relaxed">
+                <p className="text-[#434343] text-base leading-relaxed">
                   <span className="font-semibold" style={{ color: '#16003B' }}>{c.title}.</span>{' '}
                   {c.description}
                 </p>
@@ -116,7 +116,7 @@ export const ProjectControls = () => {
             <h2 className="font-bold text-3xl" style={{ color: '#16003B' }}>
               Benefits
             </h2>
-            <p className="text-[#434343] text-sm mt-3">Our project controls solution will help:</p>
+            <p className="text-[#434343] text-base mt-3">Our project controls solution will help:</p>
           </div>
           <div className="flex flex-col">
             {metrics.map((m, i) => (
@@ -124,7 +124,7 @@ export const ProjectControls = () => {
                 key={m.code}
                 className={`py-5 ${i < metrics.length - 1 ? 'border-b border-[#DCDFE3]' : ''}`}
               >
-                <p className="text-[#434343] text-sm leading-relaxed">
+                <p className="text-[#434343] text-base leading-relaxed">
                   <span className="font-bold" style={{ color: '#FF6100' }}>{m.code}</span>
                   {' — '}
                   <span className="font-semibold" style={{ color: '#16003B' }}>{m.label}.</span>{' '}
@@ -160,7 +160,7 @@ export const ProjectControls = () => {
             </div>
 
             <div className="max-w-xl">
-              <p className="text-[#434343] text-sm leading-relaxed mb-6">
+              <p className="text-[#434343] text-base leading-relaxed mb-6">
                 We deliver it three ways: as a service on your projects, as embedded
                 controls staff working alongside your team, or as training that leaves
                 your own people running it. Same standard either way.

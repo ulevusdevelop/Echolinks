@@ -22,7 +22,7 @@ export const PartnerLogos = () => {
           boomi
         </p>
 
-        <p className="font-bold text-sm mb-8" style={{ color: '#FF6100' }}>
+        <p className="font-bold text-base mb-8" style={{ color: '#FF6100' }}>
           Companies We&apos;ve Worked With in the Past
         </p>
         <div className="flex flex-wrap items-center justify-center gap-x-16 gap-y-6">

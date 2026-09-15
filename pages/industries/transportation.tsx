@@ -27,7 +27,7 @@ export default function TransportationPage() {
               Enhanced Integration
             </span>
           </div>
-          <div className="flex flex-col gap-4 text-sm leading-relaxed" style={{ color: '#434343' }}>
+          <div className="flex flex-col gap-4 text-base leading-relaxed" style={{ color: '#434343' }}>
             <p>
               Logistics providers require a versatile and extensible framework that
               supports both EDI and API integration alternatives. EDI automates the

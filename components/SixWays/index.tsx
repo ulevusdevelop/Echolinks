@@ -94,10 +94,10 @@ export const SixWays = () => {
             >
               <span className="tag-mono tag-mono--accent">{model.label}</span>
               <h4 className="text-white font-bold text-lg mt-3 mb-3">{model.title}</h4>
-              <p className="text-ink_text-secondary text-sm leading-relaxed mb-4">
+              <p className="text-ink_text-secondary text-base leading-relaxed mb-4">
                 {model.description}
               </p>
-              <div className="text-xs leading-relaxed mb-5 pt-4 border-t border-ink-border">
+              <div className="text-base leading-relaxed mb-5 pt-4 border-t border-ink-border">
                 <span className="font-bold text-white">Solves for you: </span>
                 <span className="text-ink_text-secondary">{model.solves}</span>
               </div>

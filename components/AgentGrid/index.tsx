@@ -87,11 +87,11 @@ export const AgentGrid = () => {
                     {isOpen ? '−' : '+'}
                   </span>
                 </div>
-                <p className="text-ink_text-secondary text-sm leading-relaxed">
+                <p className="text-ink_text-secondary text-base leading-relaxed">
                   {agent.description}
                 </p>
                 {isOpen && (
-                  <div className="mt-3 pt-3 border-t border-ink-border text-xs leading-relaxed">
+                  <div className="mt-3 pt-3 border-t border-ink-border text-base leading-relaxed">
                     <span className="font-bold text-white">What it solves: </span>
                     <span className="text-ink_text-secondary">{agent.solves}</span>
                   </div>
@@ -109,7 +109,7 @@ export const AgentGrid = () => {
             {pillars.map((pillar) => (
               <div key={pillar.title} className="card">
                 <h4 className="text-white font-bold mb-2">{pillar.title}</h4>
-                <p className="text-ink_text-secondary text-sm leading-relaxed">
+                <p className="text-ink_text-secondary text-base leading-relaxed">
                   {pillar.description}
                 </p>
               </div>

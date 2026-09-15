@@ -81,17 +81,17 @@ export const ThreeSteps = ({ headingLevel = 'h3' }: { headingLevel?: 'h1' | 'h3'
                 aria-hidden="true"
               />
             </div>
-            {/* SIZE + POSITION FIX (direct feedback): sized up further
-                still, kept genuinely different sizes from each other
-                (not matching pairs), and nudged inward from the left
-                edge a little rather than sitting flush against it. */}
+            {/* SIZE FIX (direct feedback, sized up again this round on
+                top of the earlier increases): kept genuinely different
+                sizes from each other and nudged inward from the left
+                edge rather than sitting flush against it. */}
             <span
-              className="absolute -top-7 left-9 w-11 h-11 hidden md:block z-10"
+              className="absolute -top-8 left-9 w-14 h-14 hidden md:block z-10"
               style={{ background: '#FF6100' }}
               aria-hidden="true"
             />
             <span
-              className="absolute top-4 left-16 w-14 h-14 hidden md:block z-10"
+              className="absolute top-5 left-[72px] w-[72px] h-[72px] hidden md:block z-10"
               style={{ background: '#16003B' }}
               aria-hidden="true"
             />
@@ -106,7 +106,7 @@ export const ThreeSteps = ({ headingLevel = 'h3' }: { headingLevel?: 'h1' | 'h3'
               <Heading className="text-white text-2xl md:text-3xl font-bold leading-tight mb-4">
                 Three steps. Diagnose, develop, deploy.
               </Heading>
-              <p className="text-white/85 text-sm leading-relaxed">
+              <p className="text-white/85 text-base leading-relaxed">
                 Every engagement runs the same way, whether it is decentralized AI,
                 robotics, traceability, or project controls. It starts with the
                 decision you need to trust, not with a platform we want to sell you.

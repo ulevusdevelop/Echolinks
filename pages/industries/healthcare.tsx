@@ -32,7 +32,7 @@ export default function HealthcarePage() {
             </p>
             <p className="text-xs" style={{ color: '#707070' }}>Vancouver, Wash.</p>
           </div>
-          <div className="flex flex-col gap-4 text-sm leading-relaxed" style={{ color: '#434343' }}>
+          <div className="flex flex-col gap-4 text-base leading-relaxed" style={{ color: '#434343' }}>
             <p>
               Echolink Solutions provided a solution for PeaceHealth optometry clinic in
               Vancouver, Washington, setting up optometry-specific templates.
@@ -64,7 +64,7 @@ export default function HealthcarePage() {
             <p className="text-white font-bold text-lg mb-1">Arrowhead Engineering</p>
             <p className="text-white/50 text-xs">Engineered Products</p>
           </div>
-          <div className="flex flex-col gap-4 text-sm leading-relaxed text-white/70">
+          <div className="flex flex-col gap-4 text-base leading-relaxed text-white">
             <p>
               Echolink Solutions helped set up and integrate Arrowhead Engineering&apos;s
               EDI and ERP systems. The EDI solution helped Arrowhead Engineering

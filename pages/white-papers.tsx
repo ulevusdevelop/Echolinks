@@ -81,7 +81,7 @@ export default function WhitePapersPage() {
                 {paper.title}
               </h2>
               <p
-                className="text-xs leading-relaxed text-center mb-6 flex-1"
+                className="text-base leading-relaxed text-center mb-6 flex-1"
                 style={{ color: paper.highlight ? 'rgba(255,255,255,0.7)' : '#707070' }}
               >
                 {paper.description}

@@ -82,7 +82,7 @@ export const Insights = ({ posts }: InsightsProps) => {
               <h4 className="text-white font-bold text-lg mt-4 mb-2 group-hover:underline">
                 {post.title}
               </h4>
-              <p className="text-ink_text-secondary text-sm leading-relaxed mb-5">
+              <p className="text-ink_text-secondary text-base leading-relaxed mb-5">
                 {post.excerpt}
               </p>
               <span className="text-accent-light text-sm font-semibold">
@@ -93,7 +93,7 @@ export const Insights = ({ posts }: InsightsProps) => {
         </div>
         </RevealOnScroll>
 
-        <p className="text-ink_text-secondary text-sm mt-10 text-center">
+        <p className="text-ink_text-secondary text-base mt-10 text-center">
           More insights coming soon. Want to be notified?{' '}
           <Link href="/contact" className="text-accent-light font-semibold">
             Get in touch →
@@ -145,7 +145,7 @@ export const Insights = ({ posts }: InsightsProps) => {
                         {openPost.title}
                       </Dialog.Title>
                       <div
-                        className="insight-content text-[#434343] text-sm leading-relaxed"
+                        className="insight-content text-[#434343] text-base leading-relaxed"
                         dangerouslySetInnerHTML={{ __html: openPost.content }}
                       />
                     </>

@@ -78,7 +78,7 @@ const TrustChainDiagram = ({
   return (
     <div className="rounded-card p-10 md:p-12 flex flex-col" style={{ background: '#16003B' }}>
       <h4 className="text-white font-bold mb-3">{title}</h4>
-      <p className="text-ink_text-secondary text-sm leading-relaxed mb-8">{description}</p>
+      <p className="text-ink_text-secondary text-base leading-relaxed mb-8">{description}</p>
 
       <div className="relative flex flex-col items-center gap-0">
         {/* Vertical traveling-ball track — sits behind the chain,
@@ -140,7 +140,7 @@ const TrustChainDiagram = ({
         })}
       </div>
 
-      <div className="mt-8 bg-ink-900 border border-ink-border rounded-none p-5 min-h-[64px] text-sm text-ink_text-secondary">
+      <div className="mt-8 bg-ink-900 border border-ink-border rounded-none p-5 min-h-[64px] text-base text-ink_text-secondary">
         {active ? active.detail : hint}
       </div>
     </div>
@@ -182,7 +182,7 @@ const SharedNetworkDiagram = ({
   return (
     <div className="rounded-card p-10 md:p-12 flex flex-col" style={{ background: '#16003B' }}>
       <h4 className="text-white font-bold mb-3">{title}</h4>
-      <p className="text-ink_text-secondary text-sm leading-relaxed mb-8">{description}</p>
+      <p className="text-ink_text-secondary text-base leading-relaxed mb-8">{description}</p>
 
       <div className="relative">
         {/* Decorative trunk line running down the right edge of the
@@ -254,7 +254,7 @@ const SharedNetworkDiagram = ({
         </button>
       </div>
 
-      <div className="mt-8 bg-ink-900 border border-ink-border rounded-none p-5 min-h-[64px] text-sm text-ink_text-secondary">
+      <div className="mt-8 bg-ink-900 border border-ink-border rounded-none p-5 min-h-[64px] text-base text-ink_text-secondary">
         {activeDetail || hint}
       </div>
     </div>

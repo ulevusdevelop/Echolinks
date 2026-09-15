@@ -56,12 +56,12 @@ export default function MembershipPage() {
               <div key={plan.name} className="card">
                 <h3 className="text-white font-bold text-xl mb-1">{plan.name}</h3>
                 <p className="text-accent-light font-bold text-2xl mb-4">{plan.price}</p>
-                <p className="text-ink_text-secondary text-sm leading-relaxed mb-4">
+                <p className="text-ink_text-secondary text-base leading-relaxed mb-4">
                   {plan.description}
                 </p>
                 <ul className="flex flex-col gap-2 mb-6">
                   {plan.features.map((f) => (
-                    <li key={f} className="flex gap-2 text-sm text-ink_text-secondary">
+                    <li key={f} className="flex gap-2 text-base text-ink_text-secondary">
                       <span className="text-accent-light">✓</span>
                       {f}
                     </li>
@@ -85,7 +85,7 @@ export default function MembershipPage() {
           </div>
 
           {user && (
-            <p className="text-ink_text-secondary text-sm mt-10">
+            <p className="text-ink_text-secondary text-base mt-10">
               Already a member?{' '}
               <Link href="/account" className="text-accent-light font-medium">
                 View your account →

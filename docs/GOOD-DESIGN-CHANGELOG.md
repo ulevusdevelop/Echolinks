@@ -4342,3 +4342,111 @@ for a cleaner, less cramped look overall, per direct feedback.
 Verified: `./node_modules/.bin/tsc --noEmit` clean, full
 `./node_modules/.bin/next build` — 26 routes, `/how-it-works` confirmed
 building.
+
+## Round 116 — Two new floating-square placements, thorough small-text sweep
+
+**Floating boxes, strategically placed (2 new spots, not more)**: chose
+`IndustryHero` (the hero used on both Healthcare and Transportation)
+and `Training`'s "Tech Made Easy" photo band — both are full-bleed
+photo sections, giving real content worth accenting, and both reach
+multiple pages from one change. Both needed the same restructure
+`ThreeSteps` needed: the image moved into its own inner `overflow-
+hidden` wrapper, freeing the outer section (previously clipping
+everything) to let the new squares actually overhang its edge.
+
+**Small body text, found and fixed at the 3 exact examples given, plus
+a genuine sitewide sweep beyond them**: `Training`'s "The class is the
+build" (2 paragraphs), the Training page's "Our training institute has
+helped..." paragraph, and the "2,000 careers" card's 2 paragraphs — all
+were `text-sm` (14px), bumped to `text-base` (16px), the standard body
+tier sitting one notch below `.sec-sub`'s 20px lead-paragraph tier.
+
+Went further per "thoroughly the website": checked all 21 files using
+the same `text-sm leading-relaxed` pattern and bumped every genuinely
+standalone, prominent paragraph found the same way — `CoreServices`'
+flagship intro, `ProjectControls`' "Measured, not guessed" column and
+closing paragraph, `WholeStack`'s intro, `WhyDecentralized`'s 3 points
+and closing "honest part" paragraph, `Layer`'s step descriptions and
+expandable detail text, the Healthcare/Transportation industry pages'
+case-study paragraphs, the ERP and FACET service pages' hero
+paragraphs, `account.tsx`'s status message, and the Labs page's "Get
+your lab pass" intro and its modal detail view.
+
+Deliberately left compact, to respect hierarchy rather than flatten
+it: genuine dense multi-item grids — `AgentGrid`'s 13 roles, `SixWays`'
+6 model cards, `WhoWeServe`'s 6 segments, `CoreServices`' 6 service
+cards and 3 sizedFor cards, `ProjectControls`' 6 capabilities and 4
+metrics, `membership.tsx`'s plan-tier cards, the Labs page's 6-card
+grid, and several FAQ-style accordions. Bumping these too would have
+made every piece of text on a page read at the same size, which is the
+opposite of the "distinction and hierarchy" that was explicitly asked
+to be preserved — a paragraph's size should still say something about
+how prominent it is.
+
+Also converted several `text-white/70` (translucent, reads grayish)
+instances to full white while touching these same paragraphs, since
+they were part of the exact same sitewide gray-to-white pass from
+earlier rounds and happened to be sitting right next to the text being
+fixed here.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes.
+
+## Round 117 — Comprehensive text-sm sweep: all of it, not just the standalone ones
+
+Fair, direct correction: the previous round's sweep was too selective
+— it only bumped paragraphs judged "standalone and prominent," leaving
+every dense-grid card description at 14px. Redone properly this round,
+programmatically rather than by individual judgment call: every `<p>`
+tag using `text-sm` anywhere in the codebase (44 instances across 22
+files) upgraded to `text-base`, including the ones deliberately left
+alone last round — `AgentGrid`'s 13 role descriptions, `SixWays`' 6
+card descriptions, `CoreServices`' service cards, `ProjectControls`'
+capabilities/metrics, `Traceability`'s industry cards, `Footer`'s
+contact details, and more.
+
+Also caught body text that wasn't in a `<p>` tag at all and so wasn't
+touched by that search: `TwoIdeas`' click-detail panels (both
+diagrams), `WhoWeServe`'s expandable "what we do for you" text,
+`OneScan`'s checklist items, `membership.tsx`'s plan-feature lists, and
+— probably the most consequential miss — the actual rendered blog-post
+reading content on both the Insights modal and the individual post
+page (`insight-content`, which wraps real WordPress HTML), which had
+been sitting at 14px this whole time despite being the primary reading
+content on those pages.
+
+**Where the line was drawn, and why**: left the `text-xs` (12px) tier
+alone — SixWays' "Solves for you" blocks, Traceability's expanded step
+detail, delivery/footnote lines, and similar. That's a distinctly
+smaller, more clearly auxiliary tier than the 14px body text the
+original complaint was about; bumping it too would collapse the
+scale down to two sizes instead of three (auxiliary/body/lead) and
+undo the hierarchy distinction that was explicitly asked to be kept.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes.
+
+## Round 118 — The 12px tier was the real remaining gap, plus bigger boxes
+
+All 4 examples given this round turned out to be the exact same tier —
+`text-xs leading-relaxed` (12px) — which is what I'd deliberately left
+alone last round, reasoning it was a genuinely separate "auxiliary"
+tier from the 14px body text the original complaint was about. That
+reasoning doesn't hold once it's clear this 12px tier is being used for
+real sentence-level descriptions in many places (client case-study
+blurbs, training-card copy, agent capability descriptions, traceability
+pillars), not just genuine footnotes. Swept the whole codebase for
+every `text-xs leading-relaxed` instance (14 more, across 9 files —
+`AgentGrid`, `SixWays`, `SoftwareThatActs`, `Traceability`, `Training`,
+`TrustedToBuildTrust`, `WholeStack`, `contact.tsx`, `white-papers.tsx`)
+and upgraded all of them to `text-base`, same standard as the 14px
+sweep from last round. True short tags/labels (`tag-mono`, single-
+phrase badges like "DELIVERED") are untouched — those aren't sentence
+content.
+
+**Floating boxes sized up further**: `ThreeSteps`' two squares,
+`IndustryHero`'s, and `Training`'s "Tech Made Easy" square all
+increased again on top of the previous round's bump.
+
+Verified: `./node_modules/.bin/tsc --noEmit` clean, full
+`./node_modules/.bin/next build` — 26 routes.
