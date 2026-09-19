@@ -1,4 +1,4 @@
-import React, { useState, ReactNode, useEffect, Fragment } from 'react';
+import React, { useState, ReactNode, useEffect, useRef, Fragment } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Head from 'next/head';
@@ -14,9 +14,13 @@ import { SITE_URL } from '@/lib/site';
 // works", matching the reference site's own nav order exactly
 // (Services dropdown -> Lab -> How it works -> Traceability ->
 // Insights).
+// "Courses" added (direct request, new /courses section) — placed
+// right after "Lab", matching where it sits conceptually (hands-on
+// training content, same neighborhood as the Lab's simulations).
 const navigation = [
   { name: 'The Layer', href: '/layer' },
   { name: 'Lab', href: '/lab' },
+  { name: 'Courses', href: '/courses' },
   { name: 'How it works', href: '/how-it-works' },
   { name: 'Project Control', href: '/project-controls' },
   { name: 'Traceability', href: '/traceability' },
@@ -140,6 +144,27 @@ const NavDraw = ({ children }: { children: React.ReactNode }) => (
 const navLinkClass = 'transition-colors text-[#16003B]';
 const navLinkStyle = { fontFamily: 'var(--font-syne), sans-serif', fontSize: '17px', fontWeight: 400 };
 
+// CLIENT QA FIX (Services page #4): "When the service dropdown is
+// dropped down, it doesn't go up itself, and it blocks the view of
+// the top of the page. Ensure that it automatically goes back up."
+// The panel is `fixed`, so once open it stays anchored over the top
+// of the page regardless of scrolling, and Headless UI's Popover has
+// no built-in "close on scroll" behavior — it only auto-closes on an
+// outside click. This listens for scroll while the panel is open and
+// closes it, so scrolling the page is itself what "puts it back up."
+// Pulled into its own tiny component (rather than a useEffect inline
+// in the Popover's render-prop function) so the hook has an
+// unambiguous, always-mounted component to belong to.
+const AutoCloseOnScroll = ({ open, close }: { open: boolean; close: () => void }) => {
+  useEffect(() => {
+    if (!open) return;
+    const handleScroll = () => close();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [open, close]);
+  return null;
+};
+
 const ServicesMegaMenu = () => {
   // Which category's sub-items are currently previewed. Defaults to
   // the first category so the panel isn't empty the instant it opens,
@@ -152,10 +177,35 @@ const ServicesMegaMenu = () => {
   // entered a category yet, independent of which one is defaulted.
   const [hasHovered, setHasHovered] = useState(false);
 
+  // CLIENT QA FIX ("when I move my mouse away from that drop down, it
+  // disappear and not stays there"): Headless UI's Popover only opens/
+  // closes on click by default — moving the mouse away did nothing.
+  // Added real hover behavior on top of the existing click toggle
+  // (kept for touch/keyboard users): entering the trigger opens the
+  // panel by programmatically clicking the button; leaving either the
+  // trigger or the panel schedules a short delayed close, which
+  // entering the other one cancels — the short delay is what lets the
+  // cursor cross the small gap between the trigger and the panel
+  // below it without the menu closing prematurely.
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const closeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancelClose = () => {
+    if (closeTimeout.current) {
+      clearTimeout(closeTimeout.current);
+      closeTimeout.current = null;
+    }
+  };
+  const scheduleClose = (close: () => void) => {
+    cancelClose();
+    closeTimeout.current = setTimeout(close, 200);
+  };
+
   return (
     <Popover className="relative">
-      {({ open }) => (
-        <>
+      {({ open, close }) => (
+        <div onMouseEnter={cancelClose} onMouseLeave={() => scheduleClose(close)}>
+          <AutoCloseOnScroll open={open} close={close} />
           {/* SPLIT TRIGGER (direct correction): "I wanted to be able to
               access the services page from the Navbar without there
               being the addition of a new nav link" — removed the "All
@@ -167,11 +217,17 @@ const ServicesMegaMenu = () => {
               item visually, but clicking the word navigates and
               clicking the arrow toggles the panel — no new top-level
               link added. */}
-          <span className={`flex items-center gap-1 ${navLinkClass}`} style={navLinkStyle}>
+          <span
+            className={`flex items-center gap-1 ${navLinkClass}`}
+            style={navLinkStyle}
+            onMouseEnter={() => {
+              if (!open) buttonRef.current?.click();
+            }}
+          >
             <Link href="/services">
               <NavDraw>Services</NavDraw>
             </Link>
-            <Popover.Button className="outline-none flex items-center" aria-label="Toggle services menu">
+            <Popover.Button ref={buttonRef} className="outline-none flex items-center" aria-label="Toggle services menu">
               <FilledTriangle
                 className={`w-2.5 h-2 transition-transform ${open ? 'rotate-180' : ''}`}
               />
@@ -191,17 +247,40 @@ const ServicesMegaMenu = () => {
                 everything at once), and hovering one reveals its
                 sub-items in a preview panel alongside it. Sub-items
                 stay non-clickable, same as before. */}
-            <Popover.Panel className="fixed left-0 right-0 mt-4 z-50">
+            <Popover.Panel
+              className="fixed left-0 right-0 mt-4 z-50"
+              onMouseEnter={cancelClose}
+              onMouseLeave={() => scheduleClose(close)}
+            >
               <div style={{ background: '#16003B' }} className="border-t border-white/10 shadow-2xl">
                 <div className="wrap py-28 md:py-32">
-                  <div className="grid lg:grid-cols-[240px_260px_1fr] gap-12">
+                  {/* HOVER-RESET FIX (Services page #5 — client QA):
+                      "whenever I hover over the services, the
+                      subservices change, which is good. However, when
+                      I move my cursor to the right, the subservices
+                      default back to the subservices for Core
+                      Services." The onMouseLeave that resets `hovered`
+                      back to 0 used to sit on the categories <ul> alone
+                      — moving the cursor right, off that <ul> and onto
+                      the separate preview <ul> beside it, fired that
+                      same "mouse left the categories list" event even
+                      though the mouse was still inside the mega menu,
+                      just now over the preview column. Moved the
+                      handler up to this shared grid wrapping BOTH
+                      columns, so it only fires when the cursor leaves
+                      the categories+preview area entirely, not when it
+                      crosses from one column into the other. */}
+                  <div
+                    className="grid lg:grid-cols-[240px_260px_1fr] gap-12"
+                    onMouseLeave={() => setHovered(0)}
+                  >
                     <div>
                       <h3 className="text-white font-bold text-3xl leading-[1.15]">
                         Services &amp; Solutions
                       </h3>
                     </div>
 
-                    <ul className="flex flex-col gap-1" onMouseLeave={() => setHovered(0)}>
+                    <ul className="flex flex-col gap-1">
                       {servicesColumns.map((col, i) => (
                         <li key={col.title} onMouseEnter={() => { setHovered(i); setHasHovered(true); }}>
                           <Link
@@ -244,7 +323,7 @@ const ServicesMegaMenu = () => {
               </div>
             </Popover.Panel>
           </Transition>
-        </>
+        </div>
       )}
     </Popover>
   );
@@ -402,7 +481,7 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
                         <Link
                           href={col.href}
                           className="text-xs tracking-tag uppercase mb-2 inline-block"
-                          style={{ color: '#B24300' }}
+                          style={{ color: 'var(--accent-light)' }}
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           {col.title}

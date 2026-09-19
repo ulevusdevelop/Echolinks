@@ -90,25 +90,20 @@ export const WholeStack = () => {
         </p>
         </RevealOnScroll>
 
-        {/* Bridge card — deliberately left OUTSIDE the RevealOnScroll
-            wrapper above: it needs the negative-margin overlap
-            positioning described here to stay exact, and
-            RevealOnScroll's own transform/opacity transition risks
-            interfering with that carefully-tuned straddle effect.
-            Sized up from the original small pill so it reads as a
-            deliberate object straddling the boundary, not a slightly-
-            repositioned version of what was there before. Negative
-            bottom margin (desktop only — the overlap effect doesn't
-            help on narrow mobile layouts, where it would just look
-            like a layout bug) pulls it down so its bottom half
-            visually crosses past this section's own padding into
-            whatever renders next. */}
-        <div
-          className="relative z-20 inline-flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 rounded-none px-7 py-6 shadow-xl lg:mb-[-70px]"
-          style={{ background: '#16003B' }}
-        >
+        {/* CLIENT QA FIX (Layer page #3): "You can take out the
+            rectangle surrounding the 'One Layer ALL FIVE, ASSEMBLED
+            INTO ONE VERIFIABLE WHOLE'. It make it look like an action
+            button but if its not clickable, visitors may think it's
+            an action button that is broken." This used to be a dark,
+            shadowed, padded rounded-none box (plus a negative-margin
+            "bridge" straddling this section and the next) that read
+            exactly like a clickable card. Removed the box treatment
+            (background, padding, shadow, overlap) entirely — same
+            copy, now rendered as plain text in the section's normal
+            flow instead of something that looks interactive. */}
+        <div className="relative flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
           <span className="text-[#FF6100] font-bold text-lg">One layer</span>
-          <span className="tag-mono !text-[#FF9E5E]">
+          <span className="tag-mono !text-[#4A4560]">
             ALL FIVE, ASSEMBLED INTO ONE VERIFIABLE WHOLE
           </span>
         </div>

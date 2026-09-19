@@ -37,7 +37,15 @@ export const StatsBar = () => {
             }`}
             style={i > 0 ? { borderColor: '#E5E5E5' } : undefined}
           >
-            <span className="text-4xl md:text-5xl font-black" style={{ color: '#16003B' }}>
+            {/* CLIENT QA FIX (sitewide stretched-typography sweep): found
+                while verifying the build output — `font-black` is
+                Tailwind's font-weight:900 utility, the same missing-
+                glyph/faux-bold issue behind "the titles in orange
+                color look stretched" (Syne only has real weights up
+                to 800/ExtraBold). Not orange here, but the same
+                distortion would show on these large 4xl/5xl stat
+                numbers. Swapped for font-extrabold (800). */}
+            <span className="text-4xl md:text-5xl font-extrabold" style={{ color: '#16003B' }}>
               {stat.value}
             </span>
             <p className="text-xs mt-3 leading-snug max-w-[16ch] mx-auto uppercase tracking-tag" style={{ color: '#707070' }}>

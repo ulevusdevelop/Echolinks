@@ -20,10 +20,8 @@ export default function ServicesPage() {
           conceptually about the layer specifically, not the service
           catalog this page covers — moved its canonical home to
           /layer, removed the repeat here. */}
-      <div className="pt-44">
-        <CoreServices headingLevel="h1" />
-        <EverythingWeConnect />
-      </div>
+      <CoreServices headingLevel="h1" />
+      <EverythingWeConnect />
     </>
   );
 }

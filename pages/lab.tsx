@@ -163,20 +163,42 @@ export default function LabPage() {
           content="Get in the lab and try it yourself. Six hands-on simulations covering blockchain foundations, EDI integration, project controls, traceability, and decentralized AI, open to members."
         />
       </Head>
-      <RequireMembership>
-        <section className="section--page !pt-44 !pb-24">
-          <div className="wrap">
-            <div className="sec-header max-w-2xl mx-auto text-center">
-              <span className="eyebrow-plain">ECHOLINK LABS</span>
-              <h1 className="sec-title">Get in the lab and try it yourself.</h1>
-              <p className="sec-sub sec-sub--center">
-                Open to anyone: students, engineers, operators, and executives. Pick a
-                simulation and work a real scenario in a safe environment. Nothing to
-                install, nothing you can break, and every move you make is anchored to
-                a trust record you can read.
-              </p>
-            </div>
+      {/* CLIENT QA FIX (Labs page intro): "Ensure that Labs page has
+          its own intro as well." Root cause: this hero used to sit
+          INSIDE <RequireMembership>, whose gate fully replaces its
+          children — a logged-out visitor (i.e. most people who land
+          on this page) saw only the bare "MEMBERS ONLY / Sign in to
+          view this content" block and never this intro at all, unlike
+          every other page on the site, which shows its intro
+          regardless of auth state. Moved the hero above the gate so
+          it's always visible as real marketing content — only the
+          interactive lab-pass card, the simulation grid, and the
+          modal (the actual gated functionality) stay behind
+          membership. Same structure as every other page-opening hero
+          (Insights, Layer, Project Controls). */}
+      <section className="relative overflow-hidden pt-44 pb-20" style={{ background: '#16003B' }}>
+        <div className="wrap">
+          <span className="eyebrow-plain">ECHOLINK LABS</span>
+          <h1 className="text-white !font-bold text-4xl md:text-5xl leading-tight mb-6 max-w-2xl">
+            Get in the lab and try it yourself.
+          </h1>
+          {/* WIDENED (direct feedback: "the intro sections... text
+              width... span through a bit more width") — matched to the
+              h1's own max-w-2xl above it, same fix applied across every
+              page using this intro-hero pattern. */}
+          <p className="text-white text-base leading-relaxed max-w-2xl mb-10">
+            Open to anyone: students, engineers, operators, and executives. Pick a
+            simulation and work a real scenario in a safe environment. Nothing to
+            install, nothing you can break, and every move you make is anchored to
+            a trust record you can read.
+          </p>
+          <span className="text-white text-2xl" aria-hidden="true">↓</span>
+        </div>
+      </section>
 
+      <RequireMembership>
+        <section className="section--page !pt-16 !pb-24">
+          <div className="wrap">
             <div className="card grid md:grid-cols-2 gap-10 items-center mb-16">
               <div>
                 <h3 className="text-white font-bold text-xl mb-3">Get your lab pass</h3>

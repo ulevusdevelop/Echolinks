@@ -401,27 +401,51 @@ const TopDiagram = () => {
           the icons above no longer carry their own text-center wrapper
           per icon. */}
       <div className="flex flex-wrap items-center justify-center gap-10 md:gap-16 mt-3 mb-5 text-center">
-        <p className="tag-mono w-16">data event</p>
+        <p className="tag-mono tag-mono--nowrap w-16">data event</p>
         <span className="text-ink_text-muted hidden md:block opacity-0">—</span>
-        <p className="tag-mono tag-mono--accent w-20">verify</p>
+        <p className="tag-mono tag-mono--accent tag-mono--nowrap w-20">verify</p>
         <span className="text-ink_text-muted hidden md:block opacity-0">—</span>
-        <div className="w-16">
-          <p className="tag-mono">Blockchain</p>
-          <p className="tag-mono tag-mono--accent">anchored</p>
+        {/* CLIENT QA FIX (Lab/How-it-works page): "Ensure that the
+            blockchain anchored underneath the stacked cubes are fully
+            spelled and not broken for example BLOCKCH AIN, ANCHOR
+            ED." Root cause: this box was w-16 (64px) with no
+            whitespace-nowrap, and `.tag-mono` sets `overflow-wrap:
+            break-word` — a box narrower than "BLOCKCHAIN"/"ANCHORED"
+            at this uppercase, letter-spaced size will break mid-word
+            to fit rather than overflow. Widened the box and added the
+            `.tag-mono--nowrap` modifier (the same one already used
+            for exactly this kind of short label elsewhere) so neither
+            word can be split. */}
+        <div className="w-24">
+          <p className="tag-mono tag-mono--nowrap">Blockchain</p>
+          <p className="tag-mono tag-mono--accent tag-mono--nowrap">anchored</p>
         </div>
         <p className="w-20"></p>
       </div>
 
+      {/* CLIENT QA FIX (Lab/How-it-works page): "when the orange dot
+          gets to the Blockchain, match it with #3, when it gets to
+          the green checkmark, match it with 'NOW PROVABLE, FOREVER'."
+          These three chips were highlighted one stage late relative
+          to the icon each one actually describes (chip "3 It is
+          anchored to the blockchain" only lit up once the ball had
+          already left Blockchain and reached the Checkmark, matching
+          the wrong icon). Shifted each chip to the ball's stage index
+          for the icon it names — chip 1 -> System (stage 0), chip 2 ->
+          AI (stage 1), chip 3 -> Blockchain (stage 2) — so "It is
+          anchored to the blockchain" now lights up exactly when the
+          ball is at the Blockchain icon. The Checkmark/"Now provable,
+          forever" pairing below was already correct (stage 3). */}
       <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
-        <span className={`tag-mono rounded-none px-4 py-2 border transition-colors ${stageIndex === 1 && visible ? 'border-accent text-accent-light' : 'border-ink-border'}`}>
+        <span className={`tag-mono rounded-none px-4 py-2 border transition-colors ${stageIndex === 0 && visible ? 'border-accent text-accent-light' : 'border-ink-border'}`}>
           1 A system creates a data event
         </span>
         <span className="text-ink_text-muted">—</span>
-        <span className={`tag-mono rounded-none px-4 py-2 border transition-colors ${stageIndex === 2 && visible ? 'border-accent text-accent-light' : 'border-ink-border'}`}>
+        <span className={`tag-mono rounded-none px-4 py-2 border transition-colors ${stageIndex === 1 && visible ? 'border-accent text-accent-light' : 'border-ink-border'}`}>
           2 Decentralized AI verifies it
         </span>
         <span className="text-ink_text-muted">—</span>
-        <span className={`tag-mono rounded-none px-4 py-2 border transition-colors ${stageIndex === 3 && visible ? 'border-accent text-accent-light' : 'border-ink-border'}`}>
+        <span className={`tag-mono rounded-none px-4 py-2 border transition-colors ${stageIndex === 2 && visible ? 'border-accent text-accent-light' : 'border-ink-border'}`}>
           3 It is anchored to the blockchain
         </span>
       </div>

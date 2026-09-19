@@ -115,6 +115,36 @@ export const Traceability = () => {
 
   return (
     <>
+    {/* CLIENT QA FIX ("The traceability page still does not have that
+        introductory section as the project-controls page and the
+        others, please ensure to add it"): dedicated standalone intro
+        section, same structure as ProjectControls'/Lab's hero
+        (eyebrow, h1, intro paragraph, down-arrow, dark purple, pt-44/
+        pb-20) — this page previously folded its eyebrow/h1 straight
+        into the 3-column photo/list grid below with no separate intro
+        of its own. The h1 moved up here; the grid below no longer
+        repeats it (see its own comment). */}
+    <section className="relative overflow-hidden pt-44 pb-20" style={{ background: '#16003B' }}>
+      <div className="wrap">
+        <span className="eyebrow-plain">VERIFIABLE TRACEABILITY</span>
+        <h1 className="text-white !font-bold text-4xl md:text-5xl leading-tight mb-6 max-w-2xl">
+          Prove where anything came from.
+        </h1>
+        {/* WIDENED (direct feedback: "the intro sections... text
+            width... span through a bit more width") — matched to the
+            h1's own max-w-2xl above it, same fix applied across every
+            page using this intro-hero pattern. */}
+        <p className="text-white text-[20px] font-normal leading-relaxed max-w-2xl mb-10">
+          From the factory floor to the customer&apos;s hands, we connect the
+          systems already tracking your parts, batches, and shipments, and
+          anchor every hand-off to a tamper-proof record. What used to be a
+          claim becomes something your buyer, auditor, or regulator can check
+          themselves, in seconds, not a weeks-long paper chase.
+        </p>
+        <span className="text-white text-2xl" aria-hidden="true">↓</span>
+      </div>
+    </section>
+
     <section className="section relative overflow-hidden">
       <span
         aria-hidden="true"
@@ -123,29 +153,61 @@ export const Traceability = () => {
       <div className="wrap">
         {/* STYLE FIX (Traceability Page item 2): mirrored the old
             site's "Capabilities" pattern (Big Data / Automation / IoT
-            pages) — heading on the left, a duotone photo in the middle,
-            a short divided list on the right, instead of a single
-            centered header block. The industry grid and interactive
-            panel below are this component's own feature with no old-
-            site equivalent, so kept unchanged. */}
-        <div className="grid md:grid-cols-[1fr_auto_1fr] gap-10 items-center mb-16">
-          <div>
-            <span className="eyebrow-plain">VERIFIABLE TRACEABILITY</span>
-            <h1 className="sec-title !text-left">Prove where anything came from.</h1>
-          </div>
-          <div className="relative w-[230px] h-[280px] overflow-hidden rounded-none mx-auto hidden md:block" style={{ background: '#16003B' }}>
-            <Image
-              src="https://picsum.photos/seed/echolink-traceability/360/440"
-              alt=""
-              fill
-              sizes="230px"
-              className="object-cover"
-              style={{ filter: 'grayscale(1) contrast(1.1)' }}
-              unoptimized
+            pages) — a duotone photo alongside a short divided list,
+            instead of a single centered header block. The industry
+            grid and interactive panel below are this component's own
+            feature with no old-site equivalent, so kept unchanged.
+            HEADING REMOVED (this round): the eyebrow/h1 that used to
+            sit in the first column here now live in the dedicated
+            intro section above instead — kept the photo + list as a
+            supporting 2-column block rather than duplicating the page
+            heading a second time. */}
+        {/* REBALANCED (direct feedback: "make the image and text to the
+            right look better"). Previous layout was `grid-cols-[auto_1fr]`
+            with a small 230px photo and a text column left with no
+            max-width of its own — the divider rules under each line
+            stretched the full 1fr grid-track width while the text itself
+            wrapped far short of it, leaving a large dead gap to the
+            right of every line. Fixed on both sides: the image column is
+            now a fixed, larger 340px (was an auto-sized 230px) and picks
+            up the same corner-square accent mark used on photos
+            elsewhere on the site (TrustBand, TrustedToBuildTrust), so it
+            reads as a deliberate framed visual instead of a small,
+            unexplained thumbnail; the text column is capped to `max-w-md`
+            so its divider rules now end where the text does, and the
+            "click any industry" line is pulled out of the divided list
+            into its own small pill/tag treatment so it reads as a
+            call-to-action rather than a third, oddly-short list row. */}
+        <div className="grid md:grid-cols-[340px_1fr] gap-12 items-center mb-16">
+          <div className="relative w-full max-w-[340px] h-[400px] mx-auto md:mx-0 hidden md:block" aria-hidden="false">
+            <div className="relative w-full h-full overflow-hidden rounded-none" style={{ background: '#16003B' }}>
+              <Image
+                src="https://picsum.photos/seed/echolink-traceability/360/440"
+                alt=""
+                fill
+                sizes="340px"
+                className="object-cover"
+                style={{ filter: 'grayscale(1) contrast(1.1)' }}
+                unoptimized
+              />
+              <div className="absolute inset-0 mix-blend-color" style={{ background: '#16003B' }} aria-hidden="true" />
+            </div>
+            {/* Corner accent mark — same layered-square motif used on
+                photo treatments elsewhere (TrustBand's ghost logo corner,
+                TrustedToBuildTrust's scattered squares), so this photo
+                reads as a designed element rather than a floating crop. */}
+            <span
+              className="absolute -top-4 -left-4 w-12 h-12"
+              style={{ background: '#FF6100' }}
+              aria-hidden="true"
             />
-            <div className="absolute inset-0 mix-blend-color" style={{ background: '#16003B' }} aria-hidden="true" />
+            <span
+              className="absolute -bottom-3 -right-3 w-6 h-6 bg-white"
+              style={{ border: '2px solid #16003B' }}
+              aria-hidden="true"
+            />
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col max-w-md">
             <p className="text-ink_text-secondary text-base leading-relaxed py-4 border-b border-ink-border">
               A tamper-proof record for high-stakes industries, from airlines and air
               taxis to the goods on your shelf.
@@ -154,43 +216,57 @@ export const Traceability = () => {
               Every part, batch, and hand-off, photographed, verified, and anchored so
               it cannot be faked.
             </p>
-            <p className="tag-mono tag-mono--accent py-4">
+            <span className="tag-mono tag-mono--accent inline-flex mt-5 border border-accent rounded-none px-4 py-2 w-fit">
               Click any industry below to watch a live verified journey.
-            </p>
+            </span>
           </div>
         </div>
 
-        {/* SPACING FIX (direct feedback: "too tight, especially between
-            the first Row and second Row") — split the gap so rows get
-            more vertical breathing room than columns need
-            horizontally. HOVER FIX (direct instruction): each card now
-            gets a small orange accent square that's invisible by
-            default and appears specifically on hover — not fixed
-            permanently to any one card. */}
-        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-9">
-          {industries.map((ind) => (
-            <button
-              key={ind.id}
-              type="button"
-              onClick={() => setActiveId(ind.id)}
-              className={`group relative card text-left transition-all hover:-translate-y-0.5 ${
-                activeId === ind.id ? 'ring-2 ring-accent' : ''
-              }`}
-            >
-              <span
-                className="absolute -top-2 -right-2 w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity"
-                style={{ background: '#FF6100' }}
-                aria-hidden="true"
-              />
-              <h4 className="text-white font-bold text-sm mb-2">{ind.title}</h4>
-              <p className="text-ink_text-secondary text-base leading-relaxed">
-                {ind.description}
-              </p>
-            </button>
-          ))}
-        </div>
+        {/* CLIENT QA FIX (Traceability page #2): "We need to realign
+            the section and put them side-by-side... the small
+            rectangular boxes can be moved to the left, maybe two
+            boxes on each row. Then the big box which is the active
+            box... should be placed on the right side. This will help
+            people see it in action while they click rather than the
+            response been underneath the industries." Restructured
+            from a full-width 4-across grid + detail panel stacked
+            below it, into a two-column layout: the 8 industry cards
+            in a 2-per-row grid on the left, the detail panel on the
+            right (sticky, so it stays in view alongside the list
+            while scrolling through it), collapsing back to a single
+            stacked column below the lg breakpoint. */}
+        <div className="grid lg:grid-cols-[1fr_1fr] gap-10 items-start">
+          {/* SPACING FIX (direct feedback: "too tight, especially between
+              the first Row and second Row") — split the gap so rows get
+              more vertical breathing room than columns need
+              horizontally. HOVER FIX (direct instruction): each card now
+              gets a small orange accent square that's invisible by
+              default and appears specifically on hover — not fixed
+              permanently to any one card. */}
+          <div className="grid sm:grid-cols-2 gap-x-5 gap-y-9">
+            {industries.map((ind) => (
+              <button
+                key={ind.id}
+                type="button"
+                onClick={() => setActiveId(ind.id)}
+                className={`group relative card text-left transition-all hover:-translate-y-0.5 ${
+                  activeId === ind.id ? 'ring-2 ring-accent' : ''
+                }`}
+              >
+                <span
+                  className="absolute -top-2 -right-2 w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{ background: '#FF6100' }}
+                  aria-hidden="true"
+                />
+                <h4 className="text-white font-bold text-sm mb-2">{ind.title}</h4>
+                <p className="text-ink_text-secondary text-base leading-relaxed">
+                  {ind.description}
+                </p>
+              </button>
+            ))}
+          </div>
 
-        <div className="card mt-8 max-w-3xl">
+        <div className="card lg:sticky lg:top-28">
           <div className="flex items-start justify-between gap-4 mb-3">
             <div>
               <span className="tag-mono tag-mono--accent">
@@ -249,6 +325,7 @@ export const Traceability = () => {
               </div>
             </>
           )}
+        </div>
         </div>
       </div>
     </section>

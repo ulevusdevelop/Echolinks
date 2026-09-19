@@ -13,6 +13,22 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  // REDIRECT SUPPORT (direct request): when RequireMembership sends a
+  // visitor here from a gated page (e.g. /lab, or a course's "Sign in
+  // to open the Lab"), `redirect` carries where they were actually
+  // trying to go. A successful login now sends them straight back
+  // there instead of always to /account, so "login... then redirected
+  // to where they can access the simulation" actually lands them on
+  // the simulation, not a generic page they have to navigate away from
+  // again. Only an internal path is ever honored (must start with a
+  // single `/`, never `//`) — guards against this becoming an open
+  // redirect to an arbitrary external URL via a crafted query string.
+  const redirectParam = router.query.redirect;
+  const redirectTo =
+    typeof redirectParam === 'string' && redirectParam.startsWith('/') && !redirectParam.startsWith('//')
+      ? redirectParam
+      : '/account';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -23,7 +39,7 @@ export default function LoginPage() {
     setSubmitting(false);
 
     if (result.success) {
-      router.push('/account');
+      router.push(redirectTo);
     } else {
       setError(result.error || 'Something went wrong. Please try again.');
     }
@@ -87,7 +103,10 @@ export default function LoginPage() {
             <a href="#login-form" className="btn btn--ghost !border-accent">
               Current Member Login
             </a>
-            <Link href="/membership" className="btn btn--ghost !border-accent">
+            <Link
+              href={redirectTo !== '/account' ? `/membership?redirect=${encodeURIComponent(redirectTo)}` : '/membership'}
+              className="btn btn--ghost !border-accent"
+            >
               Become A Member
             </Link>
           </div>

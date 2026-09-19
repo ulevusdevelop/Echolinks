@@ -37,7 +37,12 @@ export const WhyDecentralized = () => {
       <div className="wrap">
         <RevealOnScroll>
         <div className="max-w-4xl mx-auto text-center mb-16">
-          <span className="tag-mono !text-[#B24300] mb-4 inline-block">
+          {/* COLOR FIX (direct instruction): was #B24300 — should be
+              #FF7A26 (now that tailwind.config.js's accent.light
+              token matches the CSS variable of the same value, using
+              the clean `text-accent-light` utility instead of a
+              hardcoded hex duplicate). */}
+          <span className="tag-mono !text-accent-light mb-4 inline-block">
             WHY DECENTRALIZED AI
           </span>
           <h2 className="text-[#16003B] font-bold text-3xl md:text-4xl leading-tight mb-5">
@@ -58,7 +63,7 @@ export const WhyDecentralized = () => {
               key={point.number}
               className="grid md:grid-cols-[80px_1fr] gap-4 md:gap-10 py-8 border-b border-[#16003B]/15"
             >
-              <span className="text-[#B24300] font-bold text-2xl">
+              <span className="text-accent-light font-bold text-2xl">
                 {point.number}
               </span>
               <div>
@@ -80,7 +85,7 @@ export const WhyDecentralized = () => {
 
         <RevealOnScroll delayMs={250}>
         <div className="max-w-4xl mx-auto text-center mt-14 border border-[#16003B]/20 rounded-card p-8">
-          <span className="tag-mono !text-[#B24300]">THE HONEST PART</span>
+          <span className="tag-mono !text-accent-light">THE HONEST PART</span>
           <p className="text-[#434343] text-base leading-relaxed mt-4 mb-6">
             You do not need to rip out a thing. Your systems keep running the work
             exactly as they do now. We add the layer that makes it provable, keeps

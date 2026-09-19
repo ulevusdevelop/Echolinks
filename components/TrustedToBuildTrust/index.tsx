@@ -90,7 +90,15 @@ export const TrustedToBuildTrust = ({ headingLevel = 'h2' }: { headingLevel?: 'h
         </div>
         </RevealOnScroll>
 
-        <p className="text-center mt-10 text-base" style={{ color: '#707070' }}>
+        {/* CLIENT QA FIX ("I need the text all on one line"): this had
+            no explicit max-w-* class, so the sitewide `p { max-width:
+            68ch; }` line-length fallback (styles/globals.css) clipped
+            it to a box narrower than the sentence itself, forcing an
+            unwanted wrap right in the middle of it. Added `max-w-none`
+            to opt out of that fallback and `whitespace-nowrap` to
+            guarantee one line, same pattern already used for the Lab
+            page's own single-line caption. */}
+        <p className="text-center mt-10 text-base max-w-none whitespace-nowrap" style={{ color: '#707070' }}>
           Aetna engagement delivered. DFO Retail, Oando, and Western Beef prototypes
           shown with permission.
         </p>

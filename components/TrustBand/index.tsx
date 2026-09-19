@@ -45,7 +45,7 @@ export const TrustBand = () => {
 
         <RevealOnScroll>
         <div className="relative max-w-2xl">
-          <span className="tag-mono !text-[#B24300] mb-4 inline-block">
+          <span className="tag-mono !text-accent-light mb-4 inline-block">
             THE HONEST PART
           </span>
           <p className="text-[#16003B] font-bold text-2xl md:text-3xl leading-snug mb-6">

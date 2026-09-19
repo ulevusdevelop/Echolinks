@@ -131,7 +131,11 @@ export const ThreeSteps = ({ headingLevel = 'h3' }: { headingLevel?: 'h1' | 'h3'
               <div key={step.label}>
                 <span
                   className="block max-lg:!text-[13px] max-lg:!leading-[1.2]"
-                  style={{ fontFamily: 'var(--font-syne), sans-serif', fontSize: '14px', fontWeight: 900, lineHeight: '34px', color: '#FF6100', textTransform: 'uppercase' }}
+                  // CLIENT QA FIX ("titles in orange color look
+                  // stretched"): Syne has no real 900 weight, only up
+                  // to 800/ExtraBold is loaded — 900 was being faux-
+                  // bolded/distorted by the browser. Corrected to 800.
+                  style={{ fontFamily: 'var(--font-syne), sans-serif', fontSize: '14px', fontWeight: 800, lineHeight: '34px', color: '#FF6100', textTransform: 'uppercase' }}
                 >
                   {step.label}
                 </span>
@@ -149,8 +153,15 @@ export const ThreeSteps = ({ headingLevel = 'h3' }: { headingLevel?: 'h1' | 'h3'
           </div>
         </div>
 
+        {/* CLIENT QA FIX: "the action button 'START WITH ONE WORKFLOW'
+            takes people to let's talk. It should direct people to one
+            of the animated section." Was a Link to /contact — points
+            to the animated "Two ideas, drawn simply" diagram section
+            (id="see-it-clearly") right below this one on the same
+            page instead, via a same-page anchor (smooth-scroll is set
+            globally on <html>). */}
         <div className="mt-10">
-          <Link href="/contact" className="btn btn--primary">
+          <Link href="#see-it-clearly" className="btn btn--primary">
             Start with one workflow →
           </Link>
         </div>

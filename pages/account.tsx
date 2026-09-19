@@ -92,6 +92,9 @@ export default function AccountPage() {
               <Link href="/lab" className="text-sm text-ink_text-secondary hover:text-white">
                 → The Lab
               </Link>
+              <Link href="/courses" className="text-sm text-ink_text-secondary hover:text-white">
+                → Courses
+              </Link>
               <Link href="/training" className="text-sm text-ink_text-secondary hover:text-white">
                 → Training
               </Link>

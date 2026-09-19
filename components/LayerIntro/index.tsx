@@ -11,10 +11,27 @@ import { RevealOnScroll } from '@/components/RevealOnScroll';
 // replacement for it.
 export const LayerIntro = () => {
   return (
-    <section className="relative overflow-hidden pt-44 pb-20" style={{ background: '#16003B' }}>
+    <section
+      // SPACING FIX (client QA, Layer page #2): "Bring this top
+      // section and the second section closer so the 2nd section is
+      // not too far from top." This hero's own pb-20 (80px) was
+      // stacking with the Layer section right below it (py-[50px]
+      // lg:py-[100px]), leaving 130-180px of empty purple-on-purple
+      // space between the down-arrow and "How it works." Reduced to
+      // pb-10 (40px) — still a real gap, just not a canyon between two
+      // sections that share the same dark background and would
+      // otherwise read as one continuous block anyway.
+      className="relative overflow-hidden pt-44 pb-10"
+      style={{ background: '#16003B' }}
+    >
       <div className="wrap">
         <RevealOnScroll>
-          <span className="text-xs font-bold tracking-tag uppercase block mb-4" style={{ color: '#FF6100' }}>
+          {/* CLIENT QA FIX (Layer page #1): "add the correct Typography
+              to the title in orange" — this eyebrow was a bespoke
+              text-xs/font-bold/tracking-tag span instead of the
+              sitewide `.eyebrow-plain` class every other orange
+              section-label uses. Switched to that shared class. */}
+          <span className="eyebrow-plain">
             THE VERIFIABLE INTEGRATION LAYER
           </span>
           {/* WEIGHT BUG FIX: this used a plain inline style

@@ -84,7 +84,13 @@ export const IndustryHero = ({ title, description, photoSeed }: IndustryHeroProp
         <h1 className="text-white !font-bold text-4xl md:text-5xl mb-4 max-w-xl">
           {title}
         </h1>
-        <p className="text-white text-[20px] font-normal max-w-lg mb-6">{description}</p>
+        {/* WIDENED (direct feedback: "the intro sections... text
+            width... span through a bit more width") — was max-w-lg
+            (512px), narrower than the h1 right above it (max-w-xl,
+            576px). Matched to max-w-xl so both share the same right
+            edge, same fix applied across every page-opening hero
+            sitewide. */}
+        <p className="text-white text-[20px] font-normal max-w-xl mb-6">{description}</p>
         <span className="text-white text-2xl" aria-hidden="true">↓</span>
         </RevealOnScroll>
       </div>

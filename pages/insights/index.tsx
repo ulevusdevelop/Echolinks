@@ -150,7 +150,11 @@ export default function InsightsIndexPage({ posts }: InsightsPageProps) {
           <h1 className="text-white !font-bold text-4xl md:text-5xl leading-tight mb-6 max-w-2xl">
             Thinking on verifiable AI and trust.
           </h1>
-          <p className="text-white text-base leading-relaxed max-w-xl mb-10">
+          {/* WIDENED (direct feedback: "the intro sections... text
+              width... span through a bit more width") — matched to the
+              h1's own max-w-2xl above it, same fix applied across every
+              page using this intro-hero pattern. */}
+          <p className="text-white text-base leading-relaxed max-w-2xl mb-10">
             Ideas, updates, and field notes from the work of wiring AI, automation, and
             blockchain into one trusted layer.
           </p>

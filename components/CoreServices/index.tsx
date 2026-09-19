@@ -62,7 +62,27 @@ export const CoreServices = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h
   const Heading = headingLevel;
   return (
     <>
-      <section id="what-we-do" className="section--page relative overflow-hidden">
+      {/* CLIENT QA FIX (Services page #1 / sitewide hero standardization):
+          "Ensure that the beginning of all the pages look the same
+          [with] the right typography and padded space." When this
+          component is the page's own hero (headingLevel="h1", i.e.
+          on /services) it needs the same header-clearance every other
+          page-opening hero uses (pt-44 = 176px, e.g. Insights,
+          Layer's LayerIntro, ProjectControls). When it's a subsection
+          on /layer instead (headingLevel="h2", sitting well below
+          LayerIntro, which already provides that clearance),
+          `.section--page`'s own normal 50/100px section padding is
+          correct and shouldn't change. An inline style (rather than a
+          Tailwind class) guarantees this wins regardless of class
+          source order, and only touches padding-top — the class's
+          own bottom padding is untouched either way. The redundant
+          `pt-44` wrapper this needed in pages/services.tsx is removed
+          now that the section provides its own clearance directly. */}
+      <section
+        id="what-we-do"
+        className="section--page relative overflow-hidden"
+        style={headingLevel === 'h1' ? { paddingTop: '176px' } : undefined}
+      >
         <svg
           viewBox="0 0 300 300"
           fill="none"
@@ -153,7 +173,14 @@ export const CoreServices = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h
 
         <RevealOnScroll delayMs={250}>
           <div className="mt-24">
-            <p className="tag-mono mb-8">DECENTRALIZED AI, SIZED FOR WHO YOU ARE</p>
+            {/* CLIENT QA FIX (Services page #2): "The title here should
+                be orange color like the others titles." Was plain
+                `.tag-mono` (its default muted-gray color) — added the
+                `.tag-mono--accent` modifier, the same one WholeStack's
+                "THE CATEGORY WE OWN" label already uses for this exact
+                role (a tag-mono-styled label introducing a subsection,
+                not the section's own eyebrow). */}
+            <p className="tag-mono tag-mono--accent mb-8">DECENTRALIZED AI, SIZED FOR WHO YOU ARE</p>
             <div className="grid md:grid-cols-3 gap-6">
               {sizedFor.map((item) => (
                 <div key={item.title} className="card">

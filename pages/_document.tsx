@@ -1,9 +1,37 @@
 import { Html, Head, Main, NextScript } from 'next/document';
 import { SITE_URL } from '@/lib/site';
+import { syne } from '@/lib/fonts';
 
 export default function Document() {
   return (
-    <Html lang="en">
+    // FONT-INHERITANCE ROOT-CAUSE FIX ("go through and fix any other
+    // places not using the right fonts" — a long list of examples
+    // spanning nearly every component: card titles, tag/checklist
+    // text, accordion labels, etc.): `syne.variable` (the CSS custom
+    // property `--font-syne` that every Syne rule in globals.css
+    // reads via `var(--font-syne)`) was only ever applied to
+    // `<main>` in _app.tsx. `html`/`body`'s own blanket
+    // `font-family: var(--font-syne), sans-serif !important` rule —
+    // meant to be the sitewide fallback for any element with no
+    // explicit font-family of its own — sits ABOVE `<main>` in the
+    // DOM, so it could never actually see that custom property (CSS
+    // custom properties only inherit downward, and `<body>` is an
+    // ANCESTOR of `<main>`, not a descendant). That made the
+    // fallback rule invalid at computed-value time, so EVERY plain
+    // element sitewide with no explicit `.eyebrow-plain`/`.tag-
+    // mono`/`h1-h6`/`.btn`/`p`/etc. class of its own — a bare
+    // `<span>`, `<div>`, `<button>`, or `<a>` used for card titles,
+    // checklist rows, tag labels, and the like — inherited whatever
+    // broken value that produced (the browser's own default font),
+    // not Syne, even though every element with its OWN explicit Syne
+    // rule rendered correctly. Adding the variable here, on `<html>`
+    // itself (the actual DOM root, above everything including
+    // React-portaled content like the Insights/Lab modals), makes
+    // that fallback rule valid everywhere at once instead of
+    // requiring a font-family override hunted down on every
+    // individual element. Left in place on `<main>` too — harmless
+    // and redundant, not worth removing.
+    <Html lang="en" className={syne.variable}>
       <Head>
         {/* Real favicon, generated from the actual logo file composited
             onto the site's exact navy background (#16003B) — replaces

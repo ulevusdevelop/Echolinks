@@ -41,7 +41,14 @@ module.exports = {
         },
         accent: {
           DEFAULT: '#FF6100',   // brand guide orange
-          light: '#FF7B26',
+          // COLOR FIX (direct instruction: "Use this #ff6100 rather
+          // this #ff7a26"): was #FF7A26 (a prior round's correction
+          // from #B24300, which itself had fixed a one-hex-digit
+          // mismatch with --accent-light in styles/globals.css). Now
+          // matches --accent exactly, so `text-accent-light`/
+          // `border-accent-light`/etc. and every `var(--accent-light)`
+          // usage sitewide render the same orange as the DEFAULT.
+          light: '#FF6100',
           soft: 'rgba(255,97,0,0.14)',
         },
         ink_text: {

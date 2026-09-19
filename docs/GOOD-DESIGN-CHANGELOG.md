@@ -4450,3 +4450,528 @@ increased again on top of the previous round's bump.
 
 Verified: `./node_modules/.bin/tsc --noEmit` clean, full
 `./node_modules/.bin/next build` — 26 routes.
+
+## Round 33 — New /courses section, and the Lab's login gate actually restored
+
+**New `/courses` archive + detail pages** (direct request), built from
+two real screenshots supplied directly for this purpose: the live
+WordPress course archive ("Archives: Courses," 8 courses in a 3-column
+grid) and the single course page for "AI to Decentralized Intelligence
+and Traceability." New `lib/courses.ts` holds the data (8 courses,
+transcribed titles/excerpts/dates from the archive screenshot) and
+`components/CourseTile` renders each course's thumbnail as an original
+icon composition in this site's own strict 4-color brand palette
+(purple/orange/white/black), not a hotlink or recreation of the old
+site's stock course graphics — the same legal reasoning already applied
+once to Hero's photo collage (Round 5/6) applies here too.
+
+**Content honesty, same standard as every round in this file:** the
+reference screenshots include full body copy (meta info block, "Who
+this workshop is for," the two-industries narrative, "Why traceability
+matters," "The agenda," "Who's already doing this" with its 12-company
+list) for exactly one course. That course (`ai-to-decentralized-
+intelligence-and-traceability`) got a full, word-for-word transcribed
+detail page. The other 7 courses have no sourced full copy anywhere —
+rather than inventing curricula for them, their detail pages render
+their real excerpt/date only, plus a working "Talk to us about this
+course" path to `/contact`. Flagged in `lib/courses.ts`'s own header,
+same as this file flags every other unsourced gap.
+
+**`/courses` added to the header nav** (right after "Lab") and to the
+footer's MANAGED SERVICES column, plus a quick link on `/account` —
+otherwise the new page would have been unreachable except by typing the
+URL directly, the same class of bug Round 28's link audit exists to
+catch.
+
+**The Lab's login gate, actually restored (direct request):** "when
+the user tries to access [a simulation], they should be greeted with a
+login or register account first and only after that before they can be
+redirected to where they can access the simulation." Checked
+`RequireMembership` (the component already gating `/lab`) against that
+requirement and found `TESTING_BYPASS_ALL_GATES = true` still set from
+an earlier testing request — meaning `/lab`, including the real
+external Blockchain Foundations simulation link, was reachable by
+anyone with no login at all. Set back to `false`, restoring the real
+sign-in check.
+
+**Redirect-after-login added**, since a gate that dumps every visitor
+onto a generic `/account` page after signing in isn't actually "then
+redirected to where they can access the simulation." `RequireMembership`
+now sends its login link with `?redirect=<the page they wanted>`;
+`login.tsx` reads that param and pushes there on success instead of a
+hardcoded `/account` (validated to be an internal path only, so this
+can't become an open redirect via a crafted query string). The 4
+courses with a thematically related Lab simulation (EDI courses →
+"The Missing Orders," the scheduling course → "Schedule Recovery," the
+two AI/blockchain courses → "Blockchain Foundations") now carry a "Sign
+in to open the Lab" card that round-trips through this same flow —
+featuring the externally-hosted simulations on the course pages while
+keeping them behind the login/register gate, as asked.
+
+Verified: `npx tsc --noEmit` clean, full `npx next build` — 31 static
+pages generated (up from 26 before this round), including the new
+`/courses` index and its 8 `/courses/[slug]` detail pages. Confirmed
+directly in the build output that `/lab`'s prerendered HTML now
+contains only the gate's "Checking your access…" loading state, not
+the simulation cards themselves — the previous bypassed build had
+exposed "Get your lab pass" and "Blockchain Foundations" directly in
+the static HTML with no login required.
+
+## Round 34 — Courses wired to a real WordPress CPT + ACF, not just static data
+
+**`/courses` moves from static-only to WordPress-backed** (direct
+request: "connect it to my WordPress backend where there is
+MemberPress, ACF, CPT"). New `getCourses()` in `lib/service.ts` queries
+a `courses` WPGraphQL type (the same endpoint `getArticles()` already
+uses for Insights) with an ACF field group (`courseFields`) attached —
+full doc for the WordPress-side setup at
+`docs/COURSES-CPT-ACF-SETUP.md`, written in the same style as the
+existing `MEMBERPRESS-BACKEND-SETUP.md`. Both `pages/courses/index.tsx`
+and `pages/courses/[slug].tsx` now call it in `getStaticProps`, with
+`revalidate: 60` and `fallback: 'blocking'` on the detail page's paths
+— same ISR pattern `pages/insights` already established.
+
+**Fallback preserved, not replaced.** `lib/courses.ts`'s static array
+(renamed `fallbackCourses`) still exists and still renders whenever the
+WP fetch fails, the endpoint isn't configured yet, or the CPT is empty
+— `resolveCourses()` is the one shared function both pages call so
+they can never disagree about which list (real vs. fallback) is
+active, which would otherwise break prev/next navigation and direct
+slug lookups between the archive and detail pages. Confirmed in this
+round's build output: with no `NEXT_PUBLIC_WORDPRESS_API_ENDPOINT` set
+in this environment, the fetch fails as expected and both pages render
+correctly from the fallback data — the page was never at risk of going
+blank while the WordPress side gets set up.
+
+**Icons became a serialization fix, not just a refactor.** Course
+objects previously carried a real React component reference
+(`icon: ComponentType`) for their Heroicon, which worked only because
+the old static-only version never had to cross `getStaticProps`'s JSON
+props boundary — components aren't serializable (hit and fixed this
+exact error once already, in Round 33, by routing around real data
+fetching entirely). Real WP-sourced courses can't avoid that boundary,
+so `icon` became `iconKey` (a plain string, matched against the ACF
+select field's choices) with one shared `ICONS_BY_KEY` lookup in
+`lib/courses.ts` resolving it back to a component wherever it's
+rendered (`CourseTile`, the archive grid). This also let
+`pages/courses/[slug].tsx` go back to receiving the full `course`/
+`prev`/`next` objects as real props again, instead of the slug-only
+workaround from Round 33.
+
+**Render connector requested, not yet connected.** Per direct
+instruction, offered to connect Render directly (rather than handing
+over manual dashboard steps) so `NEXT_PUBLIC_WORDPRESS_API_ENDPOINT`
+can be set and the service redeployed from here once a real WordPress
+GraphQL URL exists — the connector needs to be authorized on the
+user's side first; nothing in this codebase depends on that happening
+before it's available.
+
+Verified: `npx tsc --noEmit` clean, full `npx next build` — 31 static
+pages, same route count as Round 33 (this round changed how `/courses`
+gets its data, not how many pages exist). Confirmed in the build log
+that `getCourses()` fails gracefully (the same `ERR_INVALID_URL`
+class of warning `getArticles()` already produces with no endpoint
+configured) and both course pages still render their full fallback
+content in the output HTML.
+
+## Round 35 — Client QA pass (`Echolink_Solutions_QA_TEST.pdf`), 13 items across Homepage, Layer, Services, Lab, Project Control, and Traceability
+
+Client sent a real itemized QA punch list after testing the live site.
+Every item below is a direct fix for something specifically flagged,
+not a general design pass — grouped by page in the same order the
+client's document uses.
+
+**Root cause found for "the titles in orange color look stretched"
+(Homepage #1, recurring on Layer, and found again sitewide while
+verifying the fix).** Syne, the sitewide font, has no real 900/Black
+weight — `lib/fonts.ts` only loads 400/500/600/700/800
+(Regular/Medium/SemiBold/Bold/ExtraBold; confirmed against
+`public/fonts/syne/`, which has exactly those five files). Every place
+still requesting `font-weight: 900` (or Tailwind's `font-black`) had
+no real 900 glyph to draw, so the browser synthesized ("faux-bold") a
+heavier weight by algorithmically distorting the 800 outline — that
+distortion is what reads as "stretched." Corrected every instance to
+800, the heaviest weight that's a real, undistorted glyph:
+`.eyebrow-plain`/`.eyebrow-plain--dark` and the shared `.btn` base
+class in `styles/globals.css`; inline `fontWeight: 900` in
+`components/Industries/index.tsx`, `components/Footer/index.tsx`
+(column headings), and `components/ThreeSteps/index.tsx` (the step
+labels); and `font-black` in `components/StatsBar/index.tsx` (found
+during the build-output re-check, not orange but the same missing-
+glyph distortion on large 4xl/5xl numbers).
+
+**Homepage #2 — training CTAs point at `/courses`.**
+`components/Training/index.tsx`'s "Talk about a cohort →" and "Train
+your team →" buttons both linked to `/training`; both now link to
+`/courses`, per the client's explicit interim direction (they noted
+they may confirm redirecting to the contact form instead later).
+
+**Homepage #3 — "TRAINING & SUPPORT" eyebrow typography.** This label
+(above "Tech Made Easy" in `components/Training/index.tsx`) was a
+bespoke `text-xs font-bold tracking-tag uppercase` span instead of the
+shared `.eyebrow-plain` class every other orange section-label uses —
+switched to it. Same fix applied to the Layer page's own hero eyebrow
+(`components/LayerIntro/index.tsx`, "THE VERIFIABLE INTEGRATION
+LAYER") and the Project Controls hero eyebrow
+(`components/ProjectControls/index.tsx`), which had the identical
+bespoke-span pattern.
+
+**Homepage #4 — footer CTA centering + a real email popup instead of
+`mailto:`.** The closing CTA (`components/Footer/index.tsx`) sat
+slightly low in the space between the footer's own top padding and
+the rule below it; nudged up with a small negative top margin rather
+than touching `.section--page`'s shared padding. The
+`mailto:info@echolinksolutions.com` button ("took me away from the
+website completely," per the client) is now a button that opens a new
+`components/EmailPopup/index.tsx` modal — a real form (first/last
+name, email, organization, message) posting to the same working
+`/api/contact` SMTP endpoint the full `/contact` page already uses, so
+visitors never leave the site.
+
+**Homepage #5 — footer nav columns float in on scroll.** The logo +
+link-columns row in `components/Footer/index.tsx` is now wrapped in
+`RevealOnScroll`, the same fly-in-from-the-bottom treatment used
+elsewhere on the site — previously the footer was the one section
+with no scroll motion at all.
+
+**Layer page #1 — same eyebrow-typography fix as Homepage #3** (see
+above).
+
+**Layer page #2 — hero-to-content gap closed, "+" icons bolded.**
+`components/LayerIntro/index.tsx`'s `pb-20` was stacking with the
+`Layer` section's own top padding right below it (130-180px of empty
+purple-on-purple space); reduced to `pb-10`. The "+"/"−" toggle icons
+next to each numbered keypoint (`components/Layer/index.tsx`) had no
+explicit font-weight (inheriting normal/400) — added `font-bold`.
+
+**Layer page #3 — removed the box that looked like a broken button.**
+"One layer ALL FIVE, ASSEMBLED INTO ONE VERIFIABLE WHOLE"
+(`components/WholeStack/index.tsx`) was a dark, shadowed, padded,
+rounded-none card (plus a negative-margin "bridge" straddling two
+sections) — exactly the shape of a clickable button. Removed the box
+treatment entirely; same copy, now plain text in the section's normal
+flow.
+
+**Layer page #4 — closing sentence aligned with the list, not centered
+under the whole section.** "If you run a system, a process, or an
+idea..." (`components/WhoWeServe/index.tsx`) now sits in the same
+`lg:grid-cols-[1fr_1.4fr]` column template as the row above it, under
+the segment list on the right, left-aligned within that column instead
+of centered across the full section width.
+
+**Services page #1 — hero standardized + double-padding fix.**
+`CoreServices` (`components/CoreServices/index.tsx`) is shared between
+`/services` (as the page's own hero) and `/layer` (as a subsection
+below `LayerIntro`, which already provides header clearance) — added
+an explicit 176px `padding-top` via inline style, applied only when
+`headingLevel === 'h1'` (the `/services` case), so the two usages don't
+fight over how much top clearance the section needs. Removed the now-
+redundant outer `pt-44` wrapper in `pages/services.tsx`.
+
+**Services page #2 — "DECENTRALIZED AI, SIZED FOR WHO YOU ARE" is
+orange now.** Was plain `.tag-mono` (its default muted-gray); added
+the `.tag-mono--accent` modifier, matching the precedent
+`components/WholeStack/index.tsx`'s "THE CATEGORY WE OWN" label
+already set for this exact role.
+
+**Services page #3 — "A selection of what we connect..." caption
+actually centers now.** Root cause: this paragraph (in
+`components/EverythingWeConnect/index.tsx`) had `text-center` but no
+explicit `max-w-*` class, so the sitewide `p { max-width: 68ch; }`
+line-length fallback (`styles/globals.css`) clipped its box while
+leaving that box flush against the left edge of `.wrap` — `text-center`
+only centered the words *inside* that narrow, left-stuck box. Added
+`max-w-2xl mx-auto` so the box itself centers before the text inside
+it does.
+
+**Services page #4 — mega-menu now closes itself on scroll.** The
+dropdown panel (`ServicesMegaMenu` in `components/Layout/index.tsx`)
+is `fixed`, so it used to stay anchored over the top of the page
+however far the visitor scrolled. Added `AutoCloseOnScroll`, a small
+component that closes the Headless UI `Popover` the moment the page
+scrolls while it's open.
+
+**Services page #5 — hovering into the preview panel no longer resets
+to "Core Services."** The `onMouseLeave` that reset the hovered
+category sat on the categories `<ul>` alone, so moving the cursor
+right onto the separate preview `<ul>` beside it fired the same "mouse
+left" event. Moved the handler up to the shared grid wrapping both
+columns, so it only fires when the cursor leaves the whole categories
++ preview area, not when it crosses from one column into the other.
+
+**Lab page #1 — hero standardized to match Insights/Layer/Project
+Controls.** The top of `pages/lab.tsx` was a centered `.sec-header`/
+`.sec-title`/`.sec-sub` block sharing a section with the lab-pass card
+and the grid; split into its own left-aligned pt-44/pb-20 dark hero,
+matching every other page-opening hero, with the card + grid moved
+into their own section below it.
+
+**Lab page #2 / How-it-works — "Start with one workflow" now scrolls
+to the animated section instead of leaving the page.** This button
+lives in `components/ThreeSteps/index.tsx` (rendered on
+`/how-it-works`, alongside the "Two ideas, drawn simply" animated
+diagram the client's screenshots for this item actually show) and
+linked to `/contact`; now a same-page anchor to `#see-it-clearly`
+(smooth-scroll is already set globally on `<html>`).
+
+**Lab page #3 / How-it-works — "BLOCKCHAIN"/"ANCHORED" no longer break
+mid-word, and the animation now highlights the right step.** In
+`components/TwoIdeas/index.tsx`'s `TopDiagram`, the caption box under
+the stacked cubes was `w-16` (64px) with `.tag-mono`'s
+`overflow-wrap: break-word` — too narrow for either word at this
+uppercase, letter-spaced size, so it split them ("BLOCKCH AIN",
+"ANCHOR ED"). Widened the box and added the existing
+`.tag-mono--nowrap` modifier. Separately, the three numbered captions
+below the diagram ("1 A system creates a data event," etc.) were each
+one animation stage late — the ball arriving at the Blockchain icon
+highlighted chip "2" instead of chip "3" ("It is anchored to the
+blockchain"). Shifted all three chips to match the stage of the icon
+each one actually names, so arriving at Blockchain now lights up "3,"
+exactly as asked. The Checkmark → "Now provable, forever" pairing was
+already correct.
+
+**Project Control page #1 — fixed the double-padding/overflow-looking
+top section.** `pages/project-controls.tsx` wrapped `<ProjectControls
+/>` in its own `pt-44` div on top of the `pt-44` the component's hero
+already has — ~350px of stacked top padding, which is what the
+client's screenshot shows as an overflow-like artifact. Removed the
+redundant wrapper; also switched the hero's bespoke eyebrow span to
+`.eyebrow-plain` (same fix as Homepage #3).
+
+**Traceability page #1 — same double-padding fix.**
+`pages/traceability.tsx` had the identical `pt-44`-wrapper-plus-its-
+own-hero-padding stacking bug (226-276px versus the standard 176px);
+removed the wrapper and added an explicit `!pt-44` directly to the
+hero section in `components/Traceability/index.tsx` instead (guards
+against source-order issues the plain wrapper div didn't have to worry
+about).
+
+**Traceability page #2 — industries grid and detail panel are now
+side-by-side.** Was a full-width 4-across card grid with the "active"
+detail panel stacked below it. Restructured into a two-column layout
+(`components/Traceability/index.tsx`): the 8 industry cards in a
+2-per-row grid on the left, the detail panel on the right (`lg:sticky`
+so it stays in view while scrolling the list), collapsing back to a
+single stacked column below the `lg` breakpoint — so clicking an
+industry shows its result beside the list instead of underneath it.
+
+Not touched, per the client's own framing: Lab page's "should this
+page start with the hero or the animation" question (item #2) was
+raised as an open question, not an instruction, so left as-is pending
+their decision. Insights page needed no changes — it was already the
+reference every other hero was standardized against.
+
+Verified: `npx tsc --noEmit` clean, full `npx next build` — all 31
+pages build successfully (`getCourses`/`getArticles` still fail
+gracefully with no WordPress endpoint configured, unchanged from
+Round 34, and unrelated to this round's changes).
+
+## Round 36 — Sitewide Syne-font root cause, footer/hero copy fixes, Traceability + Lab intros, mega-menu hover-close, and a full `#B24300` sweep
+
+Client sent a long list of specific text examples still not rendering
+in Syne (spread across Insights, CoreServices, ProjectControls,
+WholeStack, EverythingWeConnect, industry/lab cards, status tags, and
+more), plus five smaller targeted fixes. Rather than patch each quoted
+example individually, traced the font issue to its actual root cause
+first.
+
+**Root cause found for "not using the Syne font," affecting the large
+majority of the client's quoted examples at once.** `html, body {
+font-family: var(--font-syne), sans-serif !important; }` in
+`styles/globals.css` is the sitewide fallback every plain span/button/
+p relies on when it has no font override of its own. But
+`--font-syne` (defined by `syne.variable` in `lib/fonts.ts`) was only
+ever applied to `<main>` in `pages/_app.tsx` — a DOM descendant of
+`<body>`, not an ancestor. CSS custom properties only cascade
+downward, so `body`'s own rule could never actually resolve the
+variable it was referencing; it was silently falling through to the
+`sans-serif` fallback the whole time. Fixed by also applying
+`syne.variable` to `<Html>` itself in `pages/_document.tsx`, the true
+DOM root, so the variable is now defined above every element that
+depends on it. Confirmed via grep that zero components use an
+explicit `font-sans`/`font-mono`/`font-serif` override anywhere in the
+codebase, so this one fix — not dozens of per-component patches — is
+what resolves the "Read More" buttons, service card titles, metrics,
+status tags, industry/lab cards, "Solves for you" copy, the
+Centralized-vs-Decentralized AI rows, the WholeStack/EverythingWeConnect
+text, and every other plain-element example the client listed.
+
+**Footer — `CONTACT` column header now matches the other four.**
+`components/Footer/index.tsx` had `CONTACT` on `.tag-mono` (12px,
+muted gray) while `EXPLORE`/`MANAGED SERVICES`/`SEE IT`/`INDUSTRIES &
+RESOURCES` all use an explicit Syne/15px/800/white inline style.
+Matched `CONTACT` to the same explicit style instead of leaving it on
+a different shared class.
+
+**Homepage — "Aetna engagement delivered..." line now stays on one
+line.** `components/TrustedToBuildTrust/index.tsx`'s closing caption
+had no `max-w-*` class, so the sitewide `p { max-width: 68ch; }`
+line-length fallback clipped its box and forced an unwanted 2-line
+wrap. Added `max-w-none whitespace-nowrap`, the same pattern already
+used on Lab's own single-line caption.
+
+**Traceability page — added the missing intro section.** Every other
+inner page (Project Control, Services, etc.) opens with a standalone
+dark hero: eyebrow, h1, intro paragraph, down-arrow. Traceability's
+`components/Traceability/index.tsx` went straight into the photo/list
+grid with no equivalent section. Added one matching the established
+pattern (eyebrow "VERIFIABLE TRACEABILITY," h1 "Prove where anything
+came from," and a new intro paragraph — copy written for this fix, per
+direct request), and removed the now-duplicate eyebrow/h1 that had
+been sitting inside the grid section itself.
+
+**Lab page — intro section restored for logged-out visitors.** The
+Lab hero (eyebrow "ECHOLINK LABS," h1, intro paragraph, down-arrow)
+was nested *inside* `<RequireMembership>` in `pages/lab.tsx`.
+`RequireMembership` fully replaces its children with a bare "MEMBERS
+ONLY / Sign in to view this content" block for anyone not logged in
+(`components/RequireMembership/index.tsx`), so most visitors never saw
+the Lab page's intro at all. Moved the hero section outside/before the
+membership gate so it always renders, with only the pass-card and
+simulation grid below it still gated.
+
+**Top nav — Services dropdown font and hover-close behavior fixed.**
+Font was already covered by the root-cause fix above (the mega-menu
+had no explicit font override). Separately, the dropdown previously
+had no hover-to-close behavior at all — moving the cursor away left it
+open indefinitely. Added a debounced hover system in
+`components/Layout/index.tsx`'s `ServicesMegaMenu`: hovering the
+trigger opens the panel, and a 200ms-delayed close fires on
+`mouseleave` from either the trigger or the panel itself (cancelled if
+the cursor re-enters either one), so briefly crossing the gap between
+trigger and the `fixed`-positioned panel doesn't close it prematurely,
+but actually moving away does.
+
+**Sitewide — every `#B24300` replaced with `#FF7A26` (`var(--accent-
+light)`).** Client flagged a real color inconsistency: some accent
+text used the literal hex `#B24300` instead of the design token
+`var(--accent-light)` (`#FF7A26`). Found and fixed 5 instances in
+`styles/globals.css` (`.eyebrow--dark`, `.eyebrow-plain--dark`, `.card
+.tag-mono--accent:not(.btn)`, `.btn--ghost-dark:hover`,
+`.insight-content a`) and 6 more across
+`components/Layout/index.tsx`, `components/WhyDecentralized/index.tsx`
+(×3), `components/Insights/index.tsx` (×2), and
+`components/TrustBand/index.tsx`, all switched to `var(--accent-
+light)` or the `text-accent-light`/`!text-accent-light` Tailwind
+token. While auditing this, also found and fixed a real mismatch in
+`tailwind.config.js`: `accent.light` was `#FF7B26`, one hex digit off
+from `--accent-light: #FF7A26` in `globals.css` — corrected so
+`text-accent-light` and `var(--accent-light)` always agree. Left
+`components/Hero/index.tsx`'s `#B24300` untouched — it's a
+`mix-blend-color` photo-duotone tint, not text, and out of scope for a
+text-color fix.
+
+Verified: `npx tsc --noEmit` clean, full `npx next build` — all 31
+pages build successfully (`getCourses`/`getArticles` still fail
+gracefully with no WordPress endpoint configured, unrelated to this
+round's changes).
+
+## Round 37 — `--accent-light` changed from `#FF7A26` to `#FF6100`
+
+Direct instruction: "Use this #ff6100 rather this #ff7a26." Rather
+than hunt down individual usages, changed the two actual definitions
+that every other reference resolves from: `--accent-light` in
+`styles/globals.css` (was `#FF7A26`) and `accent.light` in
+`tailwind.config.js` (was `#FF7A26`, matching it) are now both
+`#FF6100` — the same value as `--accent`/`accent.DEFAULT`. Every
+`var(--accent-light)` and `text-accent-light`/`!text-accent-light`
+usage sitewide (the full set fixed in Round 36's `#B24300` sweep, plus
+every existing `--accent-light` reference before that) now renders
+`#FF6100` automatically, with no per-component edits needed. Left the
+in-code comments documenting Round 36's `#B24300` → `#FF7A26` fix
+as-is — they're an accurate record of that round, not live values.
+
+Verified: `npx tsc --noEmit` clean, full `npx next build` — all 31
+pages build successfully (`getCourses`/`getArticles` still fail
+gracefully with no WordPress endpoint configured, unrelated to this
+round's changes).
+
+## Round 38 — Membership gate opened again (testing bypass back on)
+
+Direct instruction: "For now I need users to be able to access every
+page even without login yet." `components/RequireMembership/index.tsx`
+already has a single `TESTING_BYPASS_ALL_GATES` flag built for exactly
+this — flipped it back to `true`, so `/lab`'s simulation content (the
+only page currently wrapped in `<RequireMembership>`) renders for
+everyone instead of showing the "Sign in to view this content" gate.
+No other page needed changes: `/account` still redirects to `/login`
+when logged out, left as-is since it's a personal account dashboard
+with nothing to show without a signed-in user, not gated content; the
+"Register Here"/"Sign in to open the Lab" links on `/courses/[slug]`
+are registration CTAs, not page gates, and were already visible to
+everyone. When real membership gating is wanted again, flip
+`TESTING_BYPASS_ALL_GATES` back to `false` — the actual sign-in/
+membership check code beneath the flag is untouched.
+
+Verified: `npx tsc --noEmit` clean, full `npx next build` — all 31
+pages build successfully (`getCourses`/`getArticles` still fail
+gracefully with no WordPress endpoint configured, unrelated to this
+round's changes).
+
+## Round 39 — Traceability page: rebalanced the photo + text row
+
+Direct feedback, with a screenshot of the section right under the
+Traceability hero: "make the image and text to the right look
+better." That block (`components/Traceability/index.tsx`) was
+`grid-cols-[auto_1fr]` with a small 230px photo and a text column with
+no `max-width` of its own — since the divider rule under each line of
+text is a full-width `border-b`, it stretched the entire 1fr grid
+track while the text wrapped far short of it, leaving a large empty
+gap to the right of every line, exactly what the screenshot showed.
+Rebalanced both sides: the photo column is now a fixed, larger 340×400
+(was an auto-sized 230×280) and picked up the same layered corner-
+square accent mark used on photo treatments elsewhere on the site
+(TrustBand, TrustedToBuildTrust), so it reads as a deliberately framed
+visual instead of a small, unexplained thumbnail; the text column is
+capped to `max-w-md`, so the divider rules now end where the text
+ends instead of running on into empty space; and the "click any
+industry" line was pulled out of the divided list into its own small
+bordered pill, so it reads as a call-to-action rather than a third,
+oddly short list row. Verified the result with a local screenshot
+before finalizing (picsum.photos itself isn't reachable from this
+sandbox's network, so the preview screenshot used a local placeholder
+texture in the photo's place — the actual `picsum.photos` URL, already
+used the same way elsewhere on the site, is unchanged in the delivered
+code and will load normally once deployed).
+
+Verified: `npx tsc --noEmit` clean, full `npx next build` — all 31
+pages build successfully (`getCourses`/`getArticles` still fail
+gracefully with no WordPress endpoint configured, unrelated to this
+round's changes).
+
+## Round 40 — Widened intro-hero paragraph text sitewide
+
+Direct feedback: "for the introductory sections of the pages... in the
+text widths such that it spans through a bit more width." Every
+page-opening hero built on the standard pattern (eyebrow, h1, intro
+paragraph, dark purple `pt-44 pb-20` background) had its paragraph
+capped noticeably narrower than the h1 sitting right above it — e.g.
+`components/ProjectControls/index.tsx`, `components/Traceability/
+index.tsx`, `pages/lab.tsx`, and `pages/insights/index.tsx` all had a
+`max-w-2xl` (672px) h1 over a `max-w-xl` (576px) paragraph, so the
+body text wrapped tighter than the heading rather than spanning to
+match it. Widened the paragraph to `max-w-2xl` in all four so both
+lines share the same right edge. `components/IndustryHero/index.tsx`
+(Healthcare/Transportation's hero) had the same mismatch at a smaller
+scale — `max-w-xl` h1 over `max-w-lg` description — matched the
+description up to `max-w-xl`. The three heroes that wrap their whole
+eyebrow/h1/paragraph in one shared container instead of sizing the
+heading and paragraph separately (`pages/services/facet-
+configurations.tsx`, `pages/services/erp-managed-services.tsx`,
+`pages/contact.tsx`) got that shared wrapper widened from `max-w-2xl`
+to `max-w-3xl` instead, so the whole hero grows together rather than
+introducing the same heading/paragraph mismatch just fixed everywhere
+else. Left `components/LayerIntro/index.tsx` as-is — it already uses
+`max-w-3xl`, wider than any of the others even after this round's
+changes. Pages with a page-opening hero but no body paragraph at all
+(`pages/white-papers.tsx`, `pages/services/edi-api-managed-
+services.tsx`, `pages/courses/index.tsx`) and centered
+account/membership/login dashboards needed no changes — there was no
+paragraph width to widen on the former, and the latter are short,
+deliberately centered forms rather than this left-aligned marketing
+pattern.
+
+Verified: `npx tsc --noEmit` clean, full `npx next build` — all 31
+pages build successfully (`getCourses`/`getArticles` still fail
+gracefully with no WordPress endpoint configured, unrelated to this
+round's changes).

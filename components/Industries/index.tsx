@@ -46,7 +46,11 @@ export const Industries = () => {
                   style={{
                     fontFamily: 'var(--font-syne), sans-serif',
                     fontSize: '21px',
-                    fontWeight: 900,
+                    // CLIENT QA FIX: Syne has no real 900 weight (max
+                    // loaded is 800/ExtraBold) — 900 was being faux-
+                    // bolded by the browser, causing the stretched
+                    // look the client flagged. Corrected to 800.
+                    fontWeight: 800,
                     textTransform: 'uppercase',
                     lineHeight: '49px',
                     color: '#FFFFFF',

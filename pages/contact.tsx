@@ -85,7 +85,11 @@ export default function ContactPage() {
       <section className="relative overflow-hidden pt-44 pb-24" style={{ background: '#16003B' }}>
         <span className="absolute bottom-10 right-32 w-6 h-6 bg-white hidden md:block" aria-hidden="true" />
         <span className="absolute bottom-0 right-16 w-14 h-14 hidden md:block" style={{ background: '#FF6100' }} aria-hidden="true" />
-        <div className="wrap max-w-2xl">
+        {/* WIDENED (direct feedback: "the intro sections... text
+            width... span through a bit more width") — same fix as the
+            other page-opening heroes: widened from max-w-2xl (672px)
+            to max-w-3xl (768px). */}
+        <div className="wrap max-w-3xl">
           <h1 className="text-white !font-bold text-4xl md:text-5xl mb-6">Let&apos;s Talk</h1>
           <p className="text-white/70 text-base leading-relaxed mb-4">
             Let&apos;s discuss what our expertise can do for you. Contact us to learn more

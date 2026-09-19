@@ -130,7 +130,7 @@ export const Insights = ({ posts }: InsightsProps) => {
                   <button
                     type="button"
                     onClick={() => setOpenIndex(null)}
-                    className="absolute top-6 right-6 text-[#16003B] hover:text-[#B24300] transition-colors"
+                    className="absolute top-6 right-6 text-[#16003B] hover:text-accent-light transition-colors"
                   >
                     <span className="sr-only">Close</span>
                     <XMarkIcon className="w-6 h-6" />
@@ -138,7 +138,7 @@ export const Insights = ({ posts }: InsightsProps) => {
 
                   {openPost && (
                     <>
-                      <span className="tag-mono !text-[#B24300] mb-4 inline-block">
+                      <span className="tag-mono !text-accent-light mb-4 inline-block">
                         {openPost.tag}
                       </span>
                       <Dialog.Title className="text-[#16003B] font-bold text-2xl md:text-3xl leading-tight mb-6 pr-8">

@@ -51,13 +51,24 @@ export const ProjectControls = () => {
       <section className="relative overflow-hidden pt-44 pb-20" style={{ background: '#16003B' }}>
         <div className="wrap">
         <RevealOnScroll>
-          <span className="text-xs font-bold tracking-tag uppercase block mb-4" style={{ color: '#FF6100' }}>
+          {/* CLIENT QA FIX (Project Control page #1 / sitewide hero
+              standardization): switched from a bespoke text-xs/font-
+              bold/tracking-tag span to the shared `.eyebrow-plain`
+              class every other page-opening hero (Insights, Layer,
+              etc.) actually uses. */}
+          <span className="eyebrow-plain">
             PROJECT SCHEDULING, CONTROLS & EVM
           </span>
           <h1 className="text-white !font-bold text-4xl md:text-5xl leading-tight mb-6 max-w-2xl">
             Know where the project really stands.
           </h1>
-          <p className="text-white text-[20px] font-normal leading-relaxed max-w-xl mb-10">
+          {/* WIDENED (direct feedback: "the intro sections... text
+              width... span through a bit more width") — was max-w-xl
+              (576px), noticeably narrower than the h1 right above it
+              (max-w-2xl, 672px), so the paragraph wrapped tighter than
+              the heading it sits under. Matched to max-w-2xl so both
+              lines now share the same right edge. */}
+          <p className="text-white text-[20px] font-normal leading-relaxed max-w-2xl mb-10">
             Schedules that hold up under scrutiny, cost and progress you can defend,
             and earned value that tells the truth. We build the schedule, run the
             controls, and wire the reporting to your live systems, so status is

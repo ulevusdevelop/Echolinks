@@ -148,7 +148,12 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
               Same approach as every client engagement. The class is the build, on real
               systems, with technical and business skills taught together.
             </p>
-            <Link href="/training" className="btn btn--ghost">
+            {/* CLIENT QA FIX (Homepage #2): "TALK ABOUT A COHORT" /
+                "TRAIN YOUR TEAM" should link to the new /courses page
+                instead of /training. Client noted they may want this
+                to go to a contact form instead — using /courses for
+                now per their stated interim direction. */}
+            <Link href="/courses" className="btn btn--ghost">
               Talk about a cohort →
             </Link>
           </div>
@@ -174,7 +179,7 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
             Integration gets you the capability. Training is what turns it into
             results. We deliver both, so your investment actually gets used.
           </p>
-          <Link href="/training" className="btn btn--primary">
+          <Link href="/courses" className="btn btn--primary">
             Train your team →
           </Link>
         </div>
@@ -230,7 +235,14 @@ export const Training = ({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }
         />
         <RevealOnScroll>
         <div className="wrap relative flex flex-col items-center justify-center text-center">
-          <span className="text-xs font-bold tracking-tag uppercase mb-3" style={{ color: '#FF6100' }}>
+          {/* CLIENT QA FIX (Homepage #3): "give the title in orange
+              color the right typography" — this eyebrow was a
+              bespoke text-xs/font-bold/tracking-tag span instead of
+              the sitewide `.eyebrow-plain` class every other orange
+              section-label (WHAT WE DO, HOW IT WORKS, TRAINING &
+              ENABLEMENT, etc.) actually uses. Switched to that shared
+              class so this one matches everywhere else on the site. */}
+          <span className="eyebrow-plain">
             TRAINING & SUPPORT
           </span>
           <h3 className="text-white font-bold text-3xl md:text-4xl mb-4">Tech Made Easy</h3>

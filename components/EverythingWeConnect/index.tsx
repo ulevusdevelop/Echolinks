@@ -98,7 +98,18 @@ export const EverythingWeConnect = () => {
         </div>
         </RevealOnScroll>
 
-        <p className="text-center mt-10 text-base" style={{ color: '#707070' }}>
+        {/* CLIENT QA FIX (Services page #3): "Keep the last sentence
+            here centered." This had `text-center` but no explicit
+            max-w-* class of its own, so the sitewide `p { max-width:
+            68ch; }` line-length fallback (globals.css) clipped its
+            box to ~68ch while leaving that box flush against the
+            left edge of `.wrap` (default block behavior, no
+            mx-auto) — text-center only centered the words *inside*
+            that narrow, left-stuck box, which read as left-aligned on
+            the page overall. Added max-w-2xl + mx-auto, same pattern
+            as the eyebrow/heading block above, so the box itself is
+            centered before the text inside it is. */}
+        <p className="text-center mt-10 text-base max-w-2xl mx-auto" style={{ color: '#707070' }}>
           A selection of what we connect, not the full list.
         </p>
       </div>

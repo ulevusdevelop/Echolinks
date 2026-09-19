@@ -33,7 +33,11 @@
   --border-default: rgba(102, 90, 125, 0.45);
 
   --accent: #FF6100;
-  --accent-light: #FF7A26;
+  /* COLOR FIX (direct instruction: "Use this #ff6100 rather this
+     #ff7a26"): was #FF7A26 (itself a correction from the earlier
+     #B24300 sweep). Every var(--accent-light) usage sitewide now
+     resolves to the same orange as --accent. */
+  --accent-light: #FF6100;
   --accent-soft: rgba(255, 96, 0, 0.14);
 
   --text-primary: #EAF1FA;
@@ -284,7 +288,11 @@ img { max-width: 100%; display: block; }
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #B24300;
+  /* COLOR FIX (direct instruction): was #B24300, a darker rust tone
+     that had drifted from the actual brand accent — every orange text
+     color sitewide should be #FF7A26 (var(--accent-light)), not this
+     one-off duplicate. */
+  color: var(--accent-light);
   background: rgba(255, 96, 0, 0.1);
   border: 1px solid rgba(255, 96, 0, 0.25);
   padding: 7px 16px;
@@ -315,16 +323,24 @@ img { max-width: 100%; display: block; }
    DECENTRALIZED AI AGENTS BY FUNCTION. Style them more like headings."
    These are the actual "section-introducing" labels the typography
    blueprint describes exactly (its "STEP ONE"-style example) — updated
-   to the exact spec: Syne (not monospace), 900 weight (not 700), 14px
-   desktop stepping to 13px at max-width 1024px (was a flat 13px with
-   no responsive step). */
+   to the exact spec: Syne (not monospace), 14px desktop stepping to
+   13px at max-width 1024px (was a flat 13px with no responsive step).
+   WEIGHT FIX (direct QA feedback: "the titles in orange color look
+   stretched"): this was 900, but the actual Syne font files loaded in
+   lib/fonts.ts only go up to 800 (ExtraBold) — Syne's family doesn't
+   have a 900/Black weight at all. Requesting 900 with no real 900
+   glyph forces the browser to synthesize ("faux-bold") an even heavier
+   weight by algorithmically distorting the 800 outline, which is
+   exactly what reads as "stretched" at this letter-spaced, uppercase
+   size. Capped at 800 — the heaviest weight that's actually a real,
+   undistorted glyph. */
 .eyebrow-plain {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   font-family: var(--font-syne), sans-serif !important;
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--accent-light);
@@ -340,10 +356,13 @@ img { max-width: 100%; display: block; }
   gap: 8px;
   font-family: var(--font-syne), sans-serif !important;
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #B24300;
+  /* COLOR FIX (direct instruction): was #B24300 — every orange text
+     color sitewide should be #FF7A26 (var(--accent-light)), same as
+     its `.eyebrow-plain` sibling right above. */
+  color: var(--accent-light);
   margin-bottom: 20px;
 }
 
@@ -501,7 +520,9 @@ h1.sec-title {
   color: #8A8A8A;
 }
 .card .tag-mono--accent:not(.btn) {
-  color: #B24300;
+  /* COLOR FIX (direct instruction): was #B24300 — should be #FF7A26
+     (var(--accent-light)), same as `.tag-mono--accent` itself. */
+  color: var(--accent-light);
 }
 .card .border-ink-border {
   border-color: rgba(22, 0, 59, 0.12) !important;
@@ -566,7 +587,15 @@ h1.sec-title {
      per variant are untouched; this only changes the font. */
   font-family: var(--font-syne), sans-serif;
   font-size: 14px;
-  font-weight: 900;
+  /* CLIENT QA FIX: "titles in orange color look stretched" — root cause
+     is that Syne has no real 900/Black weight (only up to 800/
+     ExtraBold is loaded, see lib/fonts.ts and public/fonts/syne/), so
+     requesting 900 forced the browser to synthesize ("faux-bold") a
+     heavier weight by algorithmically distorting the 800 outline,
+     which is what produced the stretched look on every button using
+     this base class. Corrected to 800, the heaviest real weight
+     available. */
+  font-weight: 800;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   padding: 11px 26px;
@@ -627,7 +656,9 @@ h1.sec-title {
 }
 .btn--ghost-dark:hover {
   border-color: var(--accent);
-  color: #B24300;
+  /* COLOR FIX (direct instruction): was #B24300 — should be #FF7A26
+     (var(--accent-light)). */
+  color: var(--accent-light);
 }
 
 /* Header CTA variant — confirmed by zooming into Good Design.pdf's
@@ -793,7 +824,9 @@ h1.sec-title {
   color: #16003B;
 }
 .insight-content a {
-  color: #B24300;
+  /* COLOR FIX (direct instruction): was #B24300 — should be #FF7A26
+     (var(--accent-light)). */
+  color: var(--accent-light);
   text-decoration: underline;
 }
 

@@ -136,10 +136,22 @@ export const WhoWeServe = () => {
       </div>
 
       {/* MISSING CLOSING LINE, restored — was absent entirely. */}
-      <p className="text-white text-base text-center mt-16 max-w-2xl mx-auto">
-        If you run a system, a process, or an idea, there is a version of this layer
-        sized for you.
-      </p>
+      {/* ALIGNMENT FIX (client QA, Layer page #4): "The last sentence
+          should be moved to the left side of the screen or aligned
+          with the list to the right." This was centered across the
+          full section width, floating with no relationship to
+          anything above it. Reused the same lg:grid-cols-[1fr_1.4fr]
+          column template as the row above, with an empty left cell,
+          so the sentence lines up under the segment list on the
+          right and left-aligns within that column instead of sitting
+          dead-center under the whole section. */}
+      <div className="wrap grid lg:grid-cols-[1fr_1.4fr] gap-12 lg:gap-20 mt-16">
+        <div aria-hidden="true" className="hidden lg:block" />
+        <p className="text-white text-base max-w-2xl">
+          If you run a system, a process, or an idea, there is a version of this layer
+          sized for you.
+        </p>
+      </div>
     </section>
   );
 };

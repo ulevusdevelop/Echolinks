@@ -44,7 +44,13 @@ export default function ErpManagedServicesPage() {
       </Head>
 
       <section className="relative overflow-hidden pt-44 pb-20" style={{ background: '#16003B' }}>
-        <div className="wrap max-w-2xl">
+        {/* WIDENED (direct feedback: "the intro sections... text
+            width... span through a bit more width") — this hero wraps
+            the eyebrow/h1/paragraph in one shared max-w, unlike the
+            other page-opening heroes' own h1+p pair; widened the whole
+            wrapper from max-w-2xl (672px) to max-w-3xl (768px) rather
+            than only the paragraph, so it stays consistent with itself. */}
+        <div className="wrap max-w-3xl">
           <span className="text-xs font-bold tracking-tag uppercase block mb-3" style={{ color: '#FF6100' }}>
             MANAGED SERVICES
           </span>

@@ -131,7 +131,11 @@ export const Layer = () => {
                   <div className="flex-1">
                     <div className="flex items-center justify-between gap-4">
                       <h4 className="text-white font-bold mb-1">{step.title}</h4>
-                      <span className="text-white/70 text-xl leading-none flex-shrink-0">
+                      {/* CLIENT QA FIX (Layer page #2): "could you bold
+                          the + sign next to the keypoints? Just so
+                          that people can see it well." Added font-bold
+                          — was inheriting the default (normal) weight. */}
+                      <span className="text-white/70 text-xl leading-none flex-shrink-0 font-bold">
                         {isOpen ? '−' : '+'}
                       </span>
                     </div>
